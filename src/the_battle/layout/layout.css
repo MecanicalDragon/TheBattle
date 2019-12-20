@@ -1,0 +1,24 @@
+html, body  {
+    height: 100%;
+    width: 100%;
+}
+
+.content {
+    min-height: calc(100vh - 76px - 59px);
+}
+
+:root {
+    --magenta-color: #e20074;
+}
+
+.magenta-bg {
+    background-color: var(--magenta-color);
+}
+
+.breadcrumb {
+    background-color: transparent;
+}
+
+.active {
+    color: var(--magenta-color)
+}
