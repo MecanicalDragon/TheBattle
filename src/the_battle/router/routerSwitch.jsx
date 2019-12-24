@@ -4,7 +4,7 @@ import * as routes from './routes';
 
 const LazyIndex = React.lazy(() => import( '@/component/index'));
 const LazyBattle = React.lazy(() => import( '@/component/battle'));
-// const LazyDenied = React.lazy(() => import( '@/component/denied'));
+const LazyManage = React.lazy(() => import( '@/component/manage'));
 // const LazyLoginPage = React.lazy(() => import( '@/component/login'));
 // const LazyFirstPage = React.lazy(() => import( '@/component/first'));
 // const LazySecondPage = React.lazy(() => import( '@/component/second'));
@@ -14,7 +14,7 @@ export default () => (
     <Switch>
         <Route exact path={routes.index()} component={LazyIndex}/>
         <Route exact path={routes.battle()} component={LazyBattle}/>
-        {/*<SecuredRouter exact path={routes.pageOne()} roles={[roles.user]} component={LazyFirstPage}/>*/}
+        <Route exact path={routes.manage()} component={LazyManage}/>
         {/*<SecuredRouter exact path={routes.pageTwo()} roles={[roles.user]} component={LazySecondPage}/>*/}
         {/*<SecuredRouter exact path={routes.pageThree()} roles={[roles.admin]} component={LazyThirdPage}/>*/}
         {/*<Route exact path={routes.login()} component={LazyLoginPage}/>*/}

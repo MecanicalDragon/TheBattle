@@ -16,4 +16,7 @@ class IndexController{
 
     @GetMapping("/battle")
     fun battle() = "index.html"
+
+    @GetMapping("/manage")
+    fun manage() = "index.html"
 }

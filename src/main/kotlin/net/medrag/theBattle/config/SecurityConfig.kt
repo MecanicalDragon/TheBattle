@@ -19,7 +19,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 class SecurityConfig : WebSecurityConfigurerAdapter() {
 
     override fun configure(http: HttpSecurity) {
-        http.cors()
+        http.cors().and().csrf().disable()
     }
 
     @Bean
@@ -30,6 +30,7 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
         config.addAllowedOrigin("*")
         config.addAllowedHeader("*")
         config.addAllowedMethod("*")
+        config.allowCredentials = true
         source.registerCorsConfiguration("/**", config)
         return source
     }

@@ -12,3 +12,11 @@ export async function getSquad() {
         }
     });
 }
+
+export async function getPool() {
+    return fetch(appApi + 'squad/getPool').then(function (response) {
+        return response.json();
+    }).then(resp => {
+        return resp;
+    });
+}

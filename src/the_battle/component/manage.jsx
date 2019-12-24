@@ -8,18 +8,26 @@ import {
     Col
 } from 'reactstrap'
 import {setNavPosition} from "@/constants/actions";
-import {Battle} from "@/constants/paths";
+import {Manage} from "@/constants/paths";
 import MySquad from "@/component/MySquad";
 import * as SquadService from '@/service/SquadService'
+import {getPlayerName} from '@/service/PlayerService'
 import {FormattedMessage} from 'react-intl';
 
-class BattleComp extends Component {
+class ManageComp extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {};
-        this.props.dispatch(setNavPosition(Battle));
-        SquadService.getSquad().then(resp => this.setState({squad: resp}));
+        this.state = {
+            playerName: getPlayerName(),
+            squad: []
+        };
+        this.props.dispatch(setNavPosition(Manage));
+    }
+
+    componentDidMount() {
+        SquadService.getPool().then(resp => this.setState({squad: resp}));
+        console.log(this.state.squad);
     }
 
     render() {
@@ -27,7 +35,7 @@ class BattleComp extends Component {
         return (
             <Container>
                 <Jumbotron>
-                        <MySquad squad={squad}/>
+                    <MySquad squad={squad}/>
                     <Row>
                         <Col>
                             <Button style={{marginTop: "20px"}} onClick={() => {
@@ -41,4 +49,4 @@ class BattleComp extends Component {
     }
 }
 
-export default connect()(BattleComp);
+export default connect()(ManageComp);

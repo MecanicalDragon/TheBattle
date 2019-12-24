@@ -2,7 +2,7 @@ import * as routes from '@/router/routes'
 
 export const Home = "Home";
 export const Battle = "Battle";
-// export const pageTwo = "Page Two";
+export const Manage = "Manage";
 // export const pageThree = "Page Three";
 // export const Login = "Login";
 // export const Denied = "Denied";
@@ -18,11 +18,11 @@ paths[Battle] = {
     pathElements: [Home],
     link: routes.battle()
 };
-// paths[pageTwo] =  {
-//     formattedId: "app.breadcrump.pageTwo",
-//     pathElements: [Home],
-//     link: routes.pageTwo()
-// };
+paths[Manage] =  {
+    formattedId: "app.breadcrump.manage",
+    pathElements: [Home],
+    link: routes.manage()
+};
 // paths[pageThree] =  {
 //     formattedId: "app.breadcrump.pageThree",
 //     pathElements: [Home, pageTwo],

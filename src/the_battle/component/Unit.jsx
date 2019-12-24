@@ -10,7 +10,7 @@ import {
 import * as routes from '@/router/routes'
 import {setNavPosition} from "@/constants/actions";
 import {Battle} from "@/constants/paths";
-import * as BattleService from '../service/BattleService'
+import * as SquadService from '../service/SquadService'
 import {FormattedMessage} from 'react-intl';
 
 function Unit(props) {
