@@ -48,7 +48,7 @@ export function isPlayerLoggedIn() {
     let auth = store.getState().auth;
     console.log("is user logged in?");
     console.log(auth);
-    return auth.auth !== null;
+    return auth !== null && auth.auth !== null;
 }
 
 export function getPlayerName() {
@@ -130,4 +130,5 @@ export async function create(name) {
             }
         });
     }
+    return null;
 }

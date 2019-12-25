@@ -78,7 +78,6 @@ module.exports = {
         new CleanWebpackPlugin(),
         new webpack.DefinePlugin({
             'process.env': {ASSET_PATH: JSON.stringify(publicPath)},
-            SOME_VARIABLE: JSON.stringify('Caesar'),
             DEPLOYED_URL: JSON.stringify('http://localhost:9191/'),
         }),
         new MiniCssExtractPlugin({

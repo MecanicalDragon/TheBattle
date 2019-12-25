@@ -1,5 +1,6 @@
 package net.medrag.theBattle.controller
 
+import net.medrag.theBattle.model.LOGGED_OUT
 import net.medrag.theBattle.model.PLAYER_SESSION
 import net.medrag.theBattle.model.ValidationException
 import net.medrag.theBattle.model.entities.Player
@@ -23,8 +24,6 @@ class AuthController(@Autowired private val playerService: PlayerService) {
         val player = playerService.getPlayerByName(name)
         val session = request.getSession(true)
         session.setAttribute(PLAYER_SESSION, player.name)
-        println(session.getAttribute(PLAYER_SESSION))
-        println("log")
         ResponseEntity.ok(player)
     } catch (e: ValidationException) {
         ResponseEntity.status(204).build<Player>()
@@ -42,8 +41,7 @@ class AuthController(@Autowired private val playerService: PlayerService) {
 
     @PostMapping("/logout")
     fun logout(request: HttpServletRequest): ResponseEntity<String> {
-        request.session.invalidate()
-        return ResponseEntity.ok("LOGGED_OUT")
+        request.getSession(false).invalidate()
+        return ResponseEntity.ok(LOGGED_OUT)
     }
-
 }
