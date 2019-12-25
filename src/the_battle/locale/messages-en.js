@@ -16,6 +16,10 @@ export default {
 
     'app.input.name': 'Input your name',
     'app.input.login.bad': 'No such player',
-    'app.input.login.success': 'Successful logging. Welcome back!'
+    'app.input.login.success': 'Successful logging. Welcome back!',
+
+    // Manage page
+    'app.manage.pool.header': 'Heroes pool',
+    'app.manage.squad.type': 'Squad type:',
 
 }

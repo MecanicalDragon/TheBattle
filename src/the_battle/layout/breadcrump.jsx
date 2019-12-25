@@ -21,7 +21,7 @@ class BreadCrump extends React.Component {
 
         return (
             <Container style={{paddingTop: "6px", paddingBottom: 0}}>
-                <ol className="breadcrumb">
+                <ol className="breadcrumb" style={{marginBottom : 0}}>
                     {
                         pathElements.map((e, index) => {
                             const prevElement = paths[e];

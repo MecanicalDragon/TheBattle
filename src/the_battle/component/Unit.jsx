@@ -1,28 +1,24 @@
 import React, {Component} from 'react';
-import {connect} from 'react-redux';
-import {
-    Container,
-    Jumbotron,
-    Button,
-    Row,
-    Col
-} from 'reactstrap'
-import * as routes from '@/router/routes'
-import {setNavPosition} from "@/constants/actions";
-import {Battle} from "@/constants/paths";
-import * as SquadService from '../service/SquadService'
-import {FormattedMessage} from 'react-intl';
 
-function Unit(props) {
-    const {characteristics, row, setDescr} = props;
+export function Unit(props) {
+    const {characteristics, descrFunc} = props;
     return (
-        <Row>
-            <Col style={row === 0 ? {marginLeft: "50px"} : {}} className={"unitLogo"}
-                 onMouseOver={() => setDescr(characteristics)}>
-                {characteristics ? characteristics.name : "pending..."}
-            </Col>
-        </Row>
+        <div className={"unitLogo" + getBorderColor(characteristics.name)}
+             onMouseOver={() => descrFunc(characteristics)}>
+            {characteristics.name}
+        </div>
     )
 }
 
-export {Unit}
+function getBorderColor(type) {
+    switch (type) {
+        case "Warrior":
+            return " warriorLogo";
+        case "Mage":
+            return " mageLogo";
+        case "Archer":
+            return " archerLogo";
+        default:
+            return null
+    }
+}

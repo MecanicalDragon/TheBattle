@@ -17,38 +17,47 @@ export default class MySquad extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            descr: ""
+            type: this.props.type
         }
     }
 
-     setDescription = (text) => {
-        let string = JSON.stringify(text).split(",").join("\n").replace("{", "")
-            .replace("}", "").split("\"").join(" ").replace("name", "class");
-        this.setState({descr: string});
-    };
+    componentDidUpdate(prevProps) {
+        if (this.props.type !== prevProps.type) {
+            this.setState({type: this.props.type});
+        }
+    }
 
     render() {
-        let {squad} = this.props;
-        let {descr} = this.state;
+        let smallRow = this.getSmallRow();
+        let longRow = this.getLongRow();
         return (
-            <Row>
-                <Col xs={"auto"}>
-                <textarea id={"mySquadStats"} value={descr} style={{width: "150px", height: "200px", resize: "none"}}
-                          readOnly={true}/>
-                </Col>
-                <Col xs={"auto"}>
-                    <Unit characteristics={squad ? squad.pos1 : null} setDescr={this.setDescription}
-                          row={squad ? squad.type === "FORCED_FRONT" ? 0 : 1 : null}/>
-                    <Unit characteristics={squad ? squad.pos2 : null} setDescr={this.setDescription}
-                          row={squad ? squad.type === "FORCED_FRONT" ? 1 : 0 : null}/>
-                    <Unit characteristics={squad ? squad.pos3 : null} setDescr={this.setDescription}
-                          row={squad ? squad.type === "FORCED_FRONT" ? 0 : 1 : null}/>
-                    <Unit characteristics={squad ? squad.pos4 : null} setDescr={this.setDescription}
-                          row={squad ? squad.type === "FORCED_FRONT" ? 1 : 0 : null}/>
-                    <Unit characteristics={squad ? squad.pos5 : null} setDescr={this.setDescription}
-                          row={squad ? squad.type === "FORCED_FRONT" ? 0 : 1 : null}/>
-                </Col>
+            <Row style={{marginLeft: 10, marginRight: 10}}>
+                <div>
+                    {this.state.type === 1 ? smallRow : longRow}
+                </div>
+                <div>
+                    {this.state.type === 2 ? smallRow : longRow}
+                </div>
             </Row>
+        )
+    }
+
+    getSmallRow() {
+        return (
+            <Fragment>
+                <div className={"unitPlace smallRow"}>empty</div>
+                <div className={"unitPlace smallRow"}>empty</div>
+            </Fragment>
+        )
+    }
+
+    getLongRow() {
+        return (
+            <Fragment>
+                <div className={"unitPlace"}>empty</div>
+                <div className={"unitPlace"}>empty</div>
+                <div className={"unitPlace"}>empty</div>
+            </Fragment>
         )
     }
 }

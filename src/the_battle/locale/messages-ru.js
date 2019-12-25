@@ -16,6 +16,10 @@ export default {
 
     'app.input.name': 'Введите своё имя',
     'app.input.login.bad': 'Нет такого игрока',
-    'app.input.login.success': 'Загрузка прошла успешно. Добро пожаловать!'
+    'app.input.login.success': 'Загрузка прошла успешно. Добро пожаловать!',
+
+    // Manage page
+    'app.manage.pool.header': 'Резерв героев',
+    'app.manage.squad.type': 'Тип отряда:',
 
 }
