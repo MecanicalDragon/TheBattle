@@ -26,8 +26,8 @@ class BreadCrump extends React.Component {
                         pathElements.map((e, index) => {
                             const prevElement = paths[e];
                             return (
-                                <Fragment>
-                                    <li key={index}><a href="#" onClick={
+                                <Fragment key={index}>
+                                    <li><a href="#" onClick={
                                         (event) => {
                                             event.preventDefault();
                                             this.props.history.push(prevElement.link,
@@ -35,7 +35,7 @@ class BreadCrump extends React.Component {
                                         }
                                     }><FormattedMessage id={prevElement.formattedId}/></a></li>
                                     {
-                                        index === pathElements.length ? null : " > "
+                                        index === pathElements.length ? null : ">"
                                     }
                                 </Fragment>
                             )

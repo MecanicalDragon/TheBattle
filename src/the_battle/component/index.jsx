@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component, Fragment} from 'react';
 import {connect} from 'react-redux';
 import {
     Container,
@@ -22,7 +22,9 @@ class Index extends Component {
         this.state = {
             enterName: "",
             playerName: "",
-            authenticated: false
+            authenticated: false,
+            wins: 0,
+            gamesTotal: 0
         };
         this.handleChange = this.handleChange.bind(this)
     }
@@ -40,9 +42,9 @@ class Index extends Component {
                 <Jumbotron>
                     <h1 id={"theBattle"}><FormattedMessage id={'app.index.header'}/></h1>
                     {this.state.authenticated ? this.getPlayerForm() : this.getLoginForm()}
-                    <Button id={"start"} color={"primary"} onClick={() => {
-                        this.props.history.push(routes.battle())
-                    }}><FormattedMessage id={'app.index.start'}/></Button>
+                    {/*<Button id={"start"} color={"primary"} onClick={() => {*/}
+                    {/*    this.props.history.push(routes.battle())*/}
+                    {/*}}><FormattedMessage id={'app.index.start'}/></Button>*/}
                 </Jumbotron>
             </Container>
         )
@@ -51,11 +53,15 @@ class Index extends Component {
     getPlayerForm() {
         let {playerName} = this.state;
         return (
-            <Row>
+            <Fragment>
                 <h2 style={{marginLeft: 20}}>{playerName}</h2>
+                <span>Games: </span><span>{this.state.gamesTotal}</span>
+                <br/>
+                <span>Wins: </span><span>{this.state.wins}</span>
+                <br/>
                 <Button color={"info"} onClick={() => this.props.history.push(routes.manage())}>Manage squad</Button>
                 <Button onClick={() => this.logout()}>Logout</Button>
-            </Row>
+            </Fragment>
         )
     }
 
@@ -89,7 +95,7 @@ class Index extends Component {
             if (resp !== null) {
                 console.log("Logged in:");
                 console.log(resp);
-                this.setState({playerName: resp.name, authenticated: true})
+                this.setState({wins: resp.wins, gamesTotal: resp.games, playerName: resp.name, authenticated: true})
             }
         });
     }

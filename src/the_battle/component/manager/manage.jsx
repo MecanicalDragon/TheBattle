@@ -13,7 +13,7 @@ import {Manage} from "@/constants/paths";
 import MySquad from "@/component/MySquad";
 import * as SquadService from '@/service/SquadService'
 import {getPlayerName} from '@/service/PlayerService'
-import Pool from "@/component/Pool";
+import Pool from "@/component/manager/Pool";
 import {FormattedMessage} from 'react-intl';
 
 class ManageComp extends Component {
@@ -23,19 +23,33 @@ class ManageComp extends Component {
         this.state = {
             playerName: getPlayerName(),
             descr: "",
-            squad: [],
+            pool: [],
             sqType: 1
         };
         this.props.dispatch(setNavPosition(Manage));
     }
 
     componentDidMount() {
-        SquadService.getPool().then(resp => this.setState({squad: resp}));
+        //TODO: TODO_SECURITY: requestParam 'name' should be removed in release
+        SquadService.getPool(this.state.playerName).then(resp => {
+            this.setState({pool: resp})
+        });
     }
 
+    addNewHero = (name, type) => {
+        SquadService.addNewHero(this.state.playerName, name, type).then(
+            resp => {
+                if (resp !== null) {
+                    this.setState((prevState) => prevState.pool.push(resp));
+                }
+            }
+        )
+    };
+
     setDescription = (text) => {
-        let string = JSON.stringify(text).split(",").join("\n").replace("{", "")
-            .replace("}", "").split("\"").join(" ").replace("name", "class");
+        let type = JSON.stringify(text.type).split(",").slice(0, 8).join("\n")
+            .replace("{", "").replace("}", "").split("\"").join(" ");
+        let string = "Name: " + text.name.concat("\n").concat("Level: ").concat(text.level).concat("\n").concat(type).concat("\n");
         this.setState({descr: string});
     };
 
@@ -43,7 +57,7 @@ class ManageComp extends Component {
         return (
             <Container>
                 <Jumbotron style={{paddingTop: 30}}>
-                    <Pool descrFunc={this.setDescription}/>
+                    <Pool pool={this.state.pool} descrFunc={this.setDescription} addNewHero={this.addNewHero}/>
                     <h5><FormattedMessage id={"app.manage.squad.type"}/></h5>
                     <Row style={{marginBottom: 15}}>
                         <ButtonGroup>
@@ -58,7 +72,7 @@ class ManageComp extends Component {
                     <Row>
                         <Col xs={"auto"}>
                             <textarea id={"mySquadStats"} value={this.state.descr} readOnly={true}
-                                      style={{width: "150px", height: "200px", resize: "none"}}/>
+                                      style={{width: "200px", height: "275px", resize: "none"}}/>
                         </Col>
                         <MySquad type={this.state.sqType}/>
                     </Row>

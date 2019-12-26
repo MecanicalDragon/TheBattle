@@ -21,5 +21,7 @@ export default {
     // Manage page
     'app.manage.pool.header': 'Heroes pool',
     'app.manage.squad.type': 'Squad type:',
+    'app.manage.squad.add': 'Add new',
+    'app.manage.squad.inout.name.for.new': 'Input a name for your new ',
 
 }

@@ -1,5 +1,6 @@
 package net.medrag.theBattle.model.entities
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import javax.persistence.*
 
 
@@ -12,10 +13,17 @@ import javax.persistence.*
 data class Player(
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
-        val id: Int?,
+        val id: Long?,
 
         @Column(name = "name", nullable = false, unique = true)
         val name: String,
 
-        @ElementCollection
-        val pool: List<String>?)
+        @Column(name = "games", nullable = false)
+        var games: Int = 0,
+
+        @Column(name = "wins", nullable = false)
+        var wins: Int = 0,
+
+        @JsonIgnore
+        @OneToMany(mappedBy = "player")
+        var pool: List<UnitEntity> = ArrayList())

@@ -1,5 +1,4 @@
 import React, {Component, Fragment} from 'react';
-import {connect} from 'react-redux';
 import {
     Container,
     Jumbotron,
@@ -7,25 +6,23 @@ import {
     Row,
     Col
 } from 'reactstrap'
-import * as routes from '@/router/routes'
-import {setNavPosition} from "@/constants/actions";
-import {Unit} from "./Unit";
-import * as SquadService from '../service/SquadService'
+import {Unit} from "../Unit";
 import {FormattedMessage} from 'react-intl';
+import AddNew from './addNew';
 
+//TODO: new dropdown here https://reactstrap.github.io/components/dropdowns/
 export default class Pool extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            pool: []
+            pool: this.props.Pool || []
         };
     }
 
-    componentDidMount() {
-        SquadService.getPool().then(resp => {
-            console.log(resp)
-            this.setState({pool: resp})
-        });
+    componentDidUpdate(prevProps) {
+        if (this.props.pool !== prevProps.pool) {
+            this.setState({pool: this.props.pool});
+        }
     }
 
     render() {
@@ -33,7 +30,7 @@ export default class Pool extends Component {
         return (
             <Fragment>
                 <h2><FormattedMessage id={"app.manage.pool.header"}/></h2>
-                <Row style={{marginBottom: 15}}>
+                <Row style={{marginBottom: 15, marginLeft: -3}}>
                     {
                         pool.map((unit, index) => {
                             return (
@@ -41,6 +38,7 @@ export default class Pool extends Component {
                             )
                         })
                     }
+                    <AddNew addNewHero={this.props.addNewHero}/>
                 </Row>
             </Fragment>
         )

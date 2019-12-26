@@ -3,20 +3,22 @@ import React, {Component} from 'react';
 export function Unit(props) {
     const {characteristics, descrFunc} = props;
     return (
-        <div className={"unitLogo" + getBorderColor(characteristics.name)}
+        <div className={"unitLogo" + getBorderColor(characteristics.type.type)}
              onMouseOver={() => descrFunc(characteristics)}>
-            {characteristics.name}
+            {characteristics.name}<br/>
+            {characteristics.type.type}<br/>
+            level {characteristics.level}
         </div>
     )
 }
 
 function getBorderColor(type) {
     switch (type) {
-        case "Warrior":
+        case "FIGHTER":
             return " warriorLogo";
-        case "Mage":
+        case "SAGE":
             return " mageLogo";
-        case "Archer":
+        case "RANGER":
             return " archerLogo";
         default:
             return null

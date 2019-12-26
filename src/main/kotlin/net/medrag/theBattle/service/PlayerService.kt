@@ -14,12 +14,13 @@ import org.springframework.stereotype.Service
 @Service
 class PlayerService(@Autowired private val playerRepo: PlayerRepo) {
 
-    fun getPlayerByName(name: String): Player = playerRepo.findByName(name) ?: throw ValidationException("no such player")
+    fun getPlayerByName(name: String): Player = playerRepo.findByName(name)
+            ?: throw ValidationException("no such player")
 
     fun createPlayer(name: String): String {
         println(name)
         if (name.length == name.trim().length && name.matches(regex.toRegex())) {
-            val player = Player(null, name, null)
+            val player = Player(null, name)
             try {
                 playerRepo.save(player)
             } catch (e: Exception) {

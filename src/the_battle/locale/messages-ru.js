@@ -21,5 +21,7 @@ export default {
     // Manage page
     'app.manage.pool.header': 'Резерв героев',
     'app.manage.squad.type': 'Тип отряда:',
+    'app.manage.squad.add': 'Добавить',
+    'app.manage.squad.inout.name.for.new': 'Введите имя для нового ',
 
 }
