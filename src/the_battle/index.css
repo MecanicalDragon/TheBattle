@@ -39,3 +39,16 @@
     position: relative;
     top: 45px;
 }
+
+/*dnd*/
+.dragHeroPool {
+    background-color: azure;
+    border-color: aqua;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 15px;
+    width: 180px;
+    height: 300px;
+    text-align: center;
+    align-content: center;
+}

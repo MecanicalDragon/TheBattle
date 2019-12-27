@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React from 'react';
 
 export function Unit(props) {
     const {characteristics, descrFunc} = props;
