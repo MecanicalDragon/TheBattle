@@ -1,21 +1,20 @@
 import React, {Component, Fragment} from 'react';
-import {
-    Container,
-    Jumbotron,
-    Button,
-    Row,
-    Col
-} from 'reactstrap'
 import {Unit} from "../Unit";
 import {FormattedMessage} from 'react-intl';
 import AddNew from './addNew';
+import {Droppable} from "react-beautiful-dnd";
+import styled from "styled-components";
 
-//TODO: new dropdown here https://reactstrap.github.io/components/dropdowns/
+const Reserve = styled.div`
+    display: flex;
+`;
+
 export default class Pool extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            pool: this.props.Pool || []
+            pool: this.props.pool,
+            reserved: this.props.reserved
         };
     }
 
@@ -23,23 +22,34 @@ export default class Pool extends Component {
         if (this.props.pool !== prevProps.pool) {
             this.setState({pool: this.props.pool});
         }
+        if (this.props.reserved !== prevProps.reserved) {
+            this.setState({reserved: this.props.reserved});
+        }
     }
 
     render() {
-        let {pool} = this.state;
+        let {pool, reserved} = this.state;
         return (
             <Fragment>
                 <h2><FormattedMessage id={"app.manage.pool.header"}/></h2>
-                <Row style={{marginBottom: 15, marginLeft: -3}}>
-                    {
-                        pool.map((unit, index) => {
-                            return (
-                                <Unit key={index} characteristics={unit} descrFunc={this.props.descrFunc}/>
-                            )
-                        })
-                    }
-                    <AddNew addNewHero={this.props.addNewHero}/>
-                </Row>
+                <Droppable droppableId={"reserve"} direction={"horizontal"}>
+                    {(provided, snapshot) => (
+                        <Reserve ref={provided.innerRef}
+                                 style={snapshot.isDraggingOver ? {backgroundColor: "skyblue"} : {backgroundColor: "azure"}}
+                                 {...provided.droppableProps}>
+                            {
+                                reserved.map((unit, index) => {
+                                    return (
+                                        <Unit key={unit} characteristics={pool.get(unit)}
+                                              descrFunc={this.props.descrFunc} index={index}/>
+                                    )
+                                })
+                            }
+                            {provided.placeholder}
+                            <AddNew addNewHero={this.props.addNewHero}/>
+                        </Reserve>
+                    )}
+                </Droppable>
             </Fragment>
         )
     }

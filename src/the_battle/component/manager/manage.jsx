@@ -24,10 +24,16 @@ class ManageComp extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            ...initialData,
+            // ...initialData,
             playerName: getPlayerName(),
             descr: "",
-            pool: [],
+            pool: {},
+            columns: {
+                'reserve': {
+                    id: 'reserve',
+                    heroes: []
+                }
+            },
             sqType: 1
         };
         this.props.dispatch(setNavPosition(Manage));
@@ -36,7 +42,19 @@ class ManageComp extends Component {
     componentDidMount() {
         //TODO: TODO_SECURITY: requestParam 'name' should be removed in release
         SquadService.getPool(this.state.playerName).then(resp => {
-            this.setState({pool: resp})
+            let inReserve = [];
+            for (let i of resp) {
+                inReserve.push(i[0]);
+            }
+            this.setState({
+                pool: resp, columns: {
+                    ...this.state.columns,
+                    "reserve": {
+                        id: 'reserve',
+                        heroes: inReserve
+                    }
+                }
+            });
         });
     }
 
@@ -44,7 +62,16 @@ class ManageComp extends Component {
         SquadService.addNewHero(this.state.playerName, name, type).then(
             resp => {
                 if (resp !== null) {
-                    this.setState((prevState) => prevState.pool.push(resp));
+                    let updCol = this.state.columns["reserve"];
+                    updCol.heroes.push(resp.id);
+                    this.setState({
+                        pool: {
+                            ...this.state.pool, [resp.id]: resp
+                        },
+                        columns: {
+                            ...this.state.columns, ["reserve"]: updCol
+                        }
+                    });
                 }
             }
         )
@@ -74,8 +101,6 @@ class ManageComp extends Component {
 
         const start = this.state.columns[source.droppableId];
         const finish = this.state.columns[destination.droppableId];
-        console.log(start)
-        console.log(finish)
 
         if (start === finish) {
             const newIds = Array.from(start.heroes);
@@ -124,28 +149,29 @@ class ManageComp extends Component {
                 <Jumbotron style={{paddingTop: 30}}>
                     <DragDropContext onDragEnd={this.onDragEnd}>
 
-                    {/*<Pool pool={this.state.pool} descrFunc={this.setDescription} addNewHero={this.addNewHero}/>*/}
-                    {/*<h5><FormattedMessage id={"app.manage.squad.type"}/></h5>*/}
-                    {/*<Row style={{marginBottom: 15}}>*/}
-                    {/*    <ButtonGroup>*/}
-                    {/*        <Button color={this.state.sqType === 2 ? "success" : "warning"}*/}
-                    {/*                onClick={() => this.setState({sqType: 2})} active={this.state.sqType === 2}>FORCED*/}
-                    {/*            BACK</Button>*/}
-                    {/*        <Button color={this.state.sqType === 1 ? "success" : "warning"}*/}
-                    {/*                onClick={() => this.setState({sqType: 1})} active={this.state.sqType === 1}>FORCED*/}
-                    {/*            FRONT</Button>*/}
-                    {/*    </ButtonGroup>*/}
-                    {/*</Row>*/}
-                    {/*<Row>*/}
-                    {/*    <Col xs={"auto"}>*/}
-                    {/*        <textarea id={"mySquadStats"} value={this.state.descr} readOnly={true}*/}
-                    {/*                  style={{width: "200px", height: "275px", resize: "none"}}/>*/}
-                    {/*    </Col>*/}
-                    {/*    <MySquad type={this.state.sqType}/>*/}
-                    {/*</Row>*/}
-                    <Row>
-                        <Dnd dco={this.state.columnOrder} dc={this.state.columns} dh={this.state.heroes}/>
-                    </Row>
+                        <Pool reserved={this.state.columns.reserve.heroes} pool={this.state.pool}
+                              descrFunc={this.setDescription} addNewHero={this.addNewHero}/>
+                        <h5><FormattedMessage id={"app.manage.squad.type"}/></h5>
+                        <Row style={{marginBottom: 15}}>
+                            <ButtonGroup>
+                                <Button color={this.state.sqType === 2 ? "success" : "warning"}
+                                        onClick={() => this.setState({sqType: 2})} active={this.state.sqType === 2}>FORCED
+                                    BACK</Button>
+                                <Button color={this.state.sqType === 1 ? "success" : "warning"}
+                                        onClick={() => this.setState({sqType: 1})} active={this.state.sqType === 1}>FORCED
+                                    FRONT</Button>
+                            </ButtonGroup>
+                        </Row>
+                        <Row>
+                            <Col xs={"auto"}>
+                            <textarea id={"mySquadStats"} value={this.state.descr} readOnly={true}
+                                      style={{width: "200px", height: "275px", resize: "none"}}/>
+                            </Col>
+                            <MySquad type={this.state.sqType}/>
+                        </Row>
+                        {/*<Row>*/}
+                        {/*    <Dnd/>*/}
+                        {/*</Row>*/}
                     </DragDropContext>
 
                 </Jumbotron>

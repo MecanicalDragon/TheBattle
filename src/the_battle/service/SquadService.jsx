@@ -18,7 +18,11 @@ export async function getPool(pName) {
     return fetch(appApi + 'squad/getPool?pName=' + pName).then(function (response) {
         return response.status === 200 ? response.json() : null;
     }).then(resp => {
-        return resp;
+        let pool = new Map();
+        resp.forEach(function (entry) {
+            pool.set(entry.id, entry);
+        });
+        return pool;
     });
 }
 

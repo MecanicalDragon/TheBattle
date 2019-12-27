@@ -29,7 +29,6 @@ export default class DragPool extends React.Component {
     render() {
         return (
             <Container>
-                {/*<div className={"dragHeroPool"}>*/}
                 <h3>{this.props.column.title}</h3>
                 <Droppable droppableId={this.props.column.id}>
                     {(provided, snapshot) => (
@@ -45,7 +44,6 @@ export default class DragPool extends React.Component {
                         </Pool>
                     )}
                 </Droppable>
-                {/*</div>*/}
             </Container>
         )
     }

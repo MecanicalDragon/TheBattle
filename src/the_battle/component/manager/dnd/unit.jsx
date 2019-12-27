@@ -34,18 +34,3 @@ export default class DndUnit extends Component {
         )
     }
 }
-
-// render() {
-//     return (
-//         <Draggable draggableId={this.props.hero.id} index={this.props.index}>
-//             {(provided, snapshot) => (
-//                 <div {...provided.draggableProps} {...provided.dragHandleProps}
-//                      ref={provided.innerRef} className={"unitLogo"}>
-//                     <span>{this.props.hero.name}</span>
-//                     <br/>
-//                     <span>{this.props.hero.type}</span>
-//                 </div>
-//             )}
-//         </Draggable>
-//     )
-// }
