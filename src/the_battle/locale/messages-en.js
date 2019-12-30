@@ -23,5 +23,6 @@ export default {
     'app.manage.squad.type': 'Squad type:',
     'app.manage.squad.add': 'Add new',
     'app.manage.squad.inout.name.for.new': 'Input a name for your new ',
+    'app.manage.delete.unit': 'Delete unit',
 
 }

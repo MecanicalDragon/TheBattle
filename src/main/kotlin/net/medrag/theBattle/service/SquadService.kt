@@ -11,6 +11,7 @@ import net.medrag.theBattle.repo.PlayerRepo
 import net.medrag.theBattle.repo.UnitRepo
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 
 /**
@@ -21,27 +22,9 @@ import org.springframework.stereotype.Service
 class SquadService(@Autowired val unitRepo: UnitRepo, @Autowired val playerRepo: PlayerRepo) {
 
     /**
-     * Get random squad
-     */
-    fun getRandomSquad(): Squad {
-        val squad = Squad();
-//        squad.type = SquadType.values()[(Math.random() * SquadType.values().size).toInt()]
-//        squad.pos1 = Unitt.Unit.Type.values()[(Math.random() * Unitt.Companion.Types.values().size).toInt()].unit
-//        squad.pos2 = Unitt.Companion.Types.values()[(Math.random() * Unitt.Companion.Types.values().size).toInt()].unit
-//        squad.pos3 = Unitt.Companion.Types.values()[(Math.random() * Unitt.Companion.Types.values().size).toInt()].unit
-//        squad.pos4 = Unitt.Companion.Types.values()[(Math.random() * Unitt.Companion.Types.values().size).toInt()].unit
-//        squad.pos5 = Unitt.Companion.Types.values()[(Math.random() * Unitt.Companion.Types.values().size).toInt()].unit
-        return squad
-    }
-
-    /**
      * Returns Player's hero pool or empty list
      */
     fun getPool(playerName: String): List<UnitDTO> {
-//        val list = playerRepo.findByName(playerName)?.pool ?: ArrayList()
-//        val result = ArrayList<UnitDTO>(list.size)
-//        for (unit in list) result.add(buildUnit(unit))
-//        return result;
         val list = unitRepo.findAllByPlayer_Name(playerName)
         val result = ArrayList<UnitDTO>(list.size)
         for (unit in list) result.add(buildUnit(unit))
@@ -56,6 +39,13 @@ class SquadService(@Autowired val unitRepo: UnitRepo, @Autowired val playerRepo:
             val saved = unitRepo.save(unit)
             return buildUnit(saved)
         } else throw ValidationException("Hero name doesn't match the pattern $regex")
+    }
+
+    @Transactional
+    fun deleteUnit(id: Long, playerName: String) {
+        val playerId = playerRepo.getIdByName(playerName)
+        val player = Player(playerId, playerName)
+        unitRepo.deleteUnit(id, player)
     }
 
     companion object {

@@ -8,9 +8,11 @@ import PerfectScrollbar from 'react-perfect-scrollbar'
 import 'react-perfect-scrollbar/dist/css/styles.css';
 
 const Reserve = styled.div`
+    background-color: ${props => (props.drag ? 'cyan' : 'azure')}
     display: flex;
     flex-direction: column;
-    flex-grow: 1
+    min-height: 498px;
+    width: 175px;
 `;
 
 export default class Pool extends Component {
@@ -48,8 +50,7 @@ export default class Pool extends Component {
                                 borderRadius: 7,
                                 backgroundColor: "azure"
                             }}>
-                                <Reserve ref={provided.innerRef}
-                                         style={snapshot.isDraggingOver ? {backgroundColor: "var(--droppable-ready-color)"} : {backgroundColor: "azure"}}
+                                <Reserve ref={provided.innerRef} drag={snapshot.isDraggingOver}
                                          {...provided.droppableProps}>
                                     {
                                         reserved.map((unit, index) => {

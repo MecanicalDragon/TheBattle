@@ -9,7 +9,6 @@ import {
 } from 'reactstrap'
 import {setNavPosition} from "@/constants/actions";
 import {Battle} from "@/constants/paths";
-import MySquad from "@/component/MySquad";
 import * as SquadService from '@/service/SquadService'
 import {FormattedMessage} from 'react-intl';
 
@@ -27,7 +26,6 @@ class BattleComp extends Component {
         return (
             <Container>
                 <Jumbotron>
-                        <MySquad squad={squad}/>
                     <Row>
                         <Col>
                             <Button style={{marginTop: "20px"}} onClick={() => {

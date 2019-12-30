@@ -19,15 +19,12 @@ import javax.servlet.http.HttpServletRequest
 @RequestMapping("/squad")
 class SquadController(@Autowired val squadService: SquadService) {
 
-    @GetMapping("/getNewSquad")
-    fun getSquad() = squadService.getRandomSquad()
-
     //TODO: TODO_SECURITY: requestParam 'name' should be removed in release
     @GetMapping("/getPool")
     fun getPool(@RequestParam(required = false) pName: String?, request: HttpServletRequest): ResponseEntity<List<UnitDTO>> {
 
         if (pName != null && !pName.isEmpty()) {
-            println("no session request")
+            println("========================================= no session request ================================================")
             return ResponseEntity.ok(squadService.getPool(pName))
         }
 
@@ -44,7 +41,7 @@ class SquadController(@Autowired val squadService: SquadService) {
 
         try {
             if (pName != null && !pName.isEmpty()) {
-                println("no session request")
+                println("========================================= no session request ================================================")
                 return ResponseEntity.ok(squadService.addNewUnit(pName, name, type))
             }
 
@@ -54,5 +51,21 @@ class SquadController(@Autowired val squadService: SquadService) {
         } catch (e: ValidationException) {
             return ResponseEntity.badRequest().build()
         }
+    }
+
+    //TODO: TODO_SECURITY: requestParam 'name' should be removed in release
+    @DeleteMapping("/retireHero")
+    fun delete(@RequestParam unit: Long,
+               @RequestParam(required = false) pName: String?,
+               request: HttpServletRequest): ResponseEntity<String> {
+        if (pName != null && !pName.isEmpty()) {
+            println("========================================= no session request ================================================")
+            squadService.deleteUnit(unit, pName)
+            return ResponseEntity.ok("RETIRED")
+        }
+
+        val playerName: String = request.getSession(false).getAttribute(PLAYER_SESSION) as String
+        squadService.deleteUnit(unit, playerName)
+        return ResponseEntity.ok("RETIRED")
     }
 }

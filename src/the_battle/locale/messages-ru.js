@@ -23,5 +23,6 @@ export default {
     'app.manage.squad.type': 'Тип отряда:',
     'app.manage.squad.add': 'Добавить',
     'app.manage.squad.inout.name.for.new': 'Введите имя для нового ',
+    'app.manage.delete.unit': 'Удалить бойца',
 
 }

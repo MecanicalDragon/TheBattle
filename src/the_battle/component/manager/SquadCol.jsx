@@ -4,11 +4,11 @@ import styled from "styled-components";
 import {Unit} from "@/component/Unit";
 
 const LongLine = styled.div`
+    background-color: ${props => (props.drag ? 'cyan' : 'azure')};
     display: flex;
     flex-direction: column;
     width: 175px;
     height: 90px;
-    background-color: white;
     border-style: solid;
     border-width: 1px;
     border-radius: 7px;
@@ -19,11 +19,11 @@ const LongLine = styled.div`
 `;
 
 const ShortLine = styled.div`
+    background-color: ${props => (props.drag ? 'cyan' : 'azure')};
     display: flex;
     flex-direction: column;
     width: 175px;
     height: 90px;
-    background-color: white;
     border-style: solid;
     border-width: 1px;
     border-radius: 7px;
@@ -38,9 +38,7 @@ const SquadCol = (props) => {
         return (
             <Droppable droppableId={props.col.id}>
                 {(provided, snapshot) => (
-                    <ShortLine ref={provided.innerRef}
-                               style={snapshot.isDraggingOver ?
-                                   {backgroundColor: "var(--droppable-ready-color)"} : {backgroundColor: "azure"}}
+                    <ShortLine ref={provided.innerRef} drag={snapshot.isDraggingOver}
                                {...provided.droppableProps}>
                         {
                             props.col.heroes.map((unit, index) => {
@@ -58,10 +56,8 @@ const SquadCol = (props) => {
     else return (
         <Droppable droppableId={props.col.id}>
             {(provided, snapshot) => (
-                <LongLine ref={provided.innerRef}
-                           style={snapshot.isDraggingOver ?
-                               {backgroundColor: "var(--droppable-ready-color)"} : {backgroundColor: "azure"}}
-                           {...provided.droppableProps}>
+                <LongLine ref={provided.innerRef} drag={snapshot.isDraggingOver}
+                          {...provided.droppableProps}>
                     {
                         props.col.heroes.map((unit, index) => {
                             return (

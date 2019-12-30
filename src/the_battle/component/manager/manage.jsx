@@ -16,13 +16,13 @@ import {getPlayerName} from '@/service/PlayerService'
 import Pool from "@/component/manager/Pool";
 import {FormattedMessage} from 'react-intl';
 import {DragDropContext, Droppable} from "react-beautiful-dnd";
+import Remove from "@/component/manager/remove";
 
 class ManageComp extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
-            // ...initialData,
             playerName: getPlayerName(),
             descr: "",
             pool: {},
@@ -50,6 +50,10 @@ class ManageComp extends Component {
                 'long3': {
                     id: 'long3',
                     heroes: []
+                },
+                'remove': {
+                    id: 'remove',
+                    heroes: []
                 }
             },
             sqType: 1,
@@ -66,7 +70,8 @@ class ManageComp extends Component {
                 inReserve.push(i[0]);
             }
             this.setState({
-                pool: resp, columns: {
+                pool: resp,
+                columns: {
                     ...this.state.columns,
                     "reserve": {
                         id: 'reserve',
@@ -77,24 +82,50 @@ class ManageComp extends Component {
         });
     }
 
-    //TODO: does not work now
     addNewHero = (name, type) => {
         SquadService.addNewHero(this.state.playerName, name, type).then(
             resp => {
                 if (resp !== null) {
                     let updCol = this.state.columns["reserve"];
                     updCol.heroes.push(resp.id);
-                    this.setState({
-                        pool: {
-                            ...this.state.pool, [resp.id]: resp
-                        },
+                    let pool = this.state.pool;
+                    pool.set(resp.id, resp);
+                    let newState = {
+                        pool: pool,
                         columns: {
                             ...this.state.columns, ["reserve"]: updCol
                         }
-                    });
+                    };
+                    this.setState(newState);
                 }
             }
         )
+    };
+
+    retireHero = (draggableId, start, index) => {
+        SquadService.retireHero(this.state.playerName, draggableId).then(resp => {
+            if (resp !== null) {
+
+                const newIds = Array.from(start.heroes);
+                newIds.splice(index, 1);
+                const newCol = {
+                    ...start,
+                    heroes: newIds
+                };
+
+                const pool = this.state.pool;
+                pool.delete(draggableId);
+                let newState = {
+                    ...this.state, pool: pool,
+                    columns: {
+                        ...this.state.columns,
+                        [newCol.id]: newCol,
+                        ["remove"]: {id: "remove", heroes: []}
+                    }
+                };
+                this.setState(newState)
+            }
+        })
     };
 
     setDescription = (text) => {
@@ -105,7 +136,8 @@ class ManageComp extends Component {
     };
 
 
-    onDragStart = () => {this.setState({removeWindow: true})
+    onDragStart = () => {
+        this.setState({removeWindow: true})
     };
 
     onDragUpdate = update => {
@@ -115,13 +147,17 @@ class ManageComp extends Component {
     onDragEnd = result => {
 
         const {destination, source, draggableId} = result;
-        if (!destination) return;
-        if (destination.droppableId === source.droppableId && destination.index === source.index) return;
+        if (!destination || (destination.droppableId === source.droppableId && destination.index === source.index)) {
+            this.setState({removeWindow: false});
+            return;
+        }
 
         const start = this.state.columns[source.droppableId];
         const finish = this.state.columns[destination.droppableId];
 
-        if (start === finish) {
+        if (destination.droppableId === "remove") {
+            this.retireHero(draggableId, start, source.index);
+        } else if (start === finish) {
             const newIds = Array.from(start.heroes);
             newIds.splice(source.index, 1);
             newIds.splice(destination.index, 0, draggableId);
@@ -142,7 +178,7 @@ class ManageComp extends Component {
             const finishHeroes = Array.from(finish.heroes);
 
             if (finishHeroes.length > 0 && finish.id !== "reserve") {
-                let spliced = finishHeroes.splice(destination.index, 1, draggableId);
+                let spliced = finishHeroes.splice(0, 1, draggableId);
                 startHeroes.splice(source.index, 1, spliced[0]);
             } else {
                 startHeroes.splice(source.index, 1);
@@ -169,14 +205,13 @@ class ManageComp extends Component {
         }
     };
 
-
     render() {
         let {sqType} = this.state;
         let smallRow = this.getSmallRow();
         let longRow = this.getLongRow();
         return (
             <Container>
-                <Jumbotron style={{paddingTop: 30}}>
+                <Jumbotron style={{paddingTop: 30, height: 700}}>
                     <DragDropContext onDragEnd={this.onDragEnd} onDragStart={this.onDragStart}>
                         <Row>
                             <Col xs={"auto"}>
@@ -209,16 +244,15 @@ class ManageComp extends Component {
                                                   resize: "none",
                                                   borderRadius: 7
                                               }}/>
+                                    <Remove show={this.state.removeWindow}/>
                                 </Col>
                             </Col>
                         </Row>
                     </DragDropContext>
-
                 </Jumbotron>
             </Container>
         )
     }
-
 
     getSmallRow() {
         let {pool, columns} = this.state;
