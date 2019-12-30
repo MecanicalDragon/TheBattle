@@ -10,10 +10,12 @@
     "bootstrap": "^4.1.1",
     "path": "^0.12.7",
     "react": "^16.9.0",
+    "react-beautiful-dnd": "^9.0.2",
     "react-dom": "^16.9.0",
     "react-intl": "^2.4.0",
     "react-loader-spinner": "^3.1.2",
     "react-notifications": "^1.4.3",
+    "react-perfect-scrollbar": "^1.5.3",
     "react-redux": "^5.0.7",
     "react-router": "^4.2.0",
     "react-router-dom": "^4.2.2",
@@ -22,7 +24,6 @@
     "react-spinners": "^0.4.5",
     "reactstrap": "^6.3.1",
     "redux": "^3.7.2",
-    "react-beautiful-dnd": "^9.0.2",
     "styled-components": "^4.4.1"
   },
   "devDependencies": {

@@ -1,3 +1,7 @@
+:root {
+    --droppable-ready-color: cyan;
+}
+
 .unitLogo{
     width: 165px;
     height: 80px;
@@ -26,21 +30,18 @@
     background-color: rgba(95,255,65,0.49);
 }
 
-.unitPlace{
-    width: 175px;
-    height: 90px;
-    background-color: white;
-    border-style: solid;
-    border-width: 1px;
-    border-radius: 7px;
-    text-align: center;
-    border-color: darkgray;
-    margin: 2px;
+.squadPlace {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
 }
 
-.smallRow{
-    position: relative;
-    top: 45px;
+.squadPlaceReverse {
+    display: flex;
+    flex-direction: row-reverse;
+    align-items: center;
+    justify-content: center;
 }
 
 /*dnd*/
@@ -48,6 +49,7 @@
     display: flex;
     flex-direction: column;
     flex-grow: 1;
+    flex-direction: row-reverse;
     justify-content: center;
     align-items: center;
 }

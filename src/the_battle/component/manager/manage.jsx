@@ -1,7 +1,5 @@
 import React, {Component} from 'react';
 import {connect} from 'react-redux';
-import Dnd from './dnd/dnd';
-import initialData from "@/component/manager/dnd/initData";
 import {
     Container,
     Jumbotron,
@@ -12,12 +10,12 @@ import {
 } from 'reactstrap'
 import {setNavPosition} from "@/constants/actions";
 import {Manage} from "@/constants/paths";
-import MySquad from "@/component/MySquad";
+import SquadCol from "@/component/manager/SquadCol";
 import * as SquadService from '@/service/SquadService'
 import {getPlayerName} from '@/service/PlayerService'
 import Pool from "@/component/manager/Pool";
 import {FormattedMessage} from 'react-intl';
-import {DragDropContext} from "react-beautiful-dnd";
+import {DragDropContext, Droppable} from "react-beautiful-dnd";
 
 class ManageComp extends Component {
 
@@ -32,9 +30,30 @@ class ManageComp extends Component {
                 'reserve': {
                     id: 'reserve',
                     heroes: []
+                },
+                'short1': {
+                    id: 'short1',
+                    heroes: []
+                },
+                'short2': {
+                    id: 'short2',
+                    heroes: []
+                },
+                'long1': {
+                    id: 'long1',
+                    heroes: []
+                },
+                'long2': {
+                    id: 'long2',
+                    heroes: []
+                },
+                'long3': {
+                    id: 'long3',
+                    heroes: []
                 }
             },
-            sqType: 1
+            sqType: 1,
+            removeWindow: false
         };
         this.props.dispatch(setNavPosition(Manage));
     }
@@ -58,6 +77,7 @@ class ManageComp extends Component {
         });
     }
 
+    //TODO: does not work now
     addNewHero = (name, type) => {
         SquadService.addNewHero(this.state.playerName, name, type).then(
             resp => {
@@ -85,8 +105,7 @@ class ManageComp extends Component {
     };
 
 
-    onDragStart = () => {
-        console.log("drag start")
+    onDragStart = () => {this.setState({removeWindow: true})
     };
 
     onDragUpdate = update => {
@@ -120,62 +139,105 @@ class ManageComp extends Component {
             this.setState(newState)
         } else {
             const startHeroes = Array.from(start.heroes);
-            startHeroes.splice(source.index, 1);
+            const finishHeroes = Array.from(finish.heroes);
+
+            if (finishHeroes.length > 0 && finish.id !== "reserve") {
+                let spliced = finishHeroes.splice(destination.index, 1, draggableId);
+                startHeroes.splice(source.index, 1, spliced[0]);
+            } else {
+                startHeroes.splice(source.index, 1);
+                finishHeroes.splice(destination.index, 0, draggableId);
+            }
+
             const newStart = {
                 ...start, heroes: startHeroes
             };
-            const finishHeroes = Array.from(finish.heroes);
-            finishHeroes.splice(destination.index, 0, draggableId)
             const newFinish = {
                 ...finish, heroes: finishHeroes
             };
 
             const newState = {
                 ...this.state,
+                removeWindow: false,
                 columns: {
                     ...this.state.columns,
                     [newStart.id]: newStart,
                     [newFinish.id]: newFinish,
                 }
             };
-            this.setState(newState)
+            this.setState(newState);
         }
     };
 
 
     render() {
+        let {sqType} = this.state;
+        let smallRow = this.getSmallRow();
+        let longRow = this.getLongRow();
         return (
             <Container>
                 <Jumbotron style={{paddingTop: 30}}>
-                    <DragDropContext onDragEnd={this.onDragEnd}>
-
-                        <Pool reserved={this.state.columns.reserve.heroes} pool={this.state.pool}
-                              descrFunc={this.setDescription} addNewHero={this.addNewHero}/>
-                        <h5><FormattedMessage id={"app.manage.squad.type"}/></h5>
-                        <Row style={{marginBottom: 15}}>
-                            <ButtonGroup>
-                                <Button color={this.state.sqType === 2 ? "success" : "warning"}
-                                        onClick={() => this.setState({sqType: 2})} active={this.state.sqType === 2}>FORCED
-                                    BACK</Button>
-                                <Button color={this.state.sqType === 1 ? "success" : "warning"}
-                                        onClick={() => this.setState({sqType: 1})} active={this.state.sqType === 1}>FORCED
-                                    FRONT</Button>
-                            </ButtonGroup>
-                        </Row>
+                    <DragDropContext onDragEnd={this.onDragEnd} onDragStart={this.onDragStart}>
                         <Row>
                             <Col xs={"auto"}>
-                            <textarea id={"mySquadStats"} value={this.state.descr} readOnly={true}
-                                      style={{width: "200px", height: "275px", resize: "none"}}/>
+                                <Pool reserved={this.state.columns.reserve.heroes} pool={this.state.pool}
+                                      descrFunc={this.setDescription} addNewHero={this.addNewHero}/>
                             </Col>
-                            <MySquad type={this.state.sqType}/>
+                            <Col xs={"auto"}>
+                                <div style={{marginTop: 60, marginLeft: 38, marginBottom: 15}}>
+                                    <h5><FormattedMessage id={"app.manage.squad.type"}/></h5>
+                                    <ButtonGroup>
+                                        <Button color={this.state.sqType === 2 ? "success" : "warning"}
+                                                onClick={() => this.setState({sqType: 2})}
+                                                active={this.state.sqType === 2}>FORCED BACK</Button>
+                                        <Button color={this.state.sqType === 1 ? "success" : "warning"}
+                                                onClick={() => this.setState({sqType: 1})}
+                                                active={this.state.sqType === 1}>FORCED FRONT</Button>
+                                    </ButtonGroup>
+                                </div>
+                                <Row className={sqType === 1 ? "squadPlace" : "squadPlaceReverse"}>
+                                    {smallRow}
+                                    {longRow}
+                                </Row>
+                            </Col>
+                            <Col xs={"auto"}>
+                                <Col xs={"auto"} style={{marginTop: 147}}>
+                                    <textarea id={"mySquadStats"} value={this.state.descr} readOnly={true}
+                                              style={{
+                                                  width: "200px",
+                                                  height: "274px",
+                                                  resize: "none",
+                                                  borderRadius: 7
+                                              }}/>
+                                </Col>
+                            </Col>
                         </Row>
-                        {/*<Row>*/}
-                        {/*    <Dnd/>*/}
-                        {/*</Row>*/}
                     </DragDropContext>
 
                 </Jumbotron>
             </Container>
+        )
+    }
+
+
+    getSmallRow() {
+        let {pool, columns} = this.state;
+        return (
+            <div>
+                <SquadCol pool={pool} col={columns.short1} descrFunc={this.setDescription} short={true}/>
+                <SquadCol pool={pool} col={columns.short2} descrFunc={this.setDescription} short={true}/>
+            </div>
+        )
+    }
+
+    getLongRow() {
+        let {pool, columns} = this.state;
+        return (
+            <div>
+                <SquadCol pool={pool} col={columns.long1} descrFunc={this.setDescription}/>
+                <SquadCol pool={pool} col={columns.long2} descrFunc={this.setDescription}/>
+                <SquadCol pool={pool} col={columns.long3} descrFunc={this.setDescription}/>
+            </div>
         )
     }
 }

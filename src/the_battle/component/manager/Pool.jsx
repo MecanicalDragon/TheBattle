@@ -4,9 +4,13 @@ import {FormattedMessage} from 'react-intl';
 import AddNew from './addNew';
 import {Droppable} from "react-beautiful-dnd";
 import styled from "styled-components";
+import PerfectScrollbar from 'react-perfect-scrollbar'
+import 'react-perfect-scrollbar/dist/css/styles.css';
 
 const Reserve = styled.div`
     display: flex;
+    flex-direction: column;
+    flex-grow: 1
 `;
 
 export default class Pool extends Component {
@@ -32,22 +36,34 @@ export default class Pool extends Component {
         return (
             <Fragment>
                 <h2><FormattedMessage id={"app.manage.pool.header"}/></h2>
-                <Droppable droppableId={"reserve"} direction={"horizontal"}>
+                <Droppable droppableId={"reserve"}>
+                    {/*direction={"horizontal"}*/}
                     {(provided, snapshot) => (
-                        <Reserve ref={provided.innerRef}
-                                 style={snapshot.isDraggingOver ? {backgroundColor: "skyblue"} : {backgroundColor: "azure"}}
-                                 {...provided.droppableProps}>
-                            {
-                                reserved.map((unit, index) => {
-                                    return (
-                                        <Unit key={unit} characteristics={pool.get(unit)}
-                                              descrFunc={this.props.descrFunc} index={index}/>
-                                    )
-                                })
-                            }
-                            {provided.placeholder}
+                        <Fragment>
+                            <PerfectScrollbar style={{
+                                height: 500,
+                                borderStyle: "solid",
+                                borderColor: "green",
+                                borderWidth: 1,
+                                borderRadius: 7,
+                                backgroundColor: "azure"
+                            }}>
+                                <Reserve ref={provided.innerRef}
+                                         style={snapshot.isDraggingOver ? {backgroundColor: "var(--droppable-ready-color)"} : {backgroundColor: "azure"}}
+                                         {...provided.droppableProps}>
+                                    {
+                                        reserved.map((unit, index) => {
+                                            return (
+                                                <Unit key={unit} characteristics={pool.get(unit)}
+                                                      descrFunc={this.props.descrFunc} index={index}/>
+                                            )
+                                        })
+                                    }
+                                    {provided.placeholder}
+                                </Reserve>
+                            </PerfectScrollbar>
                             <AddNew addNewHero={this.props.addNewHero}/>
-                        </Reserve>
+                        </Fragment>
                     )}
                 </Droppable>
             </Fragment>
