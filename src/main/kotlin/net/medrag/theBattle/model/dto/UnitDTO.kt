@@ -8,9 +8,10 @@ import net.medrag.theBattle.model.classes.Unitt
  * 25.12.2019
  */
 data class UnitDTO(
-        val id: Long?,
+        val id: Long,
         val name: String,
         val level: Int,
         val exp: Int,
+        val hp: Int,
         val type: Unitt
 )

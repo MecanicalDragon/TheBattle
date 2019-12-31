@@ -6,7 +6,6 @@ import net.medrag.theBattle.model.dto.UnitDTO
 import net.medrag.theBattle.model.dto.buildUnit
 import net.medrag.theBattle.model.dto.buildUnitEntity
 import net.medrag.theBattle.model.entities.Player
-import net.medrag.theBattle.model.squad.Squad
 import net.medrag.theBattle.repo.PlayerRepo
 import net.medrag.theBattle.repo.UnitRepo
 import org.springframework.beans.factory.annotation.Autowired
@@ -33,7 +32,7 @@ class SquadService(@Autowired val unitRepo: UnitRepo, @Autowired val playerRepo:
 
     fun addNewUnit(pName: String, name: String, type: Unitt.Unit.Type): UnitDTO {
         if (name.matches(Regex(regex))) {
-            val id = playerRepo.getIdByName(pName)
+            val id = playerRepo.getIdByName(pName) ?: throw ValidationException("Player with this name doesn't exist.")
             val player = Player(id, pName)
             val unit = buildUnitEntity(name, type, player)
             val saved = unitRepo.save(unit)
@@ -43,7 +42,7 @@ class SquadService(@Autowired val unitRepo: UnitRepo, @Autowired val playerRepo:
 
     @Transactional
     fun deleteUnit(id: Long, playerName: String) {
-        val playerId = playerRepo.getIdByName(playerName)
+        val playerId = playerRepo.getIdByName(playerName) ?: throw ValidationException("Player with this name doesn't exist.")
         val player = Player(playerId, playerName)
         unitRepo.deleteUnit(id, player)
     }

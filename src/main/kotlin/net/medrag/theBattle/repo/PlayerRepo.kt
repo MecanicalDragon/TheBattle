@@ -14,5 +14,5 @@ import org.springframework.stereotype.Repository
 interface PlayerRepo : CrudRepository<Player, Long> {
     fun findByName(name: String): Player?
     @Query("select p.id from Player p where p.name = ?1")
-    fun getIdByName(name: String): Long
+    fun getIdByName(name: String): Long?
 }

@@ -14,9 +14,13 @@ import org.springframework.stereotype.Repository
  */
 @Repository
 interface UnitRepo : CrudRepository<UnitEntity, Long> {
+
     fun findAllByPlayer_Name(name: String): List<UnitEntity>
+
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("delete from UnitEntity u where u.id = ?1 and u.player = ?2")
-    fun deleteUnit(id: Long, playerName: Player)
+    fun deleteUnit(id: Long, player: Player)
+
+    fun findByIdAndPlayer(id: Long, player: Player): UnitEntity?
 
 }

@@ -22,29 +22,17 @@ data class UnitEntity(
         @Column(name = "level", nullable = false)
         var level: Int,
 
-        @Column(name = "expirience", nullable = false)
-        var expirience: Int,
+        @Column(name = "experience", nullable = false)
+        var experience: Int,
+
+        @Column(name = "health", nullable = false)
+        var hp: Int,
 
         @Enumerated(EnumType.STRING)
         @Column(name = "type", nullable = false)
         var type: Unitt.Unit.Type,
 
-        @ManyToOne
+        @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "player_id", nullable = false)
         var player: Player
 )
-
-//        @Column(name = "attack", nullable = false)
-//        var attack: Int,
-//        @Column(name = "initiative", nullable = false)
-//        var initiative: Int,
-//        @Column(name = "health", nullable = false)
-//        var health: Int,
-//        @Column(name = "defence", nullable = false)
-//        var defence: Int,
-//        @Column(name = "accuracy", nullable = false)
-//        var accuracy: Int,
-//        @Column(name = "evasion", nullable = false)
-//        var evasion: Int,
-//        @Column(name = "name", nullable = false)
-//        var basicReward: Int,
