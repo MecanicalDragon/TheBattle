@@ -3,8 +3,11 @@ package net.medrag.theBattle.service
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
+import net.medrag.theBattle.model.GAME_FOUND
 import net.medrag.theBattle.model.classes.Squad
 import net.medrag.theBattle.model.squad.FoesPair
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Service
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -16,7 +19,7 @@ import java.util.concurrent.ConcurrentLinkedQueue
  * 31.12.2019
  */
 @Service
-class BattleSearchingService {
+class BattleSearchingService(@Autowired private val wSocket: SimpMessagingTemplate) {
 
     companion object {
         private val searching = ConcurrentLinkedQueue<Squad>()
@@ -43,6 +46,7 @@ class BattleSearchingService {
                 val pair = FoesPair(uuid, foe1, foe2)
                 battleFoes[uuid] = pair
                 //trigger websocket
+                wSocket.convertAndSend("/game/messages", GAME_FOUND)
             }
         }
 

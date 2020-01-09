@@ -18,6 +18,8 @@ fun extractPlayerName(request: HttpServletRequest, pName: String?): String? {
             println("==============> No session and no valid 'pName' parameter in the request. This request will not be handled.")
             return null
         }
+    } else {
+            println("++++++++++++++++ $playerName request ++++++++++++++++")
     }
     return playerName;
 }
