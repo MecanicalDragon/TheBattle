@@ -1,10 +1,19 @@
 package net.medrag.theBattle.model.classes
 
+import com.fasterxml.jackson.annotation.JsonSubTypes
+import com.fasterxml.jackson.annotation.JsonTypeInfo
+
 
 /**
  * {@author} Stanislav Tretyakov
  * 18.12.2019
  */
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "classType")
+@JsonSubTypes(value = [
+    JsonSubTypes.Type(value = Fighter::class, name = "Fighter"),
+    JsonSubTypes.Type(value = Ranger::class, name = "Ranger"),
+    JsonSubTypes.Type(value = Sage::class, name = "Sage")
+])
 abstract class Unitt {
     abstract var type: Type
     abstract var attack: Int

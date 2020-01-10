@@ -21,49 +21,48 @@ import java.util.concurrent.ConcurrentLinkedQueue
 @Service
 class BattleSearchingService(@Autowired private val wSocket: SimpMessagingTemplate) {
 
-    companion object {
-        private val searching = ConcurrentLinkedQueue<Squad>()
-        private var battleFoes = ConcurrentHashMap<UUID, FoesPair>()
+    private val searching = ConcurrentLinkedQueue<Squad>()
+    private var battleFoes = ConcurrentHashMap<UUID, FoesPair>()
 
-        private val searchingJob = GlobalScope.async {
-            while (true) {
+    private val searchingJob = GlobalScope.async {
+        while (true) {
 
-                var foe1: Squad? = null
-                var foe2: Squad? = null
+            var foe1: Squad? = null
+            var foe2: Squad? = null
 
-                while (foe1 == null) {
-                    foe1 = searching.poll()
-                    //pause coroutine
-                    if (foe1 == null) delay(1000)
-                }
-                //TODO: need better solution
-                while (foe2 == null) {
-                    foe2 = searching.poll()
-                    //pause coroutine
-                    if (foe2 == null) delay(1000)
-                }
-                val uuid = UUID.randomUUID()
-                val pair = FoesPair(uuid, foe1, foe2)
-                battleFoes[uuid] = pair
-                //trigger websocket
-                wSocket.convertAndSend("/game/messages", GAME_FOUND)
+            while (foe1 == null) {
+                foe1 = searching.poll()
+                //pause coroutine
+                if (foe1 == null) delay(1000)
             }
-        }
-
-        init {
-            searchingJob.start()
+            //TODO: need better solution
+            while (foe2 == null) {
+                foe2 = searching.poll()
+                //pause coroutine
+                if (foe2 == null) delay(1000)
+            }
+            val uuid = UUID.randomUUID()
+            val pair = FoesPair(uuid, foe1, foe2)
+            battleFoes[uuid] = pair
+            //trigger websocket
+            wSocket.convertAndSend("/game/messages", GAME_FOUND)
         }
     }
 
-    fun add(squad: Squad) {
+    init {
+        searchingJob.start()
+    }
+
+    fun add(squad: Squad): UUID? {
         val foe = searching.poll()
-        if (foe == null) {
+        return if (foe == null) {
             searching.add(squad)
-            //unpause coroutine
+            null
         } else {
             val uuid = UUID.randomUUID()
             val pair = FoesPair(uuid, foe, squad)
             battleFoes[uuid] = pair
+            uuid
         }
     }
 }

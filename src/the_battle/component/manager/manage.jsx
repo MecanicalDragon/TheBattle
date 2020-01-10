@@ -12,11 +12,13 @@ import {setNavPosition} from "@/constants/actions";
 import {Manage} from "@/constants/paths";
 import SquadCol from "@/component/manager/SquadCol";
 import * as SquadService from '@/service/SquadService'
+import * as BattleService from '@/service/BattleService'
 import {getPlayerName} from '@/service/PlayerService'
 import Pool from "@/component/manager/Pool";
 import {FormattedMessage} from 'react-intl';
 import {DragDropContext, Droppable} from "react-beautiful-dnd";
 import Remove from "@/component/manager/remove";
+import {NotificationManager} from "react-notifications";
 
 class ManageComp extends Component {
 
@@ -57,7 +59,8 @@ class ManageComp extends Component {
                 }
             },
             sqType: 1,
-            removeWindow: false
+            removeWindow: false,
+            toBattleDisabled: false
         };
         this.props.dispatch(setNavPosition(Manage));
     }
@@ -135,6 +138,45 @@ class ManageComp extends Component {
         this.setState({descr: string});
     };
 
+    toBattle = () => {
+        this.setState({toBattleDisabled: true});
+        let {columns} = this.state;
+        let {sqType} = this.state;
+        let {pool} = this.state;
+        let define = function () {
+            let s1 = columns.short1.heroes[0];
+            if (s1 === undefined) return;
+            let s2 = columns.short2.heroes[0];
+            if (s2 === undefined) return;
+            let l1 = columns.long1.heroes[0];
+            if (l1 === undefined) return;
+            let l2 = columns.long2.heroes[0];
+            if (l2 === undefined) return;
+            let l3 = columns.long3.heroes[0];
+            if (l3 === undefined) return;
+            squad = {
+                type: sqType === 1 ? "FORCED_FRONT" : "FORCED_BACK",
+                pos1: pool.get(l1),
+                pos2: pool.get(s1),
+                pos3: pool.get(l2),
+                pos4: pool.get(s2),
+                pos5: pool.get(l3)
+            };
+        };
+        let squad = undefined;
+        define();
+        if (squad) {
+            console.log(squad)
+            BattleService.battleBid(this.state.playerName, squad).then(resp => {
+                console.log(resp);
+                this.setState({toBattleDisabled: false});
+            })
+        } else {
+            NotificationManager.error("", <FormattedMessage id={"app.manage.need5"}/>, 5000, () => {
+            });
+            this.setState({toBattleDisabled: false});
+        }
+    };
 
     onDragStart = () => {
         this.setState({removeWindow: true})
@@ -212,7 +254,8 @@ class ManageComp extends Component {
         return (
             <Container>
                 <Jumbotron style={{paddingTop: 30, height: 700}}>
-                    <DragDropContext onDragEnd={this.onDragEnd} onDragStart={this.onDragStart}>
+                    <DragDropContext onDragEnd={this.onDragEnd} onDragStart={this.onDragStart}
+                                     onDragUpdate={this.onDragUpdate}>
                         <Row>
                             <Col xs={"auto"}>
                                 <Pool reserved={this.state.columns.reserve.heroes} pool={this.state.pool}
@@ -236,13 +279,18 @@ class ManageComp extends Component {
                                 </Row>
                             </Col>
                             <Col xs={"auto"}>
-                                <Col xs={"auto"} style={{marginTop: 147}}>
+                                <Col xs={"auto"} style={{marginTop: 92}}>
+                                    <Button onClick={() => this.toBattle()} disabled={this.state.toBattleDisabled}
+                                            color={"danger"}>
+                                        <FormattedMessage id={"app.manage.to.battle"}/></Button>
+                                    <br/>
                                     <textarea id={"mySquadStats"} value={this.state.descr} readOnly={true}
                                               style={{
                                                   width: "200px",
                                                   height: "274px",
                                                   resize: "none",
-                                                  borderRadius: 7
+                                                  borderRadius: 7,
+                                                  marginTop: 17
                                               }}/>
                                     <Remove show={this.state.removeWindow}/>
                                 </Col>

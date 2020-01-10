@@ -24,5 +24,7 @@ export default {
     'app.manage.squad.add': 'Добавить',
     'app.manage.squad.inout.name.for.new': 'Введите имя для нового ',
     'app.manage.delete.unit': 'Удалить бойца',
+    'app.manage.to.battle': 'В Бой!',
+    'app.manage.need5': 'Нужно 5 героев!',
 
 }

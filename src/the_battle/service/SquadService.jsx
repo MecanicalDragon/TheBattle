@@ -9,6 +9,8 @@ export async function getPool(pName) {
         resp.forEach(function (entry) {
             pool.set(entry.id, entry);
         });
+        console.log("pool^");
+        console.log(pool);
         return pool;
     });
 }

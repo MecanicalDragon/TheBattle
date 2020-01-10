@@ -24,5 +24,7 @@ export default {
     'app.manage.squad.add': 'Add new',
     'app.manage.squad.inout.name.for.new': 'Input a name for your new ',
     'app.manage.delete.unit': 'Delete unit',
+    'app.manage.to.battle': 'To Battle!',
+    'app.manage.need5': 'Need 5 heroes!',
 
 }

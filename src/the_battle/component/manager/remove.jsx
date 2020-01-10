@@ -1,10 +1,10 @@
-import React, {useState} from 'react';
+import React from 'react';
 import {FormattedMessage} from "react-intl";
 import {Droppable} from "react-beautiful-dnd";
 import styled from "styled-components";
 
 const Bin = styled.div`
-opacity: ${props => (props.show ? '1.0' : '0.0')}
+    opacity: ${props => (props.show ? '1.0' : '0.0')}
     display: flex;
     flex-direction: column;
     flex-grow: 1;
