@@ -6,6 +6,7 @@ package net.medrag.theBattle.model
  * 24.12.2019
  */
 const val PLAYER_SESSION: String = "PLAYER_NAME"
+const val BATTLE_UUID: String = "BATTLE_UUID"
 const val LOGGED_OUT: String = "LOGGED_OUT"
 const val GAME_FOUND: String = "GAME_FOUND"
 const val AWAIT = "AWAIT"

@@ -37,11 +37,11 @@ class BattleComp extends Component {
                     let mySquad = null;
                     let foesSquad = null;
                     switch (playerName) {
-                        case foes.foe1.player.name:
+                        case foes.foe1.playerName:
                             mySquad = foes.foe1;
                             foesSquad = foes.foe2;
                             break;
-                        case foes.foe2.player.name:
+                        case foes.foe2.playerName:
                             mySquad = foes.foe2;
                             foesSquad = foes.foe1;
                             break;
@@ -49,7 +49,7 @@ class BattleComp extends Component {
                             throw "No such player name in loaded battle!"
 
                     }
-                    let foesName = foesSquad.player.name;
+                    let foesName = foesSquad.playerName;
                     this.setState({foesSquad: foesSquad, mySquad: mySquad, foesName: foesName})
                 }
             } catch (e) {

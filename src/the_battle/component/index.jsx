@@ -42,9 +42,6 @@ class Index extends Component {
                 <Jumbotron>
                     <h1 id={"theBattle"}><FormattedMessage id={'app.index.header'}/></h1>
                     {this.state.authenticated ? this.getPlayerForm() : this.getLoginForm()}
-                    {/*<Button id={"start"} color={"primary"} onClick={() => {*/}
-                    {/*    this.props.history.push(routes.battle())*/}
-                    {/*}}><FormattedMessage id={'app.index.start'}/></Button>*/}
                 </Jumbotron>
             </Container>
         )

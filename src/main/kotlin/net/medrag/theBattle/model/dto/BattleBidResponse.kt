@@ -9,5 +9,5 @@ import java.util.*
  */
 class BattleBidResponse(
         val status:String,
-        val uuid: UUID?
+        val uuid: UUID
 )

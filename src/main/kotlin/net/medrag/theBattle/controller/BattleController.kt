@@ -1,11 +1,7 @@
 package net.medrag.theBattle.controller
 
-import net.medrag.theBattle.model.AWAIT
-import net.medrag.theBattle.model.CANCELLED
-import net.medrag.theBattle.model.NOT_CANCELLED
-import net.medrag.theBattle.model.START
+import net.medrag.theBattle.model.*
 import net.medrag.theBattle.model.dto.BattleBidResponse
-import net.medrag.theBattle.model.dto.DislocationDTO
 import net.medrag.theBattle.model.dto.SquadDTO
 import net.medrag.theBattle.model.squad.FoesPair
 import net.medrag.theBattle.service.BattleService
@@ -23,7 +19,11 @@ import javax.servlet.http.HttpServletRequest
 @RequestMapping("/battle")
 class BattleController(@Autowired val battleService: BattleService) {
 
-    //TODO: TODO_SECURITY: requestParam 'name' should be removed in release
+    /**
+     * Registers battle bid.
+     * Generates and sets 'BATTLE_UUID' parameter to the session.
+     */
+    //TODO: TODO_SECURITY: requestParam 'pName' should be removed in release
     @PostMapping("/startBattleBid")
     fun startBattleBid(@RequestBody squadDTO: SquadDTO,
                        @RequestParam(required = false) pName: String?,
@@ -31,27 +31,45 @@ class BattleController(@Autowired val battleService: BattleService) {
 
         val playerName = extractPlayerName(request, pName)
         if (playerName.isNullOrBlank()) return ResponseEntity.badRequest().build()
-        val uuid = battleService.startBattleBid(playerName, squadDTO)
-        return ResponseEntity.ok(BattleBidResponse(if (uuid == null) AWAIT else START, uuid))
+
+        val resp = battleService.startBattleBid(playerName, squadDTO)
+        request.getSession(false)?.setAttribute(BATTLE_UUID, resp.uuid)
+        return ResponseEntity.ok(resp)
     }
 
-    //TODO: TODO_SECURITY: requestParam 'name' should be removed in release
+    /**
+     * Cancels battle bid.
+     * Sets 'BATTLE_UUID' parameter to null.
+     */
+    //TODO: TODO_SECURITY: requestParam 'pName' should be removed in release
+    //TODO: TODO_SECURITY: requestParam 'bud' should be removed in release
     @PostMapping("/cancelBid")
-    fun cancelBid(@RequestParam(required = false) pName: String?,
+    fun cancelBid(@RequestParam(required = false) pName: String?, @RequestParam(required = false) bud: String?,
                   request: HttpServletRequest): ResponseEntity<String> {
 
         val playerName = extractPlayerName(request, pName)
         if (playerName.isNullOrBlank()) return ResponseEntity.badRequest().build()
-        return ResponseEntity.ok(if (battleService.cancelBid(playerName)) CANCELLED else NOT_CANCELLED)
+
+        val uuid = extractBattleUUID(request, bud)
+        val cancelled = battleService.cancelBid(playerName, uuid)
+        if (cancelled) request.getSession(false)?.setAttribute(BATTLE_UUID, null)
+        return ResponseEntity.ok(if (cancelled) CANCELLED else NOT_CANCELLED)
     }
 
+    /**
+     * Returns foesPair.
+     */
+    //TODO: TODO_SECURITY: requestParam 'pName' should be removed in release
+    //TODO: TODO_SECURITY: requestParam 'bud' should be removed in release
     @GetMapping("/getDislocations")
-    fun getDislocations(@RequestParam(required = false) pName: String?, @RequestParam bud: String,
+    fun getDislocations(@RequestParam(required = false) pName: String?, @RequestParam bud: String?,
                         request: HttpServletRequest): ResponseEntity<FoesPair> {
 
         val playerName = extractPlayerName(request, pName)
         if (playerName.isNullOrBlank()) return ResponseEntity.badRequest().build()
-        return ResponseEntity.ok(battleService.getDislocations(playerName, bud))
+
+        val uuid = extractBattleUUID(request, bud)
+        return ResponseEntity.ok(battleService.getDislocations(playerName, uuid))
     }
 
     //TODO: remove after tests
@@ -61,7 +79,7 @@ class BattleController(@Autowired val battleService: BattleService) {
 
         val playerName = extractPlayerName(request, pName)
         if (playerName.isNullOrBlank()) return ResponseEntity.badRequest().build()
-        val uuid = battleService.test(playerName)
+        val uuid = battleService.testWebSockets(playerName)
         return ResponseEntity.ok(BattleBidResponse(AWAIT, uuid))
     }
 }

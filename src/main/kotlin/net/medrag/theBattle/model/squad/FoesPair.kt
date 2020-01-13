@@ -1,6 +1,6 @@
 package net.medrag.theBattle.model.squad
 
-import net.medrag.theBattle.model.classes.Squad
+import net.medrag.theBattle.model.classes.ValidatedSquad
 import java.util.*
 
 
@@ -10,5 +10,5 @@ import java.util.*
  */
 data class FoesPair(
         val uuid: UUID,
-        val foe1: Squad,
-        val foe2: Squad)
+        val foe1: ValidatedSquad,
+        val foe2: ValidatedSquad)
