@@ -27,7 +27,7 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
         val source = UrlBasedCorsConfigurationSource()
         val config = CorsConfiguration().applyPermitDefaultValues()
         config.allowCredentials = true
-        config.addAllowedOrigin("*")
+        config.addAllowedOrigin("http://localhost:9095")
         config.addAllowedHeader("*")
         config.addAllowedMethod("*")
         config.allowCredentials = true

@@ -19,6 +19,8 @@ import {FormattedMessage} from 'react-intl';
 import {DragDropContext, Droppable} from "react-beautiful-dnd";
 import Remove from "@/component/manager/remove";
 import {NotificationManager} from "react-notifications";
+import SockJsClient from 'react-stomp';
+import * as routes from '@/router/routes'
 
 class ManageComp extends Component {
 
@@ -60,7 +62,8 @@ class ManageComp extends Component {
             },
             sqType: 1,
             removeWindow: false,
-            toBattleDisabled: false
+            toBattleDisabled: false,
+            onSearching: false
         };
         this.props.dispatch(setNavPosition(Manage));
     }
@@ -86,6 +89,7 @@ class ManageComp extends Component {
     }
 
     addNewHero = (name, type) => {
+        //TODO: TODO_SECURITY: requestParam 'name' should be removed in release
         SquadService.addNewHero(this.state.playerName, name, type).then(
             resp => {
                 if (resp !== null) {
@@ -106,6 +110,7 @@ class ManageComp extends Component {
     };
 
     retireHero = (draggableId, start, index) => {
+        //TODO: TODO_SECURITY: requestParam 'name' should be removed in release
         SquadService.retireHero(this.state.playerName, draggableId).then(resp => {
             if (resp !== null) {
 
@@ -138,8 +143,28 @@ class ManageComp extends Component {
         this.setState({descr: string});
     };
 
+    test = () => {
+        BattleService.test(this.state.playerName).then(resp => {
+            console.log(resp);
+        })
+    };
+
     toBattle = () => {
         this.setState({toBattleDisabled: true});
+        if (this.state.onSearching) {
+            BattleService.cancelBid(this.state.playerName).then(
+                resp => {
+                    if (resp === "CANCELLED") {
+                        NotificationManager.success("", <FormattedMessage id={"app.manage.cancelled"}/>, 5000);
+                        this.setState({toBattleDisabled: false, onSearching: false})
+                    } else {
+                        NotificationManager.warn("", <FormattedMessage id={"app.manage.not.cancelled"}/>, 5000);
+                        this.setState({toBattleDisabled: false})
+                    }
+                }
+            );
+            return;
+        }
         let {columns} = this.state;
         let {sqType} = this.state;
         let {pool} = this.state;
@@ -166,16 +191,26 @@ class ManageComp extends Component {
         let squad = undefined;
         define();
         if (squad) {
-            console.log(squad)
             BattleService.battleBid(this.state.playerName, squad).then(resp => {
                 console.log(resp);
-                this.setState({toBattleDisabled: false});
+                if (resp.status === "AWAIT") {
+                    this.setState({toBattleDisabled: false, onSearching: true});
+                } else if (resp.status === "START") {
+                    this.startBattle(resp.uuid);
+                } else {
+                    this.setState({toBattleDisabled: false});
+                }
             })
         } else {
-            NotificationManager.error("", <FormattedMessage id={"app.manage.need5"}/>, 5000, () => {
-            });
+            NotificationManager.error("", <FormattedMessage id={"app.manage.need5"}/>, 5000);
             this.setState({toBattleDisabled: false});
         }
+    };
+
+    startBattle = (uuid) => {
+        console.log(uuid);
+        BattleService.registerBattle(uuid);
+        this.props.history.push(routes.battle())
     };
 
     onDragStart = () => {
@@ -281,8 +316,11 @@ class ManageComp extends Component {
                             <Col xs={"auto"}>
                                 <Col xs={"auto"} style={{marginTop: 92}}>
                                     <Button onClick={() => this.toBattle()} disabled={this.state.toBattleDisabled}
-                                            color={"danger"}>
-                                        <FormattedMessage id={"app.manage.to.battle"}/></Button>
+                                            color={this.state.onSearching ? "danger" : "success"}>
+                                        <FormattedMessage id={this.state.onSearching
+                                            ? "app.manage.battle.cancel" : "app.manage.to.battle"}/></Button>
+                                    {/*<Button onClick={() => this.test()}>Test</Button>*/}
+                                    {this.state.onSearching ? <span>Searching...</span> : null}
                                     <br/>
                                     <textarea id={"mySquadStats"} value={this.state.descr} readOnly={true}
                                               style={{
@@ -298,6 +336,16 @@ class ManageComp extends Component {
                         </Row>
                     </DragDropContext>
                 </Jumbotron>
+                <SockJsClient url='http://localhost:9191/battleStomp' topics={['/searching/' + this.state.playerName]}
+                              onMessage={(msg) => {
+                                  let pl = msg.split("->");
+                                  if (pl[0] === "GAME_FOUND" && pl[1]) {
+                                      this.startBattle(pl[1])
+                                  }
+                              }}
+                              ref={(client) => {
+                                  this.clientRef = client
+                              }}/>
             </Container>
         )
     }

@@ -4,3 +4,4 @@ import * as actionType from "./actionTypes";
 export const setLocale = (locale = '') => ({type: actionType.SET_LOCALE, locale});
 export const setNavPosition = (navPosition = '') => ({type: actionType.SET_NAV_POSITION, navPosition});
 export const setAuth = (auth = null) => ({type: actionType.SET_AUTH, auth});
+export const setBattleUuid = (bud = null) => ({type: actionType.SET_BATTLE_UUID, bud});

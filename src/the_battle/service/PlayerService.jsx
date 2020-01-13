@@ -80,13 +80,11 @@ export async function login(name) {
         else return response
     }).then(resp => {
         if (resp.status !== undefined) {
-            NotificationManager.warning(name, <FormattedMessage id={"app.input.login.bad"}/>, 3000, () => {
-            });
+            NotificationManager.warning(name, <FormattedMessage id={"app.input.login.bad"}/>, 3000);
             return null;
         } else {
             store.dispatch(setAuth(resp.name));
-            NotificationManager.success(name, <FormattedMessage id={"app.input.login.success"}/>, 3000, () => {
-            });
+            NotificationManager.success(name, <FormattedMessage id={"app.input.login.success"}/>, 3000);
             return resp;
         }
     });
@@ -101,11 +99,9 @@ export async function login(name) {
 export async function create(name) {
 
     if (name.length !== name.trim().length) {
-        NotificationManager.warning(name, <FormattedMessage id={"app.input.create.trim"}/>, 3000, () => {
-        });
+        NotificationManager.warning(name, <FormattedMessage id={"app.input.create.trim"}/>, 3000);
     } else if (!name.match("^[A-Za-z 0-9]{4,16}$")) {
-        NotificationManager.warning(name, <FormattedMessage id={"app.input.create.short.name"}/>, 3000, () => {
-        });
+        NotificationManager.warning(name, <FormattedMessage id={"app.input.create.short.name"}/>, 3000);
     } else {
         let url = new URL(appApi + 'auth/createPlayer');
         url.searchParams.append("name", name);
@@ -119,13 +115,11 @@ export async function create(name) {
             return response.text();
         }).then(resp => {
             if (resp === name) {
-                NotificationManager.success(name, <FormattedMessage id={"app.input.create.success"}/>, 3000, () => {
-                });
+                NotificationManager.success(name, <FormattedMessage id={"app.input.create.success"}/>, 3000);
                 store.dispatch(setAuth(name));
                 return resp;
             } else {
-                NotificationManager.warning(name, resp, 3000, () => {
-                });
+                NotificationManager.warning(name, resp, 3000);
                 return null;
             }
         });

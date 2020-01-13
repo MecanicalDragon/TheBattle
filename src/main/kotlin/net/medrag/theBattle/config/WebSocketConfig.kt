@@ -10,13 +10,13 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 class WebSocketConfig : WebSocketMessageBrokerConfigurer {
 
-    override fun configureMessageBroker(config: MessageBrokerRegistry) {
-        config.enableSimpleBroker("/game")
-        //        config.setApplicationDestinationPrefixes("/");
+    override fun registerStompEndpoints(registry: StompEndpointRegistry) {
+        registry.addEndpoint("/battleStomp").setAllowedOrigins("http://localhost:9095")
+        registry.addEndpoint("/battleStomp").setAllowedOrigins("http://localhost:9095").withSockJS()
     }
 
-    override fun registerStompEndpoints(registry: StompEndpointRegistry) {
-        registry.addEndpoint("/xml_requests")
-        registry.addEndpoint("/xml_requests").withSockJS()
+    override fun configureMessageBroker(config: MessageBrokerRegistry) {
+        config.enableSimpleBroker("/searching")
+        //        config.setApplicationDestinationPrefixes("/");
     }
 }

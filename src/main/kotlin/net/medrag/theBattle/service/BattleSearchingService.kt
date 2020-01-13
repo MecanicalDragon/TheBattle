@@ -1,16 +1,17 @@
 package net.medrag.theBattle.service
 
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.*
 import net.medrag.theBattle.model.GAME_FOUND
+import net.medrag.theBattle.model.ValidationException
 import net.medrag.theBattle.model.classes.Squad
+import net.medrag.theBattle.model.entities.Player
 import net.medrag.theBattle.model.squad.FoesPair
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Service
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.ConcurrentLinkedDeque
 import java.util.concurrent.ConcurrentLinkedQueue
 
 
@@ -21,31 +22,34 @@ import java.util.concurrent.ConcurrentLinkedQueue
 @Service
 class BattleSearchingService(@Autowired private val wSocket: SimpMessagingTemplate) {
 
-    private val searching = ConcurrentLinkedQueue<Squad>()
+    private val searching = ConcurrentLinkedDeque<Squad>()
     private var battleFoes = ConcurrentHashMap<UUID, FoesPair>()
 
-    private val searchingJob = GlobalScope.async {
+    private val searchingJob = GlobalScope.async(start = CoroutineStart.LAZY) {
         while (true) {
 
-            var foe1: Squad? = null
-            var foe2: Squad? = null
+            val foe1: Squad? = searching.poll()
+            if (foe1 == null) {
+                delay(1000)
+                continue
+            }
 
-            while (foe1 == null) {
-                foe1 = searching.poll()
-                //pause coroutine
-                if (foe1 == null) delay(1000)
+            val foe2: Squad? = searching.poll()
+            if (foe2 == null) {
+                while (true) {
+                    if (searching.offerFirst(foe1)) break
+                    delay(500)
+                }
+                continue
             }
-            //TODO: need better solution
-            while (foe2 == null) {
-                foe2 = searching.poll()
-                //pause coroutine
-                if (foe2 == null) delay(1000)
-            }
+
             val uuid = UUID.randomUUID()
             val pair = FoesPair(uuid, foe1, foe2)
             battleFoes[uuid] = pair
-            //trigger websocket
-            wSocket.convertAndSend("/game/messages", GAME_FOUND)
+
+            //trigger websockets
+            wSocket.convertAndSend("/searching/${foe1.player.name}", "$GAME_FOUND->$uuid")
+            wSocket.convertAndSend("/searching/${foe2.player.name}", "$GAME_FOUND->$uuid")
         }
     }
 
@@ -53,16 +57,39 @@ class BattleSearchingService(@Autowired private val wSocket: SimpMessagingTempla
         searchingJob.start()
     }
 
-    fun add(squad: Squad): UUID? {
-        val foe = searching.poll()
-        return if (foe == null) {
-            searching.add(squad)
-            null
-        } else {
-            val uuid = UUID.randomUUID()
-            val pair = FoesPair(uuid, foe, squad)
-            battleFoes[uuid] = pair
-            uuid
+    fun test() {
+        println("received")
+        GlobalScope.launch {
+            println("wait...")
+            delay(5000)
+            println("now!")
+            wSocket.convertAndSend("/searching/asdd", "$GAME_FOUND->${UUID.randomUUID()}")
+            println("sent")
         }
+    }
+
+    /**
+     * Looks for a foe in 'searching'-queue.
+     * Returns uuid of the battle, if foe was found, otherwise null
+     */
+    fun getFoeOrAddToQueue(squad: Squad): UUID? {
+        searching.poll()?.let {
+            val uuid = UUID.randomUUID()
+            val pair = FoesPair(uuid, it, squad)
+            battleFoes[uuid] = pair
+            wSocket.convertAndSend("/searching/${it.player.name}", "$GAME_FOUND->$uuid")
+            return uuid
+        }
+        searching.add(squad)
+        return null
+    }
+
+    fun cancelBid(squad: Squad) = searching.remove(squad)
+
+    fun getBattleByUuid(bud: String): FoesPair {
+        battleFoes[UUID.fromString(bud)]?.let {
+            return it
+        }
+        throw ValidationException("No battle with uuid '$bud'")
     }
 }
