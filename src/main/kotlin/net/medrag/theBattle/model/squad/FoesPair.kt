@@ -9,6 +9,5 @@ import java.util.*
  * 31.12.2019
  */
 data class FoesPair(
-        val uuid: UUID,
         val foe1: ValidatedSquad,
         val foe2: ValidatedSquad)

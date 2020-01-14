@@ -8,6 +8,5 @@ import java.util.*
  * 10.01.2020
  */
 class BattleBidResponse(
-        val status:String,
-        val uuid: UUID
+        val status:String
 )

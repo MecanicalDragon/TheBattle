@@ -33,7 +33,6 @@ class BattleController(@Autowired val battleService: BattleService) {
         if (playerName.isNullOrBlank()) return ResponseEntity.badRequest().build()
 
         val resp = battleService.startBattleBid(playerName, squadDTO)
-        request.getSession(false)?.setAttribute(BATTLE_UUID, resp.uuid)
         return ResponseEntity.ok(resp)
     }
 
@@ -42,34 +41,35 @@ class BattleController(@Autowired val battleService: BattleService) {
      * Sets 'BATTLE_UUID' parameter to null.
      */
     //TODO: TODO_SECURITY: requestParam 'pName' should be removed in release
-    //TODO: TODO_SECURITY: requestParam 'bud' should be removed in release
     @PostMapping("/cancelBid")
-    fun cancelBid(@RequestParam(required = false) pName: String?, @RequestParam(required = false) bud: String?,
-                  request: HttpServletRequest): ResponseEntity<String> {
+    fun cancelBid(@RequestParam(required = false) pName: String?, request: HttpServletRequest): ResponseEntity<String> {
 
         val playerName = extractPlayerName(request, pName)
         if (playerName.isNullOrBlank()) return ResponseEntity.badRequest().build()
 
-        val uuid = extractBattleUUID(request, bud)
-        val cancelled = battleService.cancelBid(playerName, uuid)
-        if (cancelled) request.getSession(false)?.setAttribute(BATTLE_UUID, null)
-        return ResponseEntity.ok(if (cancelled) CANCELLED else NOT_CANCELLED)
+        extractBattleUUID(request, pName)?.let {
+            val cancelled = battleService.cancelBid(playerName, it)
+            if (cancelled) request.getSession(false)?.setAttribute(BATTLE_UUID, null)
+            return ResponseEntity.ok(if (cancelled) CANCELLED else NOT_CANCELLED)
+        }
+        return ResponseEntity.ok(NOT_CANCELLED)
     }
 
     /**
      * Returns foesPair.
      */
     //TODO: TODO_SECURITY: requestParam 'pName' should be removed in release
-    //TODO: TODO_SECURITY: requestParam 'bud' should be removed in release
     @GetMapping("/getDislocations")
-    fun getDislocations(@RequestParam(required = false) pName: String?, @RequestParam bud: String?,
+    fun getDislocations(@RequestParam(required = false) pName: String?,
                         request: HttpServletRequest): ResponseEntity<FoesPair> {
 
         val playerName = extractPlayerName(request, pName)
         if (playerName.isNullOrBlank()) return ResponseEntity.badRequest().build()
 
-        val uuid = extractBattleUUID(request, bud)
-        return ResponseEntity.ok(battleService.getDislocations(playerName, uuid))
+        extractBattleUUID(request, playerName)?.let {
+            return ResponseEntity.ok(battleService.getDislocations(playerName, it))
+        }
+        return ResponseEntity.badRequest().build()
     }
 
     //TODO: remove after tests
@@ -80,6 +80,6 @@ class BattleController(@Autowired val battleService: BattleService) {
         val playerName = extractPlayerName(request, pName)
         if (playerName.isNullOrBlank()) return ResponseEntity.badRequest().build()
         val uuid = battleService.testWebSockets(playerName)
-        return ResponseEntity.ok(BattleBidResponse(AWAIT, uuid))
+        return ResponseEntity.ok(BattleBidResponse(AWAIT))
     }
 }

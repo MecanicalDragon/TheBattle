@@ -3,6 +3,7 @@ package net.medrag.theBattle.controller
 import net.medrag.theBattle.model.BATTLE_UUID
 import net.medrag.theBattle.model.PLAYER_SESSION
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import javax.servlet.http.HttpServletRequest
 
 
@@ -15,7 +16,7 @@ fun extractPlayerName(request: HttpServletRequest, pName: String?): String? {
     if (playerName == null) {
         if (pName != null && pName.isNotBlank()) {
             println("========================================= no session request ================================================")
-            playerName = pName
+            playerName = sessionStorage[pName]?.playerName
         } else {
             println("==============> No session and no valid 'pName' parameter in the request. This request will not be handled.")
             return null
@@ -23,16 +24,29 @@ fun extractPlayerName(request: HttpServletRequest, pName: String?): String? {
     } else {
         println("++++++++++++++++ $playerName request ++++++++++++++++")
     }
-    return playerName;
+    return playerName
 }
 
-fun extractBattleUUID(request: HttpServletRequest, uuid: String?): UUID {
-    var bud = request.getSession(false)?.getAttribute(BATTLE_UUID) as? String
-    if (bud == null) {
-            println("========================================= no session UUID request ================================================")
-            bud = uuid
-    } else {
-        println("++++++++++++++++ $bud request ++++++++++++++++")
+fun extractBattleUUID(request: HttpServletRequest, pName: String?): UUID? {
+    request.getSession(false)?.let {
+        return it.getAttribute(BATTLE_UUID) as? UUID
+
     }
-    return UUID.fromString(bud)
+    println("========================================= no session UUID request ================================================")
+    return sessionStorage[pName]?.bud
 }
+
+fun emulateBudSetting(pName: String, bud: UUID) {
+    sessionStorage[pName]?.bud = bud
+}
+
+fun loginEmulation(pName: String) {
+    sessionStorage[pName] = UserData(pName)
+}
+
+val sessionStorage: ConcurrentHashMap<String, UserData> = ConcurrentHashMap()
+
+class UserData(
+        var playerName: String? = null,
+        var bud: UUID? = null
+)

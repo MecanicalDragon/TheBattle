@@ -196,7 +196,7 @@ class ManageComp extends Component {
                 if (resp.status === "AWAIT") {
                     this.setState({toBattleDisabled: false, onSearching: true});
                 } else if (resp.status === "START") {
-                    this.startBattle(resp.uuid);
+                    this.startBattle();
                 } else {
                     this.setState({toBattleDisabled: false});
                 }
@@ -207,9 +207,7 @@ class ManageComp extends Component {
         }
     };
 
-    startBattle = (uuid) => {
-        console.log(uuid);
-        BattleService.registerBattle(uuid);
+    startBattle = () => {
         this.props.history.push(routes.battle())
     };
 

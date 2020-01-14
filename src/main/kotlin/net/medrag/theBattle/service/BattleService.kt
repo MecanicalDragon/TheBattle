@@ -10,7 +10,6 @@ import net.medrag.theBattle.model.dto.BattleBidResponse
 import net.medrag.theBattle.model.dto.SquadDTO
 import net.medrag.theBattle.model.dto.buildUnit
 import net.medrag.theBattle.model.squad.FoesPair
-import net.medrag.theBattle.model.squad.SquadType
 import net.medrag.theBattle.repo.PlayerRepo
 import net.medrag.theBattle.repo.UnitRepo
 import org.springframework.beans.factory.annotation.Autowired
@@ -19,7 +18,6 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.ConcurrentLinkedDeque
 import java.util.concurrent.ConcurrentLinkedQueue
 
 
@@ -41,7 +39,13 @@ class BattleService(
     /**
      * Map of ongoing battles.
      */
-    private var battleFoes = ConcurrentHashMap<UUID, FoesPair>()
+    private val battleFoes = ConcurrentHashMap<UUID, FoesPair>()
+
+
+    /**
+     * Map stores players, that were notified about battle start by websocket and do not know their Battle UUID
+     */
+    private val playersWhoDontKnowTheirBattleUUIDs = ConcurrentHashMap<String, UUID>()
 
     /**
      * Receives battle bid from the player with name 'playerName'.
@@ -66,24 +70,26 @@ class BattleService(
         }
 
         searching.poll()?.let {
-            val bud = it.bud
+            val uuid = UUID.randomUUID()
             val squad = ValidatedSquad(player.name, squadDTO.type, buildUnit(unit1), buildUnit(unit2),
-                    buildUnit(unit3), buildUnit(unit4), buildUnit(unit5), bud)
-            val pair = FoesPair(bud, it, squad)
-            battleFoes[bud] = pair
-            wSocket.convertAndSend("/searching/${it.playerName}", "$GAME_FOUND->$bud")
-            return BattleBidResponse(START, bud)
+                    buildUnit(unit3), buildUnit(unit4), buildUnit(unit5))
+            val pair = FoesPair(it, squad)
+            battleFoes[uuid] = pair
+            playersWhoDontKnowTheirBattleUUIDs[playerName] = uuid
+            playersWhoDontKnowTheirBattleUUIDs[it.playerName] = uuid
+            wSocket.convertAndSend("/searching/${it.playerName}", GAME_FOUND)
+            return BattleBidResponse(START)
         }
 
-        val squad = ValidatedSquad(player.name, squadDTO.type, buildUnit(unit1), buildUnit(unit2), buildUnit(unit3), buildUnit(unit4), buildUnit(unit5))
-        searching.add(squad)
-        return BattleBidResponse(AWAIT, squad.bud)
+        searching.add(ValidatedSquad(player.name, squadDTO.type, buildUnit(unit1), buildUnit(unit2),
+                buildUnit(unit3), buildUnit(unit4), buildUnit(unit5)))
+        return BattleBidResponse(AWAIT)
     }
 
     /**
      * Removes squad from the searching queue. Returns true if succeeds, otherwise false.
      */
-    fun cancelBid(playerName: String, bud: UUID) = searching.remove(ValidatedSquad(playerName, bud = bud))
+    fun cancelBid(playerName: String, bud: UUID) = searching.remove(ValidatedSquad(playerName))
 
     /**
      * Returns foesPair, based on Battle UUID

@@ -1,48 +1,46 @@
-import {NotificationManager} from "react-notifications";
-
 const appApi = DEPLOYED_URL;
 import {createStore} from 'redux';
 import {reducers} from '@/reducer/reducers'
 import React from "react";
 import {setBattleUuid} from "@/constants/actions";
 
-// Redux
-export const loadState = () => {
-    try {
-        const serializedState = sessionStorage.getItem('bud');
-        console.log("load bud state");
-        console.log(serializedState);
-        if (serializedState === null) {
-            return {bud: null};
-        }
-        return JSON.parse(serializedState);
-    } catch (err) {
-        return undefined;
-    }
-};
-
-export const saveState = (state) => {
-    try {
-        const serializedState = JSON.stringify(state);
-        console.log("save bud state");
-        console.log(state);
-        sessionStorage.setItem('bud', serializedState);
-    } catch {
-        // ignore write errors
-    }
-};
-
-const store = createStore(
-    reducers,
-    loadState()
-);
-
-store.subscribe(() => {
-    saveState({
-        bud: store.getState().bud
-    });
-});
-/// Redux
+// // Redux
+// export const loadState = () => {
+//     try {
+//         const serializedState = sessionStorage.getItem('bud');
+//         console.log("load bud state");
+//         console.log(serializedState);
+//         if (serializedState === null) {
+//             return {bud: null};
+//         }
+//         return JSON.parse(serializedState);
+//     } catch (err) {
+//         return undefined;
+//     }
+// };
+//
+// export const saveState = (state) => {
+//     try {
+//         const serializedState = JSON.stringify(state);
+//         console.log("save bud state");
+//         console.log(state);
+//         sessionStorage.setItem('bud', serializedState);
+//     } catch {
+//         // ignore write errors
+//     }
+// };
+//
+// const store = createStore(
+//     reducers,
+//     loadState()
+// );
+//
+// store.subscribe(() => {
+//     saveState({
+//         bud: store.getState().bud
+//     });
+// });
+// /// Redux
 
 export function registerBattle(uuid) {
     store.dispatch(setBattleUuid(uuid))

@@ -1,9 +1,7 @@
 package net.medrag.theBattle.model.classes
 
 import net.medrag.theBattle.model.dto.UnitDTO
-import net.medrag.theBattle.model.entities.Player
 import net.medrag.theBattle.model.squad.SquadType
-import java.util.*
 
 
 /**
@@ -16,8 +14,7 @@ data class ValidatedSquad(val playerName: String,
                           val pos2: UnitDTO = mock,
                           val pos3: UnitDTO = mock,
                           val pos4: UnitDTO = mock,
-                          val pos5: UnitDTO = mock,
-                          val bud: UUID = UUID.randomUUID()) {  //  BattleUUID
+                          val pos5: UnitDTO = mock) {  //  BattleUUID
 
     companion object {
         val mock = UnitDTO(0, "Mock", 0, 0, 0, Unitt.Unit.Type.FIGHTER.getInstance())
@@ -28,14 +25,8 @@ data class ValidatedSquad(val playerName: String,
         if (other !is ValidatedSquad) return false
 
         if (playerName != other.playerName) return false
-        if (bud != other.bud) return false
-
         return true
     }
 
-    override fun hashCode(): Int {
-        var result = playerName.hashCode()
-        result = 31 * result + bud.hashCode()
-        return result
-    }
+    override fun hashCode() = playerName.hashCode()
 }

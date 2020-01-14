@@ -24,6 +24,8 @@ class AuthController(@Autowired private val playerService: PlayerService) {
         val player = playerService.getPlayerByName(name)
         val session = request.getSession(true)
         session.setAttribute(PLAYER_SESSION, player.name)
+        //TODO: should be removed in release
+        loginEmulation(player.name)
         ResponseEntity.ok(player)
     } catch (e: ValidationException) {
         ResponseEntity.status(204).build<Player>()
@@ -34,6 +36,8 @@ class AuthController(@Autowired private val playerService: PlayerService) {
         val player = playerService.createPlayer(name)
         val session = request.getSession(true)
         session.setAttribute(PLAYER_SESSION, player)
+        //TODO: should be removed in release
+        loginEmulation(player)
         ResponseEntity.ok(player)
     } catch (e: ValidationException) {
         ResponseEntity.badRequest().body(e.message)

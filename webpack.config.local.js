@@ -2,7 +2,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackTemplate = require('html-webpack-template');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
-const webpack= require('webpack');
+const webpack = require('webpack');
 const publicPath = '/';
 const path = require('path');
 
@@ -18,11 +18,11 @@ module.exports = {
         port: 9095,
         publicPath: `${publicPath}`,
         // proxy: [{
-        //     context: ['/api', '/endpoint'],
+        //     context: ['/auth', '/battle', '/squad'],
         //     target: {
         //         host: "localhost",
         //         protocol: 'http:',
-        //         port: 8090
+        //         port: 9191
         //     }
         // }]
     },
