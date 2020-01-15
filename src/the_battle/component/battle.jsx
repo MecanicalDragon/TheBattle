@@ -17,10 +17,8 @@ class BattleComp extends Component {
     constructor(props) {
         super(props);
         this.props.dispatch(setNavPosition(Battle));
-        let bud = BattleService.getBattleUuid();
         let playerName = getPlayerName();
         this.state = {
-            bud: bud,
             playerName: playerName,
             mySquad: undefined,
             foesSquad: undefined,
@@ -30,10 +28,8 @@ class BattleComp extends Component {
 
     componentDidMount() {
         let {playerName} = this.state;
-        let {bud} = this.state;
-        BattleService.getBattle(playerName, bud).then(foes => {
+        BattleService.getBattle(playerName).then(foes => {
             try {
-                if (foes.uuid === bud) {
                     let mySquad = null;
                     let foesSquad = null;
                     switch (playerName) {
@@ -51,7 +47,6 @@ class BattleComp extends Component {
                     }
                     let foesName = foesSquad.playerName;
                     this.setState({foesSquad: foesSquad, mySquad: mySquad, foesName: foesName})
-                }
             } catch (e) {
                 console.log(e)
             }

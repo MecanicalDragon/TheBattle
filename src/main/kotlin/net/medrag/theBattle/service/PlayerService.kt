@@ -18,7 +18,6 @@ class PlayerService(@Autowired private val playerRepo: PlayerRepo) {
             ?: throw ValidationException("no such player")
 
     fun createPlayer(name: String): String {
-        println(name)
         if (name.length == name.trim().length && name.matches(regex.toRegex())) {
             val player = Player(null, name)
             try {

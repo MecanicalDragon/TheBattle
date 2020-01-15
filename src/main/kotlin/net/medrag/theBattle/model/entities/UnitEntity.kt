@@ -29,6 +29,10 @@ data class UnitEntity(
         var hp: Int,
 
         @Enumerated(EnumType.STRING)
+        @Column(name = "status", nullable = false)
+        var status: UnitStatus,
+
+        @Enumerated(EnumType.STRING)
         @Column(name = "type", nullable = false)
         var type: Unitt.Unit.Type,
 

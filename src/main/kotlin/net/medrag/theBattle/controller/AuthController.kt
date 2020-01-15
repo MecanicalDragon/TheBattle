@@ -43,9 +43,10 @@ class AuthController(@Autowired private val playerService: PlayerService) {
         ResponseEntity.badRequest().body(e.message)
     }
 
+    //TODO: what about logging out during game search?
     @PostMapping("/logout")
     fun logout(request: HttpServletRequest): ResponseEntity<String> {
-        request.getSession(false).invalidate()
+        request.getSession(false)?.invalidate()
         return ResponseEntity.ok(LOGGED_OUT)
     }
 }

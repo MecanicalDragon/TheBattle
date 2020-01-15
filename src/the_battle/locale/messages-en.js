@@ -17,6 +17,7 @@ export default {
     'app.input.name': 'Input your name',
     'app.input.login.bad': 'No such player',
     'app.input.login.success': 'Successful logging. Welcome back!',
+    'app.logout.failed': 'By some unknown reasons logout process has failed. Try again.',
 
     // Manage page
     'app.manage.pool.header': 'Heroes pool',

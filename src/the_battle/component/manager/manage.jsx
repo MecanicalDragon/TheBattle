@@ -69,7 +69,6 @@ class ManageComp extends Component {
     }
 
     componentDidMount() {
-        //TODO: TODO_SECURITY: requestParam 'name' should be removed in release
         SquadService.getPool(this.state.playerName).then(resp => {
             let inReserve = [];
             for (let i of resp) {
@@ -89,7 +88,6 @@ class ManageComp extends Component {
     }
 
     addNewHero = (name, type) => {
-        //TODO: TODO_SECURITY: requestParam 'name' should be removed in release
         SquadService.addNewHero(this.state.playerName, name, type).then(
             resp => {
                 if (resp !== null) {
@@ -110,7 +108,6 @@ class ManageComp extends Component {
     };
 
     retireHero = (draggableId, start, index) => {
-        //TODO: TODO_SECURITY: requestParam 'name' should be removed in release
         SquadService.retireHero(this.state.playerName, draggableId).then(resp => {
             if (resp !== null) {
 
@@ -143,12 +140,9 @@ class ManageComp extends Component {
         this.setState({descr: string});
     };
 
-    test = () => {
-        BattleService.test(this.state.playerName).then(resp => {
-            console.log(resp);
-        })
-    };
-
+    //TODO: what if player reloads the page after searching start?
+    //TODO: what if player starts the search and logs out?
+    //TODO: what if player clears cookies after searching start or battle start?
     toBattle = () => {
         this.setState({toBattleDisabled: true});
         if (this.state.onSearching) {
@@ -158,7 +152,7 @@ class ManageComp extends Component {
                         NotificationManager.success("", <FormattedMessage id={"app.manage.cancelled"}/>, 5000);
                         this.setState({toBattleDisabled: false, onSearching: false})
                     } else {
-                        NotificationManager.warn("", <FormattedMessage id={"app.manage.not.cancelled"}/>, 5000);
+                        NotificationManager.warning("", <FormattedMessage id={"app.manage.not.cancelled"}/>, 5000);
                         this.setState({toBattleDisabled: false})
                     }
                 }
@@ -215,9 +209,9 @@ class ManageComp extends Component {
         this.setState({removeWindow: true})
     };
 
-    onDragUpdate = update => {
-        console.log("drag update")
-    };
+    // onDragUpdate = update => {
+    //     console.log("drag update")
+    // };
 
     onDragEnd = result => {
 
@@ -336,10 +330,7 @@ class ManageComp extends Component {
                 </Jumbotron>
                 <SockJsClient url='http://localhost:9191/battleStomp' topics={['/searching/' + this.state.playerName]}
                               onMessage={(msg) => {
-                                  let pl = msg.split("->");
-                                  if (pl[0] === "GAME_FOUND" && pl[1]) {
-                                      this.startBattle(pl[1])
-                                  }
+                                  if (msg === "GAME_FOUND") this.startBattle()
                               }}
                               ref={(client) => {
                                   this.clientRef = client

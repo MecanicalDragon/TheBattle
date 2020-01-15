@@ -17,6 +17,7 @@ export default {
     'app.input.name': 'Введите своё имя',
     'app.input.login.bad': 'Нет такого игрока',
     'app.input.login.success': 'Загрузка прошла успешно. Добро пожаловать!',
+    'app.logout.failed': 'По неким странным обстоятельствам логаут факапнулся. Старайтесь лучше.',
 
     // Manage page
     'app.manage.pool.header': 'Резерв героев',

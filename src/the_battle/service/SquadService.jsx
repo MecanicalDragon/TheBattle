@@ -1,6 +1,6 @@
 const appApi = DEPLOYED_URL;
 
-//TODO: TODO_SECURITY: requestParam 'name' should be removed in release
+//TODO: TODO_SECURITY: requestParam 'pName' should be removed in release
 export async function getPool(pName) {
     return fetch(appApi + 'squad/getPool?pName=' + pName).then(function (response) {
         return response.status === 200 ? response.json() : null;
@@ -15,7 +15,7 @@ export async function getPool(pName) {
     });
 }
 
-//TODO: TODO_SECURITY: requestParam 'name' should be removed in release
+//TODO: TODO_SECURITY: requestParam 'pName' should be removed in release
 export async function retireHero(pName, unit) {
     let url = new URL(appApi + 'squad/retireHero');
     url.search = new URLSearchParams({pName: pName, unit: unit});
@@ -32,7 +32,7 @@ export async function retireHero(pName, unit) {
     });
 }
 
-//TODO: TODO_SECURITY: requestParam 'name' should be removed in release
+//TODO: TODO_SECURITY: requestParam 'pName' should be removed in release
 export async function addNewHero(pName, name, type) {
     let url = new URL(appApi + 'squad/addNew');
     url.search = new URLSearchParams({pName: pName, name: name, type: type.toUpperCase()});

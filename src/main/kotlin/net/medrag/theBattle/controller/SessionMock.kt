@@ -36,7 +36,11 @@ fun extractBattleUUID(request: HttpServletRequest, pName: String?): UUID? {
     return sessionStorage[pName]?.bud
 }
 
-fun emulateBudSetting(pName: String, bud: UUID) {
+fun emulateBudSetting(pName: String, bud: UUID, request: HttpServletRequest) {
+    request.getSession(false)?.let {
+        it.setAttribute(BATTLE_UUID, bud)
+        return
+    }
     sessionStorage[pName]?.bud = bud
 }
 

@@ -9,6 +9,7 @@ import net.medrag.theBattle.model.classes.ValidatedSquad
 import net.medrag.theBattle.model.dto.BattleBidResponse
 import net.medrag.theBattle.model.dto.SquadDTO
 import net.medrag.theBattle.model.dto.buildUnit
+import net.medrag.theBattle.model.entities.UnitStatus
 import net.medrag.theBattle.model.squad.FoesPair
 import net.medrag.theBattle.repo.PlayerRepo
 import net.medrag.theBattle.repo.UnitRepo
@@ -45,6 +46,7 @@ class BattleService(
     /**
      * Map stores players, that were notified about battle start by websocket and do not know their Battle UUID
      */
+    //TODO: why don't you add this info to player entity?
     private val playersWhoDontKnowTheirBattleUUIDs = ConcurrentHashMap<String, UUID>()
 
     /**
@@ -56,7 +58,7 @@ class BattleService(
      * Otherwise new bid will be added to the searching queue with new battle uuid, it will be returned with status AWAIT.
      */
     @Transactional(readOnly = true)
-    fun startBattleBid(playerName: String, squadDTO: SquadDTO): BattleBidResponse {
+    fun registerBattleBid(playerName: String, squadDTO: SquadDTO): BattleBidResponse {
         val player = playerRepo.findByName(playerName)
                 ?: throw ValidationException("Player with this name does not exists.")
         val unit1 = unitRepo.findByIdAndPlayer(squadDTO.pos1.id, player)
@@ -67,6 +69,10 @@ class BattleService(
 
         if (unit1 == null || unit2 == null || unit3 == null || unit4 == null || unit5 == null) {
             throw ValidationException("Someone cheats: there are no such heroes in your pool!")
+        }
+        for (unit in listOf(unit1, unit2, unit3, unit4, unit5)) {
+            if (unit.status != UnitStatus.IN_POOL)
+                throw ValidationException("Someone cheats: $unit is not free fo pick!")
         }
 
         searching.poll()?.let {
@@ -89,7 +95,12 @@ class BattleService(
     /**
      * Removes squad from the searching queue. Returns true if succeeds, otherwise false.
      */
-    fun cancelBid(playerName: String, bud: UUID) = searching.remove(ValidatedSquad(playerName))
+    fun cancelBid(playerName: String) = searching.remove(ValidatedSquad(playerName))
+
+    /**
+     * Removes player's battle uuid from playersWhoDontKnowTheirBattleUUIDs and returns it
+     */
+    fun getBud(playerName: String) = playersWhoDontKnowTheirBattleUUIDs.remove(playerName)
 
     /**
      * Returns foesPair, based on Battle UUID

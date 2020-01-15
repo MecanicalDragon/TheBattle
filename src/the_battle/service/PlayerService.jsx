@@ -44,6 +44,7 @@ store.subscribe(() => {
 });
 /// Redux
 
+//TODO: maybe you wand to bound this request with server?
 export function isPlayerLoggedIn() {
     let auth = store.getState().auth;
     console.log("is user logged in?");
@@ -61,8 +62,26 @@ export function getPlayerName() {
  * @returns true if ok
  */
 export async function logout() {
-    store.dispatch(setAuth(null));
-    return true;
+    let url = new URL(appApi + 'auth/logout');
+    return fetch(url, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        }
+    }).then(function (response) {
+        if (response.status === 200)
+            return response.text();
+        else return response
+    }).then(resp => {
+        if (resp === "LOGGED_OUT") {
+            store.dispatch(setAuth(null));
+            return true;
+        } else {
+            NotificationManager.error("", <FormattedMessage id={"app.logout.failed"}/>, 5000);
+            return false;
+        }
+    });
 }
 
 /**
@@ -77,9 +96,9 @@ export async function login(name) {
     return fetch(url).then(function (response) {
         if (response.status === 200)
             return response.json();
-        else return response
+        else return null
     }).then(resp => {
-        if (resp.status !== undefined) {
+        if (resp === null) {
             NotificationManager.warning(name, <FormattedMessage id={"app.input.login.bad"}/>, 3000);
             return null;
         } else {
