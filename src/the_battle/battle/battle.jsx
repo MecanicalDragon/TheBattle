@@ -3,7 +3,6 @@ import {connect} from 'react-redux';
 import {
     Container,
     Jumbotron,
-    Button,
     Row,
     Col
 } from 'reactstrap'
@@ -11,6 +10,7 @@ import {setNavPosition} from "@/constants/actions";
 import {Battle} from "@/constants/paths";
 import * as BattleService from '@/service/BattleService'
 import {getPlayerName} from "@/service/PlayerService";
+import BattleSquad from "@/component/common/BattleSquad";
 
 class BattleComp extends Component {
 
@@ -20,6 +20,8 @@ class BattleComp extends Component {
         let playerName = getPlayerName();
         this.state = {
             playerName: playerName,
+            myDescr: "",
+            foesDescr: "",
             mySquad: undefined,
             foesSquad: undefined,
             foesName: null
@@ -30,23 +32,23 @@ class BattleComp extends Component {
         let {playerName} = this.state;
         BattleService.getBattle(playerName).then(foes => {
             try {
-                    let mySquad = null;
-                    let foesSquad = null;
-                    switch (playerName) {
-                        case foes.foe1.playerName:
-                            mySquad = foes.foe1;
-                            foesSquad = foes.foe2;
-                            break;
-                        case foes.foe2.playerName:
-                            mySquad = foes.foe2;
-                            foesSquad = foes.foe1;
-                            break;
-                        default:
-                            throw "No such player name in loaded battle!"
+                let mySquad = null;
+                let foesSquad = null;
+                switch (playerName) {
+                    case foes.foe1.playerName:
+                        mySquad = foes.foe1;
+                        foesSquad = foes.foe2;
+                        break;
+                    case foes.foe2.playerName:
+                        mySquad = foes.foe2;
+                        foesSquad = foes.foe1;
+                        break;
+                    default:
+                        throw "No such player name in loaded battle!"
 
-                    }
-                    let foesName = foesSquad.playerName;
-                    this.setState({foesSquad: foesSquad, mySquad: mySquad, foesName: foesName})
+                }
+                let foesName = foesSquad.playerName;
+                this.setState({foesSquad: foesSquad, mySquad: mySquad, foesName: foesName})
             } catch (e) {
                 console.log(e)
             }
@@ -63,27 +65,24 @@ class BattleComp extends Component {
             <Container>
                 <Jumbotron>
                     <Row>
-                        <Col>
+                        <Col xs={"auto"}>
+                            <h3>
                             {playerName}
+                            </h3>
                         </Col>
-                        <Col>
+                        <Col/>
+                        <Col xs={"auto"}>
+                            <h3>
                             {foesName}
+                            </h3>
                         </Col>
                     </Row>
                     <Row>
                         <Col>
-                            {mySquad ? mySquad.pos1.name : null}<br/>
-                            {mySquad ? mySquad.pos2.name : null}<br/>
-                            {mySquad ? mySquad.pos3.name : null}<br/>
-                            {mySquad ? mySquad.pos4.name : null}<br/>
-                            {mySquad ? mySquad.pos5.name : null}<br/>
+                            {mySquad ? <BattleSquad foe={false} squad={mySquad}/> : null}
                         </Col>
                         <Col>
-                            {foesSquad ? foesSquad.pos1.name : null}<br/>
-                            {foesSquad ? foesSquad.pos2.name : null}<br/>
-                            {foesSquad ? foesSquad.pos3.name : null}<br/>
-                            {foesSquad ? foesSquad.pos4.name : null}<br/>
-                            {foesSquad ? foesSquad.pos5.name : null}<br/>
+                            {foesSquad ? <BattleSquad foe={true} squad={foesSquad}/> : null}
                         </Col>
                     </Row>
                 </Jumbotron>

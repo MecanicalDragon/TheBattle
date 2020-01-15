@@ -14,7 +14,7 @@ data class ValidatedSquad(val playerName: String,
                           val pos2: UnitDTO = mock,
                           val pos3: UnitDTO = mock,
                           val pos4: UnitDTO = mock,
-                          val pos5: UnitDTO = mock) {  //  BattleUUID
+                          val pos5: UnitDTO = mock) {
 
     companion object {
         val mock = UnitDTO(0, "Mock", 0, 0, 0, Unitt.Unit.Type.FIGHTER.getInstance())

@@ -4,7 +4,7 @@ import * as routes from './routes';
 import AuthRouter from "@/router/authRouter";
 
 const LazyIndex = React.lazy(() => import( '@/component/index'));
-const LazyBattle = React.lazy(() => import( '@/component/battle'));
+const LazyBattle = React.lazy(() => import( '@/battle/battle'));
 const LazyManage = React.lazy(() => import( '@/component/manager/manage'));
 // const LazyLoginPage = React.lazy(() => import( '@/component/login'));
 // const LazyFirstPage = React.lazy(() => import( '@/component/first'));

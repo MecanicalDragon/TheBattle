@@ -21,6 +21,7 @@ import Remove from "@/component/manager/remove";
 import {NotificationManager} from "react-notifications";
 import SockJsClient from 'react-stomp';
 import * as routes from '@/router/routes'
+import DescriptionArea from "@/component/common/DescriptionArea";
 
 class ManageComp extends Component {
 
@@ -133,12 +134,7 @@ class ManageComp extends Component {
         })
     };
 
-    setDescription = (text) => {
-        let type = JSON.stringify(text.type).split(",").slice(0, 8).join("\n")
-            .replace("{", "").replace("}", "").split("\"").join(" ");
-        let string = "Name: " + text.name.concat("\n").concat("Level: ").concat(text.level).concat("\n").concat(type).concat("\n");
-        this.setState({descr: string});
-    };
+    setDescription = (text) => this.setState({descr: text});
 
     //TODO: what if player reloads the page after searching start?
     //TODO: what if player starts the search and logs out?
@@ -308,20 +304,14 @@ class ManageComp extends Component {
                             <Col xs={"auto"}>
                                 <Col xs={"auto"} style={{marginTop: 92}}>
                                     <Button onClick={() => this.toBattle()} disabled={this.state.toBattleDisabled}
-                                            color={this.state.onSearching ? "danger" : "success"}>
+                                            color={this.state.onSearching ? "danger" : "success"}
+                                    style={{marginBottom: 17, marginRight: 15}}>
                                         <FormattedMessage id={this.state.onSearching
                                             ? "app.manage.battle.cancel" : "app.manage.to.battle"}/></Button>
                                     {/*<Button onClick={() => this.test()}>Test</Button>*/}
                                     {this.state.onSearching ? <span>Searching...</span> : null}
                                     <br/>
-                                    <textarea id={"mySquadStats"} value={this.state.descr} readOnly={true}
-                                              style={{
-                                                  width: "200px",
-                                                  height: "274px",
-                                                  resize: "none",
-                                                  borderRadius: 7,
-                                                  marginTop: 17
-                                              }}/>
+                                    <DescriptionArea description={this.state.descr}/>
                                     <Remove show={this.state.removeWindow}/>
                                 </Col>
                             </Col>

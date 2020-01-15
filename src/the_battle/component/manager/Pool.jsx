@@ -1,5 +1,5 @@
 import React, {Component, Fragment} from 'react';
-import {Unit} from "../Unit";
+import {Unit} from "../common/Unit";
 import {FormattedMessage} from 'react-intl';
 import AddNew from './addNew';
 import {Droppable} from "react-beautiful-dnd";
