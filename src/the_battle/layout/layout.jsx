@@ -17,7 +17,7 @@ import {
 
 import "./layout.css";
 import * as routes from '@/router/routes'
-import logo from '@/logo.png';
+import logo from '@/img/logo.png';
 
 class Layout extends React.Component {
 

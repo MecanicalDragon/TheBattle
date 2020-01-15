@@ -1,7 +1,7 @@
 import React from 'react';
 import {Droppable} from "react-beautiful-dnd";
 import styled from "styled-components";
-import {Unit} from "@/component/common/Unit";
+import {Unit} from "@/component/manager/Unit";
 
 const LongLine = styled.div`
     background-color: ${props => (props.drag ? 'cyan' : 'azure')};

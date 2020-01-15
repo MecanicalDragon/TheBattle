@@ -1,5 +1,4 @@
 const appApi = DEPLOYED_URL;
-import React from "react";
 
 //TODO: TODO_SECURITY: requestParam 'pName' should be removed in release
 export async function getBattle(pName) {

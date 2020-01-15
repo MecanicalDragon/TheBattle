@@ -12,6 +12,7 @@
     "react": "^16.9.0",
     "react-beautiful-dnd": "^9.0.2",
     "react-dom": "^16.9.0",
+    "react-image": "^2.2.2",
     "react-intl": "^2.4.0",
     "react-loader-spinner": "^3.1.2",
     "react-notifications": "^1.4.3",

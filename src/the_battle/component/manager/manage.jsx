@@ -308,10 +308,9 @@ class ManageComp extends Component {
                                     style={{marginBottom: 17, marginRight: 15}}>
                                         <FormattedMessage id={this.state.onSearching
                                             ? "app.manage.battle.cancel" : "app.manage.to.battle"}/></Button>
-                                    {/*<Button onClick={() => this.test()}>Test</Button>*/}
                                     {this.state.onSearching ? <span>Searching...</span> : null}
                                     <br/>
-                                    <DescriptionArea description={this.state.descr}/>
+                                    <DescriptionArea description={this.state.descr} height={274}/>
                                     <Remove show={this.state.removeWindow}/>
                                 </Col>
                             </Col>

@@ -1,8 +1,8 @@
-import React, {useState} from 'react';
+import React from 'react';
 
 const DescriptionArea = (props) => {
 
-    let {description} = props;
+    let {description, height} = props;
 
     const setDescription = (text) => {
         if (text) {
@@ -16,10 +16,9 @@ const DescriptionArea = (props) => {
         <textarea value={setDescription(description)} readOnly={true}
                   style={{
                       width: "200px",
-                      height: "274px",
+                      height: height || 300,
                       resize: "none",
-                      borderRadius: 7,
-                      // marginTop: 17
+                      borderRadius: 7
                   }}/>
     )
 };
