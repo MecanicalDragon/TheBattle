@@ -10,7 +10,7 @@ import {setNavPosition} from "@/constants/actions";
 import {Battle} from "@/constants/paths";
 import * as BattleService from '@/service/BattleService'
 import {getPlayerName} from "@/service/PlayerService";
-import BattleSquad from "@/battle/BattleSquad";
+import BattleSquad from "@/component/battle/BattleSquad";
 
 class BattleComp extends Component {
 
@@ -77,11 +77,11 @@ class BattleComp extends Component {
                     </Row>
                     <Row>
                         <Col>
-                            {mySquad ? <BattleSquad foe={false} squad={mySquad}
+                            {mySquad ? <BattleSquad foe={false} squad={mySquad} clearTargets={this.clearTargets}
                                                     calculateTargets={this.calculateTargets}/> : null}
                         </Col>
                         <Col>
-                            {foesSquad ? <BattleSquad foe={true} squad={foesSquad}
+                            {foesSquad ? <BattleSquad foe={true} squad={foesSquad} clearTargets={this.clearTargets}
                                                       calculateTargets={this.calculateTargets}/> : null}
                         </Col>
                     </Row>
@@ -93,13 +93,35 @@ class BattleComp extends Component {
     calculateTargets = (pos, foe, mark) => {
         let attacker = foe === true ? this.state.foesSquad : this.state.mySquad;
         let target = foe === true ? this.state.mySquad : this.state.foesSquad;
+        let targets = mark(pos, attacker, target);
+        targets.forEach(function (pos) {
+            target[pos].marked = true;
+        });
+        if (!foe) {
+            this.setState({foesSquad: target});
+        } else {
+            this.setState({mySquad: target});
+        }
+    };
 
-        console.log("_______________");
-        console.log("targets of " + pos);
-        mark();
-        console.log(attacker[pos]);
-        console.log(target);
-    }
+    clearTargets = (foe) => {
+        let clearMark = function (squad) {
+            squad.pos1.marked = false;
+            squad.pos2.marked = false;
+            squad.pos3.marked = false;
+            squad.pos4.marked = false;
+            squad.pos5.marked = false;
+        };
+        if (foe) {
+            let squad = this.state.mySquad;
+            clearMark(squad);
+            this.setState({mySquad: squad});
+        } else {
+            let squad = this.state.foesSquad;
+            clearMark(squad);
+            this.setState({foesSquad: squad});
+        }
+    };
 }
 
 export default connect()(BattleComp);

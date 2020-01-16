@@ -20,6 +20,6 @@ export function attack() {
     console.log("everyone")
 }
 
-export function markTargets() {
-    console.log("everyone")
+export function markTargets(position, attacker, target) {
+    return ["pos1", "pos2", "pos3", "pos4", "pos5"];
 }

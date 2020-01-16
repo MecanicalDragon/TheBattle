@@ -13,7 +13,7 @@ const UnitPlace = styled.div`
     width: 100px;
     height: 100px;
     border-radius: 15px;
-    background-color: ${props => props.over ? "var(--over-unit)" : "var(--jumbotron-bg)"}
+    background-color: ${props => props.mrk ? "var(--marked-unit)" : props.over ? "var(--over-unit)" : "var(--jumbotron-bg)"}
 `;
 
 /**
@@ -21,7 +21,7 @@ const UnitPlace = styled.div`
  */
 export function BattleUnit(props) {
 
-    const {characteristics, descrFunc, foe, calculateTargets, pos} = props;
+    const {characteristics, descrFunc, foe, calculateTargets, pos, clearTargets} = props;
     const [over, setOver] = useState(false);
 
     const unitProps = getUnitProps(characteristics.type.type);
@@ -33,11 +33,12 @@ export function BattleUnit(props) {
     };
 
     const onMouseLeave = () => {
-        setOver(false)
+        clearTargets(foe);
+        setOver(false);
     };
 
     return characteristics ?
-        <UnitPlace over={over}
+        <UnitPlace over={over} mrk={characteristics.marked}
                    onMouseOver={() => onMouseOver()}
                    onMouseLeave={() => onMouseLeave()}>
             <Img style={{maxHeight: 100, maxWidth: 80, transform: foe ? "scaleX(-1)" : "scaleX(1)"}}

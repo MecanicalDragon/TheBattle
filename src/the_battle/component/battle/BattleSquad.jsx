@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import {Button} from 'reactstrap'
 import styled from "styled-components";
 import DescriptionArea from "@/component/common/DescriptionArea";
-import {BattleUnit} from "@/battle/BattleUnit";
+import {BattleUnit} from "@/component/battle/BattleUnit";
 
 const Field = styled.div`
     display: flex;
@@ -27,7 +27,7 @@ const Column = styled.div`
 
 const BattleSquad = (props) => {
 
-    let {foe, squad, calculateTargets} = props;
+    let {foe, squad, calculateTargets, clearTargets} = props;
 
     const [description, setDescription] = useState("");
 
@@ -38,7 +38,8 @@ const BattleSquad = (props) => {
                 units.map((unit, index) => {
                         return (
                             <BattleUnit key={index} characteristics={unit} descrFunc={setDescription} foe={foe}
-                                        calculateTargets={calculateTargets} pos={positions[index]}/>
+                                        calculateTargets={calculateTargets} pos={positions[index]}
+                                        clearTargets={clearTargets}/>
                         )
                     }
                 )

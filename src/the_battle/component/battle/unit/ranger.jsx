@@ -20,6 +20,6 @@ export function attack() {
     console.log("distant enemies")
 }
 
-export function markTargets() {
-    console.log("distant enemies")
+export function markTargets(position, attacker, target) {
+    return ["pos1", "pos3"]
 }
