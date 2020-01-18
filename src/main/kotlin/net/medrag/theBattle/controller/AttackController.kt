@@ -1,8 +1,10 @@
 package net.medrag.theBattle.controller
 
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import net.medrag.theBattle.model.dto.AttackAction
+import net.medrag.theBattle.service.AttackService
+import org.springframework.http.ResponseEntity
+import org.springframework.web.bind.annotation.*
+import javax.servlet.http.HttpServletRequest
 
 
 /**
@@ -11,9 +13,19 @@ import org.springframework.web.bind.annotation.RestController
  */
 @RestController
 @RequestMapping("/attack")
-class AttackController(){
-    @PostMapping("/")
-    fun attack(){
+class AttackController(private val attackService: AttackService) {
+    //TODO: TODO_SECURITY: requestParam 'pName' should be removed in release
+    @PostMapping("/performAttack")
+    fun performAttack(@RequestParam pName: String?,
+                      @RequestBody attackAction: AttackAction,
+                      request: HttpServletRequest): ResponseEntity<String> {
 
+        val playerName = extractPlayerName(request, pName)
+        if (playerName.isNullOrBlank()) return ResponseEntity.badRequest().build()
+
+        extractBattleUUID(request, playerName)?.let {
+            return ResponseEntity.ok(attackService.performAttack(playerName, it, attackAction))
+        }
+        return ResponseEntity.badRequest().build()
     }
 }

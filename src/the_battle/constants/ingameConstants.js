@@ -3,6 +3,12 @@ export const FORCED_BACK = "FORCED_BACK";
 export const LONG_LINE = ["pos1", "pos2", "pos3"];
 export const SHORT_LINE = ["pos2", "pos4"];
 
+export const UNIT_BG_DEFAULT = "var(--jumbotron-bg)";
+export const UNIT_BG_OVER = "var(--over-unit)";
+export const UNIT_BG_MARKED = "var(--marked-unit)";
+export const UNIT_BG_PICKED = "var(--picked-unit)";
+export const UNIT_BG_ATTACK = "var(--attack-unit)";
+
 export const CLOSE_TARGETS = {
     "ff": {
         "pos1": ["pos1", "pos3"],

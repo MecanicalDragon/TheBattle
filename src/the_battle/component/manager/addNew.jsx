@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useRef, Fragment} from 'react';
 import {
     Dropdown,
     DropdownToggle,
@@ -18,6 +18,7 @@ const AddNew = (props) => {
     const [popOpen, setPopOpen] = useState(false);
     const [name, setName] = useState("");
     const [type, setType] = useState("");
+    const inputRef = useRef();
 
     const toggleDd = () => {
         setDdOpen(prevState => !prevState);
@@ -28,7 +29,8 @@ const AddNew = (props) => {
 
     const setNewUnitType = (type) => {
         setType(type);
-        togglePop()
+        togglePop();
+        // inputRef.current.focus() //  But it will work only if you extract Input from popover
     };
 
     const changeName = (event) => {
@@ -49,7 +51,7 @@ const AddNew = (props) => {
             <Popover placement="bottom" isOpen={popOpen} target="AddUnitTypeSelector1" toggle={togglePop}>
                 <PopoverHeader><FormattedMessage id={"app.manage.squad.inout.name.for.new"}/>{type}</PopoverHeader>
                 <PopoverBody style={{display: "flex"}}>
-                    <Input placeholder={"2-16 chars"} onChange={() => changeName(event)} value={name}
+                    <Input placeholder={"2-16 chars"} onChange={(e) => changeName(e)} value={name} innerRef={inputRef}
                            style={{width: 180}} minLength={2} maxLength={16}/>
                     <Button color={"success"} style={{width: 60, padding: 0, marginLeft: 10}}
                             onClick={() => {

@@ -27,7 +27,7 @@ const Column = styled.div`
 
 const BattleSquad = (props) => {
 
-    let {foe, squad, calculateTargets, clearTargets} = props;
+    let {foe, squad, calculateTargets, clearTargets, pickAttacker, selectTargets} = props;
 
     const [description, setDescription] = useState("");
 
@@ -39,7 +39,8 @@ const BattleSquad = (props) => {
                         return (
                             <BattleUnit key={index} characteristics={unit} descrFunc={setDescription} foe={foe}
                                         calculateTargets={calculateTargets} pos={positions[index]}
-                                        clearTargets={clearTargets}/>
+                                        clearTargets={clearTargets} pickAttacker={foe ? null : pickAttacker}
+                                        selectTargets={foe ? selectTargets : null}/>
                         )
                     }
                 )

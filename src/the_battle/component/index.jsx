@@ -6,7 +6,7 @@ import {
     Button,
     Row,
     Col,
-    Input
+    Input, Form
 } from 'reactstrap'
 import * as routes from '@/router/routes'
 import * as player from '@/service/PlayerService'
@@ -64,21 +64,23 @@ class Index extends Component {
 
     getLoginForm() {
         return (
-            <Row>
-                <Col xs={"auto"}>
-                    <FormattedMessage id={"app.input.name"}/>
-                </Col>
-                <Col xs={"auto"}>
-                    <Input type={"text"} value={this.state.enterName} onChange={this.handleChange}
-                           placeholder={"Input your name"}/>
-                </Col>
-                <Col xs={"auto"}>
-                    <Button color={"success"} onClick={() => this.login()}>Login</Button>
-                </Col>
-                <Col xs={"auto"}>
-                    <Button color={"info"} onClick={() => this.create()}>Create</Button>
-                </Col>
-            </Row>
+            <Form onSubmit={(e) => this.login(e)}>
+                <Row>
+                    <Col xs={"auto"}>
+                        <FormattedMessage id={"app.input.name"}/>
+                    </Col>
+                    <Col xs={"auto"}>
+                        <Input type={"text"} value={this.state.enterName} onChange={this.handleChange}
+                               placeholder={"Input your name"}/>
+                    </Col>
+                    <Col xs={"auto"}>
+                        <Button color={"success"} type={"submit"}>Login</Button>
+                    </Col>
+                    <Col xs={"auto"}>
+                        <Button color={"info"} onClick={() => this.create()}>Create</Button>
+                    </Col>
+                </Row>
+            </Form>
         )
     }
 
@@ -86,7 +88,8 @@ class Index extends Component {
         this.setState({enterName: event.target.value})
     }
 
-    login() {
+    login(event) {
+        event.preventDefault();
         let name = this.state.enterName;
         player.login(name).then(resp => {
             if (resp !== null) {

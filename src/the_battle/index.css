@@ -3,6 +3,8 @@
     --jumbotron-bg: #e9ecef;
     --over-unit: azure;
     --marked-unit: #FF999B;
+    --attack-unit: #FF4632;
+    --picked-unit: #5AFFAC;
 }
 
 .unitLogo{

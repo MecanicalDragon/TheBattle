@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import styled from "styled-components";
 import * as fighter from "./unit/fighter"
 import * as ranger from "./unit/ranger"
@@ -8,12 +8,19 @@ import Img from 'react-image'
 import img_fgt from '@/img/fighter.png';
 import img_rng from '@/img/ranger.png';
 import img_sag from '@/img/sage.png';
+import {
+    UNIT_BG_ATTACK,
+    UNIT_BG_DEFAULT,
+    UNIT_BG_MARKED,
+    UNIT_BG_OVER,
+    UNIT_BG_PICKED
+} from "@/constants/ingameConstants";
 
 const UnitPlace = styled.div`
     width: 100px;
     height: 100px;
     border-radius: 15px;
-    background-color: ${props => props.mrk ? "var(--marked-unit)" : props.over ? "var(--over-unit)" : "var(--jumbotron-bg)"}
+    background-color: ${props => props.bgc}
 `;
 
 /**
@@ -21,26 +28,57 @@ const UnitPlace = styled.div`
  */
 export function BattleUnit(props) {
 
-    const {characteristics, descrFunc, foe, calculateTargets, pos, clearTargets} = props;
-    const [over, setOver] = useState(false);
+    const {characteristics, descrFunc, foe, calculateTargets, pos, clearTargets, pickAttacker, selectTargets} = props;
+    const [bgc, setBgc] = useState(UNIT_BG_DEFAULT);
 
     const unitProps = getUnitProps(characteristics.type.type);
 
+    useEffect(() => {
+        if (characteristics.marked) {
+            setBgc(UNIT_BG_MARKED)
+        } else {
+            setBgc(UNIT_BG_DEFAULT)
+        }
+    }, [characteristics.marked]);
+
+    useEffect(() => {
+        if (characteristics.picked) {
+            setBgc(UNIT_BG_PICKED)
+        } else if (characteristics.picked === undefined) {
+            setBgc(UNIT_BG_DEFAULT)
+        } else {
+            setBgc(UNIT_BG_OVER)
+        }
+    }, [characteristics.picked]);
+
     const onMouseOver = () => {
-        descrFunc(characteristics);
-        setOver(true);
-        calculateTargets(pos, foe, unitProps.mark)
+        if (!characteristics.picked) {
+            descrFunc(characteristics);
+            if (characteristics.marked) {
+                setBgc(UNIT_BG_ATTACK)
+            } else {
+                setBgc(UNIT_BG_OVER);
+                calculateTargets(pos, foe, unitProps.mark)
+            }
+        }
     };
 
     const onMouseLeave = () => {
-        clearTargets(foe);
-        setOver(false);
+        if (!characteristics.picked) {
+            clearTargets(foe);
+            setBgc(characteristics.marked ? UNIT_BG_MARKED : UNIT_BG_DEFAULT);
+        }
+    };
+    const validateAttack = () => {
+        if (characteristics.marked)
+            selectTargets([pos]);
     };
 
     return characteristics ?
-        <UnitPlace over={over} mrk={characteristics.marked}
+        <UnitPlace bgc={bgc}
                    onMouseOver={() => onMouseOver()}
-                   onMouseLeave={() => onMouseLeave()}>
+                   onMouseLeave={() => onMouseLeave()}
+                   onClick={foe ? () => validateAttack() : () => pickAttacker(pos)}>
             <Img style={{maxHeight: 100, maxWidth: 80, transform: foe ? "scaleX(-1)" : "scaleX(1)"}}
                  src={unitProps.image}/>
         </UnitPlace>
