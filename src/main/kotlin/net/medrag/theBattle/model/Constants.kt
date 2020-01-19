@@ -13,3 +13,5 @@ const val AWAIT = "AWAIT"
 const val START = "START"
 const val CANCELLED = "CANCELLED"
 const val NOT_CANCELLED = "NOT_CANCELLED"
+
+const val ACCURACY_MODIFIER = 3
