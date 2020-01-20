@@ -53,7 +53,9 @@ class BattleComp extends Component {
 
                     }
                     let foesName = foesSquad.playerName;
-                    this.setState({foesSquad: foesSquad, mySquad: mySquad, foesName: foesName})
+                    this.setState({foesSquad: foesSquad, mySquad: mySquad, foesName: foesName, action: foes.actionMan})
+                    console.log("Now turn of...");
+                    console.log(foes.actionMan)
                 } catch (e) {
                     console.log(e)
                 }
@@ -125,9 +127,8 @@ class BattleComp extends Component {
         let {playerName, attacker} = this.state;
         performAttack(playerName, attacker, targets).then(r => {
             if (r) {
-                console.log("perform attack!");
+                console.log("ATTACK PERFORMED!");
                 console.log(r);
-
             }
         })
     };

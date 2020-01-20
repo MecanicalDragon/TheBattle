@@ -12,6 +12,8 @@ data class UnitDTO(
         val name: String,
         val level: Int,
         val exp: Int,
-        val hp: Int,
+        var hp: Int,
+        var initiative: Double = 0.0,
+        var movePerformed: Boolean = false,
         val type: Unitt
 )

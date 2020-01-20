@@ -1,0 +1,4 @@
+- second move(init/2)
+- fireball (3 targets)
+- ignore defence
+- backstab

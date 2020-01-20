@@ -10,7 +10,7 @@ export async function performAttack(pName, attacker, targets) {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
         },
-        body: JSON.stringify({attacker: attacker, targets: targets})
+        body: JSON.stringify({attacker: attacker.toString().toUpperCase(), targets: targets})
     }).then(function (response) {
         return response.status === 200 ? response.json() : null;
     }).then(resp => {

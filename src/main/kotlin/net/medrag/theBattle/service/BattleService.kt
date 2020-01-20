@@ -108,9 +108,19 @@ class BattleService(
     fun getDislocations(playerName: String, bud: UUID): FoesPair {
         battleFoes[bud]?.let {
             if (it.foe1.playerName == playerName || it.foe2.playerName == playerName) return it
+            throw ValidationException("Your name is not in battle data, cheater.")
         }
-        throw ValidationException("Your name is not in battle data, cheater.")
+        throw ValidationException("Your battle id is not in battle data, cheater.")
     }
+
+//    fun updateDislocations(playerName: String, bud: UUID, pair: FoesPair) {
+//        battleFoes[bud]?.let {
+//            if (it.foe1.playerName == playerName || it.foe2.playerName == playerName)
+//                battleFoes[bud] = pair
+//            else throw ValidationException("Your name is not in battle data, cheater.")
+//        }
+//        throw ValidationException("Your battle id is not in battle data, cheater.")
+//    }
 
     //TODO: delete after tests
     fun testWebSockets(playerName: String): UUID {
