@@ -18,7 +18,9 @@ const DescriptionArea = (props) => {
                       width: "200px",
                       height: height || 300,
                       resize: "none",
-                      borderRadius: 7
+                      borderRadius: 7,
+                      marginLeft: 3,
+                      marginRight: 3
                   }}/>
     )
 };

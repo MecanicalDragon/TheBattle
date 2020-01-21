@@ -305,10 +305,12 @@ class ManageComp extends Component {
                                 <Col xs={"auto"} style={{marginTop: 92}}>
                                     <Button onClick={() => this.toBattle()} disabled={this.state.toBattleDisabled}
                                             color={this.state.onSearching ? "danger" : "success"}
-                                    style={{marginBottom: 17, marginRight: 15}}>
+                                            style={{marginBottom: 17, marginRight: 15}}>
                                         <FormattedMessage id={this.state.onSearching
                                             ? "app.manage.battle.cancel" : "app.manage.to.battle"}/></Button>
                                     {this.state.onSearching ? <span>Searching...</span> : null}
+                                    <Button onClick={() => this.test()} color={"info"}
+                                            style={{marginBottom: 17, marginRight: 15}}>Test</Button>
                                     <br/>
                                     <DescriptionArea description={this.state.descr} height={274}/>
                                     <Remove show={this.state.removeWindow}/>
@@ -326,6 +328,76 @@ class ManageComp extends Component {
                               }}/>
             </Container>
         )
+    }
+
+    test() {
+        console.log(this.state.columns);
+        if (this.state.playerName === "asdd")
+            this.setState({
+                columns: {
+                    'reserve': {
+                        id: 'reserve',
+                        heroes: []
+                    },
+                    'short1': {
+                        id: 'short1',
+                        heroes: [1]
+                    },
+                    'short2': {
+                        id: 'short2',
+                        heroes: [4]
+                    },
+                    'long1': {
+                        id: 'long1',
+                        heroes: [66]
+                    },
+                    'long2': {
+                        id: 'long2',
+                        heroes: [67]
+                    },
+                    'long3': {
+                        id: 'long3',
+                        heroes: [68]
+                    },
+                    'remove': {
+                        id: 'remove',
+                        heroes: []
+                    }
+                },
+            });
+        if (this.state.playerName === "asds")
+            this.setState({
+                columns: {
+                    'reserve': {
+                        id: 'reserve',
+                        heroes: []
+                    },
+                    'short1': {
+                        id: 'short1',
+                        heroes: [33]
+                    },
+                    'short2': {
+                        id: 'short2',
+                        heroes: [34]
+                    },
+                    'long1': {
+                        id: 'long1',
+                        heroes: [35]
+                    },
+                    'long2': {
+                        id: 'long2',
+                        heroes: [69]
+                    },
+                    'long3': {
+                        id: 'long3',
+                        heroes: [70]
+                    },
+                    'remove': {
+                        id: 'remove',
+                        heroes: []
+                    }
+                },
+            })
     }
 
     getSmallRow() {

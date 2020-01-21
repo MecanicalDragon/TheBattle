@@ -1,4 +1,5 @@
 import React, {useState, useEffect} from 'react';
+import {Progress} from 'reactstrap';
 import styled from "styled-components";
 import * as fighter from "./unit/fighter"
 import * as ranger from "./unit/ranger"
@@ -9,6 +10,8 @@ import img_fgt from '@/img/fighter.png';
 import img_rng from '@/img/ranger.png';
 import img_sag from '@/img/sage.png';
 import {
+    FOES_TURN, MY_TURN,
+    NO_TURN,
     UNIT_BG_ATTACK,
     UNIT_BG_DEFAULT,
     UNIT_BG_MARKED,
@@ -20,6 +23,9 @@ const UnitPlace = styled.div`
     width: 100px;
     height: 100px;
     border-radius: 15px;
+    border-style: ${props => props.brd === NO_TURN ? "none" : "dashed"}
+    border-color: ${props => props.brd}
+    border-width: 1px;
     background-color: ${props => props.bgc}
 `;
 
@@ -28,11 +34,36 @@ const UnitPlace = styled.div`
  */
 export function BattleUnit(props) {
 
-    const {characteristics, descrFunc, foe, calculateTargets, pos, clearTargets, pickAttacker, selectTargets} = props;
+    const {
+        characteristics, descrFunc, foe, calculateTargets, pos, clearTargets, pickActor, selectTargets,
+        yourTurn
+    } = props;
     const [bgc, setBgc] = useState(UNIT_BG_DEFAULT);
+    const [borders, setBorders] = useState(NO_TURN);
+    const [currentHP, setCurrentHP] = useState(characteristics.hp);
 
     const unitProps = getUnitProps(characteristics.type.type);
 
+    useEffect(() => {
+        setCurrentHP(characteristics.hp * 100 / characteristics.type.health);
+    }, [characteristics.hp]);
+
+    /**
+     * If unit's turn, colors borders
+     */
+    useEffect(() => {
+        if (yourTurn && foe) {
+            setBorders(FOES_TURN)
+        } else if (yourTurn && !foe) {
+            setBorders(MY_TURN)
+        } else {
+            setBorders(NO_TURN)
+        }
+    }, [yourTurn]);
+
+    /**
+     * If unit can be a target of attack, colors bg
+     */
     useEffect(() => {
         if (characteristics.marked) {
             setBgc(UNIT_BG_MARKED)
@@ -41,6 +72,9 @@ export function BattleUnit(props) {
         }
     }, [characteristics.marked]);
 
+    /**
+     * If unit's picked, colors bg
+     */
     useEffect(() => {
         if (characteristics.picked) {
             setBgc(UNIT_BG_PICKED)
@@ -75,12 +109,15 @@ export function BattleUnit(props) {
     };
 
     return characteristics ?
-        <UnitPlace bgc={bgc}
+        <UnitPlace bgc={bgc} brd={borders}
                    onMouseOver={() => onMouseOver()}
                    onMouseLeave={() => onMouseLeave()}
-                   onClick={foe ? () => validateAttack() : () => pickAttacker(pos)}>
+                   onClick={foe ? () => validateAttack() : () => pickActor(pos)}>
+            {/*<div  style={{height: 90, width: 80}}/>*/}
             <Img style={{maxHeight: 100, maxWidth: 80, transform: foe ? "scaleX(-1)" : "scaleX(1)"}}
                  src={unitProps.image}/>
+            <Progress animated color={"success"} value={currentHP}
+                      style={{height: 5, marginRight: 3, marginLeft: 3, backgroundColor: "red"}}/>
         </UnitPlace>
         : null
 }

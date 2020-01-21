@@ -5,7 +5,7 @@ import net.medrag.theBattle.model.AWAIT
 import net.medrag.theBattle.model.GAME_FOUND
 import net.medrag.theBattle.model.START
 import net.medrag.theBattle.model.ValidationException
-import net.medrag.theBattle.model.classes.ValidatedSquad
+import net.medrag.theBattle.model.squad.ValidatedSquad
 import net.medrag.theBattle.model.dto.BattleBidResponse
 import net.medrag.theBattle.model.dto.SquadDTO
 import net.medrag.theBattle.model.dto.buildUnit
@@ -28,8 +28,8 @@ import java.util.concurrent.ConcurrentLinkedQueue
  */
 @Service
 class BattleService(
-        @Autowired val playerRepo: PlayerRepo,
-        @Autowired val unitRepo: UnitRepo,
+        @Autowired private val playerRepo: PlayerRepo,
+        @Autowired private val unitRepo: UnitRepo,
         @Autowired private val wSocket: SimpMessagingTemplate) {
 
     /**
@@ -111,27 +111,5 @@ class BattleService(
             throw ValidationException("Your name is not in battle data, cheater.")
         }
         throw ValidationException("Your battle id is not in battle data, cheater.")
-    }
-
-//    fun updateDislocations(playerName: String, bud: UUID, pair: FoesPair) {
-//        battleFoes[bud]?.let {
-//            if (it.foe1.playerName == playerName || it.foe2.playerName == playerName)
-//                battleFoes[bud] = pair
-//            else throw ValidationException("Your name is not in battle data, cheater.")
-//        }
-//        throw ValidationException("Your battle id is not in battle data, cheater.")
-//    }
-
-    //TODO: delete after tests
-    fun testWebSockets(playerName: String): UUID {
-        println("received")
-        GlobalScope.launch {
-            println("wait...")
-            delay(5000)
-            println("now!")
-            wSocket.convertAndSend("/searching/$playerName", "$GAME_FOUND->${UUID.randomUUID()}")
-            println("sent")
-        }
-        return UUID.randomUUID()
     }
 }

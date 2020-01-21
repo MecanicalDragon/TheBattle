@@ -1,5 +1,6 @@
 package net.medrag.theBattle.model.dto
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import net.medrag.theBattle.model.classes.Unitt
 
 
@@ -13,7 +14,9 @@ data class UnitDTO(
         val level: Int,
         val exp: Int,
         var hp: Int,
+        @JsonIgnore
         var initiative: Double = 0.0,
         var movePerformed: Boolean = false,
+        val effects: ArrayList<UnitEffects> = ArrayList(),
         val type: Unitt
 )

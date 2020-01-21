@@ -1,9 +1,9 @@
-package net.medrag.theBattle.model.classes
+package net.medrag.theBattle.model.squad
 
 import com.fasterxml.jackson.annotation.JsonIgnore
+import net.medrag.theBattle.model.classes.Unitt
 import net.medrag.theBattle.model.dto.Position
 import net.medrag.theBattle.model.dto.UnitDTO
-import net.medrag.theBattle.model.squad.SquadType
 
 
 /**
@@ -23,16 +23,6 @@ data class ValidatedSquad(val playerName: String,
 
     companion object {
         val mock = UnitDTO(0, "Mock", 0, 0, 0, type = Unitt.Unit.Type.FIGHTER.getInstance())
-
-        //TODO: remove?
-        fun sufferDamage(squad: ValidatedSquad, damaged: Map<String, UnitDTO>): ValidatedSquad {
-            val pos1 = damaged["pos1"] ?: squad.pos1
-            val pos2 = damaged["pos2"] ?: squad.pos2
-            val pos3 = damaged["pos3"] ?: squad.pos3
-            val pos4 = damaged["pos4"] ?: squad.pos4
-            val pos5 = damaged["pos5"] ?: squad.pos5
-            return ValidatedSquad(squad.playerName, squad.type, pos1, pos2, pos3, pos4, pos5)
-        }
     }
 
     override fun equals(other: Any?): Boolean {

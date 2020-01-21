@@ -1,7 +1,6 @@
 package net.medrag.theBattle.model.squad
 
 import com.fasterxml.jackson.annotation.JsonIgnore
-import net.medrag.theBattle.model.classes.ValidatedSquad
 import net.medrag.theBattle.model.dto.Position
 import net.medrag.theBattle.model.dto.UnitDTO
 
@@ -35,6 +34,7 @@ data class FoesPair(
         turnOrder[turn++].movePerformed = true
         if (turn == 10) calculateTurnOrder()
         actionMan = turnOrder[turn]
+        sout()
         return actionMan
     }
 
@@ -46,5 +46,28 @@ data class FoesPair(
         turnOrder.sortByDescending { it.initiative }
         turn = 0
         actionMan = turnOrder[turn]
+        sout()
+    }
+
+    /**
+     * Recalculates the order of acting units by it's current initiative and returns unit, who's turn now
+     */
+    fun recalculateOrder(): UnitDTO {
+        if (turn != 9 && turnOrder[turn + 1].initiative > turnOrder[turn].initiative) {
+            turnOrder.sortByDescending { it.initiative }
+        }
+        sout()
+        actionMan = turnOrder[turn]
+        return actionMan
+    }
+
+    private fun sout(){
+        println("turn:")
+        println(turn)
+        turnOrder.forEach {
+            println(it)
+        }
+        println("actionMan:")
+        println(actionMan)
     }
 }

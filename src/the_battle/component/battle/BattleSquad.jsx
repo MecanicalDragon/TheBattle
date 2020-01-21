@@ -1,18 +1,12 @@
 import React, {useState} from "react";
-import {Button} from 'reactstrap'
 import styled from "styled-components";
 import DescriptionArea from "@/component/common/DescriptionArea";
 import {BattleUnit} from "@/component/battle/BattleUnit";
+import ControlPanel from "@/component/battle/ControlPanel";
 
 const Field = styled.div`
     display: flex;
     flex-direction: ${props => (props.foe ? 'row-reverse' : 'row')}
-`;
-
-const ControlPane = styled.div`
-    width: 100px
-    display: flex;
-    flex-direction: column;
 `;
 
 const Squad = styled.div`
@@ -27,7 +21,7 @@ const Column = styled.div`
 
 const BattleSquad = (props) => {
 
-    let {foe, squad, calculateTargets, clearTargets, pickAttacker, selectTargets} = props;
+    let {foe, squad, calculateTargets, clearTargets, pickActor, selectTargets, actionManId, simpleAction} = props;
 
     const [description, setDescription] = useState("");
 
@@ -39,8 +33,8 @@ const BattleSquad = (props) => {
                         return (
                             <BattleUnit key={index} characteristics={unit} descrFunc={setDescription} foe={foe}
                                         calculateTargets={calculateTargets} pos={positions[index]}
-                                        clearTargets={clearTargets} pickAttacker={foe ? null : pickAttacker}
-                                        selectTargets={foe ? selectTargets : null}/>
+                                        clearTargets={clearTargets} pickActor={foe ? null : pickActor}
+                                        selectTargets={foe ? selectTargets : null} yourTurn={actionManId === unit.id}/>
                         )
                     }
                 )
@@ -51,12 +45,7 @@ const BattleSquad = (props) => {
 
     return (
         <Field foe={foe}>
-            <ControlPane>
-                {/*    <Button style={{margin: 5}}>Attack!</Button>*/}
-                {/*    <Button style={{margin: 5}}>Spell</Button>*/}
-                {/*    <Button style={{margin: 5}}>Wait</Button>*/}
-                {/*    <Button style={{margin: 5}}>Block</Button>*/}
-            </ControlPane>
+            <ControlPanel simpleAction={simpleAction} foe={foe}/>
             <DescriptionArea description={description}/>
             {squad ?
                 <Squad straight={(squad.type === "FORCED_BACK" && !foe) || (squad.type !== "FORCED_BACK" && foe)}>

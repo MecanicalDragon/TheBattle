@@ -9,6 +9,14 @@ export const UNIT_BG_MARKED = "var(--marked-unit)";
 export const UNIT_BG_PICKED = "var(--picked-unit)";
 export const UNIT_BG_ATTACK = "var(--attack-unit)";
 
+export const MY_TURN = "green";
+export const FOES_TURN = "red";
+export const NO_TURN = "grey";
+
+export const ATTACK = "ATTACK";
+export const WAIT = "WAIT";
+export const BLOCK = "BLOCK";
+
 export const CLOSE_TARGETS = {
     "ff": {
         "pos1": ["pos1", "pos3"],

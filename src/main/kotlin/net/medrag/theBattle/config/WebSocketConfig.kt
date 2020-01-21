@@ -16,7 +16,7 @@ class WebSocketConfig : WebSocketMessageBrokerConfigurer {
     }
 
     override fun configureMessageBroker(config: MessageBrokerRegistry) {
-        config.enableSimpleBroker("/searching")
+        config.enableSimpleBroker("/searching", "/battle")
         //        config.setApplicationDestinationPrefixes("/");
     }
 }

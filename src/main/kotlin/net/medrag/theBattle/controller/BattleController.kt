@@ -72,15 +72,4 @@ class BattleController(@Autowired val battleService: BattleService) {
         }
         return ResponseEntity.badRequest().build()
     }
-
-    //TODO: remove after tests
-    @PostMapping("/test")
-    fun test(@RequestParam(required = false) pName: String?,
-             request: HttpServletRequest): ResponseEntity<BattleBidResponse> {
-
-        val playerName = extractPlayerName(request, pName)
-        if (playerName.isNullOrBlank()) return ResponseEntity.badRequest().build()
-        val uuid = battleService.testWebSockets(playerName)
-        return ResponseEntity.ok(BattleBidResponse(AWAIT))
-    }
 }

@@ -1,4 +1,4 @@
-import React, {useState, useRef, Fragment} from 'react';
+import React, {useState, useRef} from 'react';
 import {
     Dropdown,
     DropdownToggle,
