@@ -1,18 +1,18 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useRef} from 'react';
 
 const Console = (props) => {
 
     const {battleLogs} = props;
     const [log, addLog] = useState("");
+    const ref = useRef();
 
     useEffect(() => {
-        let l = log;
-        if (l !== "") l += "\n";
-        addLog(l + battleLogs)
+        addLog(log.slice(0, -1) + battleLogs + "\n\n");
+        if (ref) ref.current.scrollTop = ref.current.scrollHeight;
     }, [battleLogs]);
 
     return (
-        <textarea value={log} readOnly={true}
+        <textarea value={log} readOnly={true} ref={ref}
                   style={{
                       width: 800,
                       height: 200,
