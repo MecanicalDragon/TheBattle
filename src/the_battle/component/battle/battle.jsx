@@ -14,6 +14,7 @@ import BattleSquad from "@/component/battle/BattleSquad";
 import {performAction} from "@/service/ActionService";
 import {ATTACK} from "@/constants/ingameConstants";
 import SockJsClient from 'react-stomp';
+import Console from "@/component/battle/Console";
 
 class BattleComp extends Component {
 
@@ -33,7 +34,8 @@ class BattleComp extends Component {
                 id: -1,
                 pos: "",
                 player: false
-            }
+            },
+            battleLogs: ""
         };
     }
 
@@ -52,8 +54,6 @@ class BattleComp extends Component {
                     actionMan: actionMan
                 });
             }
-            console.log("state:");
-            console.log(this.state)
         });
     }
 
@@ -91,6 +91,9 @@ class BattleComp extends Component {
                                 : null}
                         </Col>
                     </Row>
+                    <Row style={{justifyContent: "center", marginTop: 15}}>
+                        <Console battleLogs={this.state.battleLogs}/>
+                    </Row>
                 </Jumbotron>
                 <SockJsClient url='http://localhost:9191/battleStomp' topics={['/battle/' + this.state.playerName]}
                               onMessage={(msg) => this.actionPerformed(msg)}
@@ -102,16 +105,18 @@ class BattleComp extends Component {
     }
 
     actionPerformed = (msg) => {
-        console.log(msg.action);
         let actionMan = this.defineActionMan(msg.nextUnit);
-        switch (msg.action) {
-            case ATTACK:
-                console.log(msg.additionalData.DAMAGED_SQUAD);
-                this.setState({actionMan: actionMan, mySquad: msg.additionalData.DAMAGED_SQUAD});
-                console.log("xx")
-                break;
-            default:
-                this.setState({actionMan: actionMan});
+        if (msg.action === ATTACK) {
+            this.setState({
+                actionMan: actionMan,
+                battleLogs: msg.comments,
+                mySquad: msg.additionalData.DAMAGED_SQUAD
+            });
+        } else {
+            this.setState({
+                actionMan: actionMan,
+                battleLogs: msg.comments
+            });
         }
     };
 
@@ -143,24 +148,22 @@ class BattleComp extends Component {
                 }
             }
         }
-        console.log("Now turn of...");
-        console.log(actionMan);
         return actionMan;
     };
 
     simpleAction = (action) => {
         let {actionMan, playerName} = this.state;
         performAction(playerName, actionMan.pos, action).then(resp => {
-            console.log("Simple action performed:");
-            console.log(resp);
             let newActionMan = this.defineActionMan(resp.nextUnit);
             this.setState({
                 actionMan: newActionMan,
-                lockTargets: false, mySquad: {
+                lockTargets: false,
+                mySquad: {
                     ...this.state.mySquad, [actionMan.pos]: {
                         ...this.state.mySquad[actionMan.pos], picked: false
                     }
-                }
+                },
+                battleLogs: resp.comments
             });
         })
     };
@@ -187,19 +190,18 @@ class BattleComp extends Component {
         let data = {targets: targets};
         performAction(playerName, actionMan.pos, ATTACK, data).then(resp => {
             if (resp) {
-                console.log("ATTACK PERFORMED!");
-                console.log(resp);
                 let foe = resp.additionalData.DAMAGED_SQUAD;
-                console.log(foe);
                 let newActionMan = this.defineActionMan(resp.nextUnit);
                 this.setState({
                     foesSquad: foe,
                     actionMan: newActionMan,
-                    lockTargets: false, mySquad: {
+                    lockTargets: false,
+                    mySquad: {
                         ...this.state.mySquad, [actionMan.pos]: {
                             ...this.state.mySquad[actionMan.pos], picked: false
                         }
-                    }
+                    },
+                    battleLogs: resp.comments
                 });
             }
         })

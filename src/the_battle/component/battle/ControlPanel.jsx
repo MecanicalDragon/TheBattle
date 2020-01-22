@@ -11,7 +11,7 @@ const ControlPanel = (props) => {
             {foe ? null :
                 <Fragment>
                     <Button color={"danger"} style={{margin: 5}} onClick={() => simpleAction(ATTACK)}>Attack!</Button>
-                    < Button color={"info"} style={{margin: 5}} onClick={() => simpleAction(WAIT)}>Wait</Button>
+                    <Button color={"info"} style={{margin: 5}} onClick={() => simpleAction(WAIT)}>Wait</Button>
                     <Button color={"primary"} style={{margin: 5}} onClick={() => simpleAction(BLOCK)}>Block</Button>
                 </Fragment>
             }

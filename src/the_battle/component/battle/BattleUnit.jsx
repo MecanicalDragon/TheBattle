@@ -65,7 +65,7 @@ export function BattleUnit(props) {
      * If unit can be a target of attack, colors bg
      */
     useEffect(() => {
-        if (characteristics.marked) {
+        if (characteristics.marked && characteristics.hp !== 0) {
             setBgc(UNIT_BG_MARKED)
         } else {
             setBgc(UNIT_BG_DEFAULT)
@@ -113,9 +113,9 @@ export function BattleUnit(props) {
                    onMouseOver={() => onMouseOver()}
                    onMouseLeave={() => onMouseLeave()}
                    onClick={foe ? () => validateAttack() : () => pickActor(pos)}>
-            {/*<div  style={{height: 90, width: 80}}/>*/}
-            <Img style={{maxHeight: 100, maxWidth: 80, transform: foe ? "scaleX(-1)" : "scaleX(1)"}}
-                 src={unitProps.image}/>
+            <div style={{height: 90, width: 80}}/>
+            {/*<Img style={{maxHeight: 100, maxWidth: 80, transform: foe ? "scaleX(-1)" : "scaleX(1)"}}*/}
+            {/*     src={unitProps.image}/>*/}
             <Progress animated color={"success"} value={currentHP}
                       style={{height: 5, marginRight: 3, marginLeft: 3, backgroundColor: "red"}}/>
         </UnitPlace>
