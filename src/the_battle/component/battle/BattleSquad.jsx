@@ -24,6 +24,7 @@ const BattleSquad = (props) => {
     let {foe, squad, calculateTargets, clearTargets, pickActor, selectTargets, actionManId, simpleAction} = props;
 
     const [description, setDescription] = useState("");
+    const [remarkTrigger, increaseTrigger] = useState(0);
 
     const getLine = (...units) => {
         let positions = units.length < 3 ? ["pos2", "pos4"] : ["pos1", "pos3", "pos5"];
@@ -33,8 +34,8 @@ const BattleSquad = (props) => {
                         return (
                             <BattleUnit key={index} characteristics={unit} descrFunc={setDescription} foe={foe}
                                         calculateTargets={calculateTargets} pos={positions[index]}
-                                        clearTargets={clearTargets} pickActor={foe ? null : pickActor}
-                                        selectTargets={foe ? selectTargets : null} yourTurn={actionManId === unit.id}/>
+                                        clearTargets={clearTargets} selectTargets={foe ? selectTargets : null}
+                                        yourTurn={actionManId === unit.id} rt={remarkTrigger}/>
                         )
                     }
                 )
@@ -48,7 +49,8 @@ const BattleSquad = (props) => {
             <ControlPanel simpleAction={simpleAction} foe={foe}/>
             <DescriptionArea description={description}/>
             {squad ?
-                <Squad straight={(squad.type === "FORCED_BACK" && !foe) || (squad.type !== "FORCED_BACK" && foe)}>
+                <Squad straight={(squad.type === "FORCED_BACK" && !foe) || (squad.type !== "FORCED_BACK" && foe)}
+                       onMouseLeave={() => increaseTrigger(remarkTrigger + 1)}>
                     {getLine(squad.pos1, squad.pos3, squad.pos5)}
                     {getLine(squad.pos2, squad.pos4)}
                 </Squad>

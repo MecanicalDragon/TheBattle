@@ -3,11 +3,6 @@ import Img from 'react-image'
 import img_fgt from '@/img/fighter.png';
 import {FORCED_BACK, FORCED_FRONT, SHORT_LINE, CLOSE_TARGETS} from "@/constants/ingameConstants";
 
-export function attack() {
-    console.log("close enemies")
-}
-
-//TODO: object[][][] - merdge functions
 export function markTargets(position, attacker, target) {
 
     let posN = +position.substring(3);

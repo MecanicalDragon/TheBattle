@@ -28,8 +28,6 @@ class BattleComp extends Component {
             mySquad: undefined,
             foesSquad: undefined,
             foesName: null,
-            targets: [],
-            lockTargets: false,
             actionMan: {
                 id: -1,
                 pos: "",
@@ -79,8 +77,8 @@ class BattleComp extends Component {
                         <Col>
                             {mySquad ?
                                 <BattleSquad foe={false} squad={mySquad} clearTargets={this.clearTargets}
-                                             calculateTargets={this.calculateTargets} pickActor={this.pickActor}
-                                             actionManId={actionMan.id} simpleAction={this.simpleAction}/>
+                                             calculateTargets={this.calculateTargets} actionManId={actionMan.id}
+                                             simpleAction={this.simpleAction}/>
                                 : null}
                         </Col>
                         <Col>
@@ -157,7 +155,6 @@ class BattleComp extends Component {
             let newActionMan = this.defineActionMan(resp.nextUnit);
             this.setState({
                 actionMan: newActionMan,
-                lockTargets: false,
                 mySquad: {
                     ...this.state.mySquad, [actionMan.pos]: {
                         ...this.state.mySquad[actionMan.pos], picked: false
@@ -166,23 +163,6 @@ class BattleComp extends Component {
                 battleLogs: resp.comments
             });
         })
-    };
-
-    /**
-     * Invoked on unit clicking
-     * @param actor - position of the unit
-     */
-    pickActor = (actor) => {
-        if (this.state.actionMan.player === true && actor === this.state.actionMan.pos) {
-            this.setState({
-                lockTargets: !this.state.lockTargets,
-                mySquad: {
-                    ...this.state.mySquad, [actor]: {
-                        ...this.state.mySquad[actor], picked: !this.state.mySquad[actor].picked
-                    }
-                }
-            });
-        }
     };
 
     selectTargets = (targets) => {
@@ -195,7 +175,6 @@ class BattleComp extends Component {
                 this.setState({
                     foesSquad: foe,
                     actionMan: newActionMan,
-                    lockTargets: false,
                     mySquad: {
                         ...this.state.mySquad, [actionMan.pos]: {
                             ...this.state.mySquad[actionMan.pos], picked: false
@@ -214,18 +193,24 @@ class BattleComp extends Component {
      * @param mark - mark function of unit type
      */
     calculateTargets = (pos, foe, mark) => {
-        if (!this.state.lockTargets) {
-            let attacker = foe === true ? this.state.foesSquad : this.state.mySquad;
-            let target = foe === true ? this.state.mySquad : this.state.foesSquad;
-            let targets = mark(pos, attacker, target);
-            targets.forEach(function (pos) {
-                target[pos].marked = true;
-            });
-            if (!foe) {
-                this.setState({foesSquad: target});
-            } else {
-                this.setState({mySquad: target});
-            }
+        let attacker = foe === true ? this.state.foesSquad : this.state.mySquad;
+        let target = foe === true ? this.state.mySquad : this.state.foesSquad;
+
+        target.pos1.marked = false;
+        target.pos2.marked = false;
+        target.pos3.marked = false;
+        target.pos4.marked = false;
+        target.pos5.marked = false;
+
+        let targets = mark(pos, attacker, target);
+        targets.forEach(function (pos) {
+            target[pos].marked = true;
+        });
+
+        if (!foe) {
+            this.setState({foesSquad: target});
+        } else {
+            this.setState({mySquad: target});
         }
     };
 
@@ -235,23 +220,21 @@ class BattleComp extends Component {
      * @param foe
      */
     clearTargets = (foe) => {
-        if (!this.state.lockTargets) {
-            let clearMark = function (squad) {
-                squad.pos1.marked = false;
-                squad.pos2.marked = false;
-                squad.pos3.marked = false;
-                squad.pos4.marked = false;
-                squad.pos5.marked = false;
-            };
-            if (foe) {
-                let squad = this.state.mySquad;
-                clearMark(squad);
-                this.setState({mySquad: squad});
-            } else {
-                let squad = this.state.foesSquad;
-                clearMark(squad);
-                this.setState({foesSquad: squad});
-            }
+        let clearMark = function (squad) {
+            squad.pos1.marked = false;
+            squad.pos2.marked = false;
+            squad.pos3.marked = false;
+            squad.pos4.marked = false;
+            squad.pos5.marked = false;
+        };
+        if (foe) {
+            let squad = this.state.mySquad;
+            clearMark(squad);
+            this.setState({mySquad: squad});
+        } else {
+            let squad = this.state.foesSquad;
+            clearMark(squad);
+            this.setState({foesSquad: squad});
         }
     };
 }

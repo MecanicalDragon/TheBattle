@@ -4,11 +4,18 @@ const DescriptionArea = (props) => {
 
     let {description, height} = props;
 
-    const setDescription = (text) => {
-        if (text) {
-            let type = JSON.stringify(text.type).split(",").slice(0, 8).join("\n")
-                .replace("{", "").replace("}", "").split("\"").join(" ");
-            return "Name: " + text.name.concat("\n").concat("Level: ").concat(text.level).concat("\n").concat(type).concat("\n");
+    const setDescription = (unit) => {
+        if (unit) {
+            return `  Name: ${unit.name}
+  level: ${unit.level}
+  class: ${unit.type.classType}
+  range: ${unit.type.distance}
+  health: ${unit.hp}
+  initiative: ${unit.type.initiative}
+  attack: ${unit.type.attack}
+  defence: ${unit.type.defence}
+  accuracy: ${unit.type.accuracy}
+  evasion: ${unit.type.evasion}`;
         } else return ""
     };
 

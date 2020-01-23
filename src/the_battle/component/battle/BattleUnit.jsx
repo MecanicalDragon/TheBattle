@@ -10,8 +10,8 @@ import img_fgt from '@/img/fighter.png';
 import img_rng from '@/img/ranger.png';
 import img_sag from '@/img/sage.png';
 import {
-    FOES_TURN, MY_TURN,
-    NO_TURN,
+    UNIT_FOES_TURN, UNIT_FOES_TARGET,
+    UNIT_NOT_FOES_TARGET,
     UNIT_BG_ATTACK,
     UNIT_BG_DEFAULT,
     UNIT_BG_MARKED,
@@ -23,7 +23,7 @@ const UnitPlace = styled.div`
     width: 100px;
     height: 100px;
     border-radius: 15px;
-    border-style: ${props => props.brd === NO_TURN ? "none" : "dashed"}
+    border-style: ${props => props.brd === UNIT_NOT_FOES_TARGET ? "none" : "dashed"}
     border-color: ${props => props.brd}
     border-width: 1px;
     background-color: ${props => props.bgc}
@@ -35,74 +35,116 @@ const UnitPlace = styled.div`
 export function BattleUnit(props) {
 
     const {
-        characteristics, descrFunc, foe, calculateTargets, pos, clearTargets, pickActor, selectTargets,
-        yourTurn
+        characteristics, descrFunc, foe, calculateTargets, pos, clearTargets, selectTargets, yourTurn, rt
     } = props;
-    const [bgc, setBgc] = useState(UNIT_BG_DEFAULT);
-    const [borders, setBorders] = useState(NO_TURN);
+
+    const initDefaultBg = () => {
+        if (foe) {
+            return UNIT_BG_DEFAULT
+        } else {
+            if (yourTurn) {
+                return UNIT_BG_PICKED
+            } else {
+                return UNIT_BG_DEFAULT
+            }
+        }
+    };
+
+    const initDefaultBorders = () => {
+        if (foe) {
+            if (yourTurn) {
+                return UNIT_FOES_TURN
+            } else {
+                return UNIT_NOT_FOES_TARGET
+            }
+        } else {
+            return UNIT_NOT_FOES_TARGET
+        }
+    };
+
+    const [bgc, setBgc] = useState(initDefaultBg());
+    const [borders, setBorders] = useState(initDefaultBorders());
     const [currentHP, setCurrentHP] = useState(characteristics.hp);
 
     const unitProps = getUnitProps(characteristics.type.type);
 
+    /**
+     * Updating unit hp
+     */
     useEffect(() => {
         setCurrentHP(characteristics.hp * 100 / characteristics.type.health);
     }, [characteristics.hp]);
 
     /**
-     * If unit's turn, colors borders
+     * If unit's turn, sets it's and it's targets' borders or backgrounds
      */
     useEffect(() => {
         if (yourTurn && foe) {
-            setBorders(FOES_TURN)
+            setBorders(UNIT_FOES_TURN);
+            calculateTargets(pos, foe, unitProps.mark)
         } else if (yourTurn && !foe) {
-            setBorders(MY_TURN)
+            setBgc(UNIT_BG_PICKED);
+            calculateTargets(pos, foe, unitProps.mark)
         } else {
-            setBorders(NO_TURN)
+            setBorders(UNIT_NOT_FOES_TARGET);
+            setBgc(UNIT_BG_DEFAULT);
         }
     }, [yourTurn]);
 
+    useEffect(() => {
+        if (yourTurn) {
+            if (foe) {
+                setBorders(UNIT_FOES_TURN);
+            } else {
+                setBgc(UNIT_BG_PICKED);
+            }
+            calculateTargets(pos, foe, unitProps.mark)
+        }
+    }, [rt]);
+
     /**
-     * If unit can be a target of attack, colors bg
+     * If unit can be a target of attack, colors bg or borders
      */
     useEffect(() => {
-        if (characteristics.marked && characteristics.hp !== 0) {
-            setBgc(UNIT_BG_MARKED)
-        } else {
-            setBgc(UNIT_BG_DEFAULT)
+        if (characteristics.hp !== 0) {
+            if (characteristics.marked) {
+                if (foe) {
+                    setBgc(UNIT_BG_MARKED)
+                } else {
+                    setBorders(UNIT_FOES_TARGET)
+                }
+            } else {
+                if (foe) {
+                    setBgc(UNIT_BG_DEFAULT)
+                } else {
+                    setBorders(UNIT_NOT_FOES_TARGET)
+                }
+            }
         }
     }, [characteristics.marked]);
 
-    /**
-     * If unit's picked, colors bg
-     */
-    useEffect(() => {
-        if (characteristics.picked) {
-            setBgc(UNIT_BG_PICKED)
-        } else if (characteristics.picked === undefined) {
-            setBgc(UNIT_BG_DEFAULT)
-        } else {
-            setBgc(UNIT_BG_OVER)
-        }
-    }, [characteristics.picked]);
-
     const onMouseOver = () => {
-        if (!characteristics.picked) {
-            descrFunc(characteristics);
-            if (characteristics.marked) {
+        if (!yourTurn) {
+            if (foe && characteristics.marked) {
                 setBgc(UNIT_BG_ATTACK)
             } else {
                 setBgc(UNIT_BG_OVER);
-                calculateTargets(pos, foe, unitProps.mark)
             }
+        } else if (yourTurn && foe) {
+            setBgc(UNIT_BG_OVER);
         }
+        descrFunc(characteristics);
+        if (characteristics.hp !== 0)
+            calculateTargets(pos, foe, unitProps.mark)
     };
 
     const onMouseLeave = () => {
-        if (!characteristics.picked) {
+        if (!yourTurn) {
             clearTargets(foe);
-            setBgc(characteristics.marked ? UNIT_BG_MARKED : UNIT_BG_DEFAULT);
+            setBgc(characteristics.marked && foe ? UNIT_BG_MARKED : UNIT_BG_DEFAULT);
         }
     };
+
     const validateAttack = () => {
         if (characteristics.marked)
             selectTargets([pos]);
@@ -112,7 +154,7 @@ export function BattleUnit(props) {
         <UnitPlace bgc={bgc} brd={borders}
                    onMouseOver={() => onMouseOver()}
                    onMouseLeave={() => onMouseLeave()}
-                   onClick={foe ? () => validateAttack() : () => pickActor(pos)}>
+                   onClick={foe ? () => validateAttack() : null}>
             <div style={{height: 90, width: 80}}/>
             {/*<Img style={{maxHeight: 100, maxWidth: 80, transform: foe ? "scaleX(-1)" : "scaleX(1)"}}*/}
             {/*     src={unitProps.image}/>*/}
