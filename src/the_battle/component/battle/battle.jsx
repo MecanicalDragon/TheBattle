@@ -15,6 +15,7 @@ import {performAction} from "@/service/ActionService";
 import {ATTACK} from "@/constants/ingameConstants";
 import SockJsClient from 'react-stomp';
 import Console from "@/component/battle/Console";
+import * as routes from "@/router/routes";
 
 class BattleComp extends Component {
 
@@ -33,7 +34,8 @@ class BattleComp extends Component {
                 pos: "",
                 player: false
             },
-            battleLogs: ""
+            battleLogs: "",
+            battleWon: false
         };
     }
 
@@ -56,42 +58,40 @@ class BattleComp extends Component {
     }
 
     render() {
-        let {mySquad} = this.state;
-        let {foesSquad} = this.state;
-        let {playerName} = this.state;
-        let {foesName} = this.state;
-        let {actionMan} = this.state;
+        let {mySquad, foesSquad, playerName, foesName, actionMan, battleWon} = this.state;
         return (
             <Container>
                 <Jumbotron style={{paddingLeft: 10, paddingRight: 10}}>
                     <Row>
-                        <Col xs={"auto"}>
-                            <h3>{playerName}</h3>
-                        </Col>
-                        <Col/>
-                        <Col xs={"auto"}>
-                            <h3>{foesName}</h3>
-                        </Col>
-                    </Row>
-                    <Row>
                         <Col>
                             {mySquad ?
                                 <BattleSquad foe={false} squad={mySquad} clearTargets={this.clearTargets}
-                                             calculateTargets={this.calculateTargets} actionManId={actionMan.id}
-                                             simpleAction={this.simpleAction}/>
+                                             calculateTargets={this.calculateTargets} actionMan={actionMan}
+                                             simpleAction={this.simpleAction} playerName={playerName}
+                                             won={battleWon}/>
                                 : null}
                         </Col>
                         <Col>
                             {foesSquad ?
                                 <BattleSquad foe={true} squad={foesSquad} clearTargets={this.clearTargets}
-                                             calculateTargets={this.calculateTargets}
-                                             selectTargets={this.selectTargets} actionManId={actionMan.id}/>
+                                             calculateTargets={this.calculateTargets} actionMan={actionMan}
+                                             selectTargets={this.selectTargets} playerName={foesName}
+                                             won={battleWon}/>
                                 : null}
                         </Col>
                     </Row>
                     <Row style={{justifyContent: "center", marginTop: 15}}>
                         <Console battleLogs={this.state.battleLogs}/>
                     </Row>
+                    {battleWon ?
+                        <Row>
+                            <Col style={{textAlign: "center", cursor: "pointer", color: "magenta"}}
+                                 onClick={() => this.props.history.push(routes.index())}>
+                                <h1>EXIT</h1>
+                            </Col>
+                        </Row>
+                        : null
+                    }
                 </Jumbotron>
                 <SockJsClient url='http://localhost:9191/battleStomp' topics={['/battle/' + this.state.playerName]}
                               onMessage={(msg) => this.actionPerformed(msg)}
@@ -102,13 +102,18 @@ class BattleComp extends Component {
         )
     }
 
+    /**
+     * Receiving info by websocket about opponent's turn results
+     * @param msg - ws message
+     */
     actionPerformed = (msg) => {
         let actionMan = this.defineActionMan(msg.nextUnit);
         if (msg.action === ATTACK) {
             this.setState({
-                actionMan: actionMan,
+                mySquad: msg.additionalData.DAMAGED_SQUAD,
                 battleLogs: msg.comments,
-                mySquad: msg.additionalData.DAMAGED_SQUAD
+                actionMan: actionMan,
+                battleWon: msg.battleWon
             });
         } else {
             this.setState({
@@ -118,6 +123,13 @@ class BattleComp extends Component {
         }
     };
 
+    /**
+     * Just defining the unit, who's turn
+     * @param nextUnit - from response
+     * @param mySquad - player's squad
+     * @param foesSquad opponent's squad
+     * @returns {{pos: string, id: *, player: *}} - this.state.actionMan
+     */
     defineActionMan = (nextUnit, mySquad, foesSquad) => {
 
         let getPosition = function (sq, pos) {
@@ -149,22 +161,29 @@ class BattleComp extends Component {
         return actionMan;
     };
 
+    /**
+     * Perform simple action like WAIT or BLOCK
+     * @param action - action itself
+     */
     simpleAction = (action) => {
-        let {actionMan, playerName} = this.state;
-        performAction(playerName, actionMan.pos, action).then(resp => {
-            let newActionMan = this.defineActionMan(resp.nextUnit);
-            this.setState({
-                actionMan: newActionMan,
-                mySquad: {
-                    ...this.state.mySquad, [actionMan.pos]: {
-                        ...this.state.mySquad[actionMan.pos], picked: false
-                    }
-                },
-                battleLogs: resp.comments
-            });
-        })
+        if (action === ATTACK) {
+            alert("This button is just for fancy view here, but two of others work, we assure)")
+        } else {
+            let {actionMan, playerName} = this.state;
+            performAction(playerName, actionMan.pos, action).then(resp => {
+                let newActionMan = this.defineActionMan(resp.nextUnit);
+                this.setState({
+                    actionMan: newActionMan,
+                    battleLogs: resp.comments
+                });
+            })
+        }
     };
 
+    /**
+     * Pick attack targets and perform attack action on them
+     * @param targets - targets positions
+     */
     selectTargets = (targets) => {
         let {playerName, actionMan} = this.state;
         let data = {targets: targets};
@@ -175,12 +194,8 @@ class BattleComp extends Component {
                 this.setState({
                     foesSquad: foe,
                     actionMan: newActionMan,
-                    mySquad: {
-                        ...this.state.mySquad, [actionMan.pos]: {
-                            ...this.state.mySquad[actionMan.pos], picked: false
-                        }
-                    },
-                    battleLogs: resp.comments
+                    battleLogs: resp.comments,
+                    battleWon: resp.battleWon
                 });
             }
         })
@@ -204,7 +219,8 @@ class BattleComp extends Component {
 
         let targets = mark(pos, attacker, target);
         targets.forEach(function (pos) {
-            target[pos].marked = true;
+            if (target[pos].hp > 0)
+                target[pos].marked = true;
         });
 
         if (!foe) {
@@ -217,7 +233,7 @@ class BattleComp extends Component {
     /**
      * Clears target marks from units.
      * Invoked on mouseLeave
-     * @param foe
+     * @param foe - define player's or opponent's squad
      */
     clearTargets = (foe) => {
         let clearMark = function (squad) {

@@ -1,8 +1,9 @@
-import React, {useState} from "react";
+import React, {Fragment, useState} from "react";
 import styled from "styled-components";
 import DescriptionArea from "@/component/common/DescriptionArea";
 import {BattleUnit} from "@/component/battle/BattleUnit";
 import ControlPanel from "@/component/battle/ControlPanel";
+import Header from "@/component/battle/Header";
 
 const Field = styled.div`
     display: flex;
@@ -21,7 +22,7 @@ const Column = styled.div`
 
 const BattleSquad = (props) => {
 
-    let {foe, squad, calculateTargets, clearTargets, pickActor, selectTargets, actionManId, simpleAction} = props;
+    let {foe, squad, calculateTargets, clearTargets, selectTargets, actionMan, simpleAction, playerName, won} = props;
 
     const [description, setDescription] = useState("");
     const [remarkTrigger, increaseTrigger] = useState(0);
@@ -35,7 +36,7 @@ const BattleSquad = (props) => {
                             <BattleUnit key={index} characteristics={unit} descrFunc={setDescription} foe={foe}
                                         calculateTargets={calculateTargets} pos={positions[index]}
                                         clearTargets={clearTargets} selectTargets={foe ? selectTargets : null}
-                                        yourTurn={actionManId === unit.id} rt={remarkTrigger}/>
+                                        yourTurn={actionMan.id === unit.id} rt={remarkTrigger}/>
                         )
                     }
                 )
@@ -45,17 +46,21 @@ const BattleSquad = (props) => {
     };
 
     return (
-        <Field foe={foe}>
-            <ControlPanel simpleAction={simpleAction} foe={foe}/>
-            <DescriptionArea description={description}/>
-            {squad ?
-                <Squad straight={(squad.type === "FORCED_BACK" && !foe) || (squad.type !== "FORCED_BACK" && foe)}
-                       onMouseLeave={() => increaseTrigger(remarkTrigger + 1)}>
-                    {getLine(squad.pos1, squad.pos3, squad.pos5)}
-                    {getLine(squad.pos2, squad.pos4)}
-                </Squad>
-                : null}
-        </Field>
+        <Fragment>
+            <Header foe={foe} playerName={playerName} yourTurn={actionMan.player} won={won}/>
+            <Field foe={foe}>
+                <ControlPanel simpleAction={simpleAction} foe={foe} yourTurn={actionMan.player} won={won}/>
+                <DescriptionArea description={description}/>
+                {squad ?
+                    <Squad
+                        straight={(squad.type === "FORCED_BACK" && !foe) || (squad.type !== "FORCED_BACK" && foe)}
+                        onMouseLeave={() => increaseTrigger(remarkTrigger + 1)}>
+                        {getLine(squad.pos1, squad.pos3, squad.pos5)}
+                        {getLine(squad.pos2, squad.pos4)}
+                    </Squad>
+                    : null}
+            </Field>
+        </Fragment>
     )
 };
 

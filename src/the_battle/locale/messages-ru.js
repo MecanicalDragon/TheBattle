@@ -31,4 +31,8 @@ export default {
     'app.manage.not.cancelled': 'Поиск битвы НЕ отменен.',
     'app.manage.need5': 'Нужно 5 героев!',
 
+    //Battle page
+    'app.battle.your.turn.header': 'Ваш ход',
+    'app.battle.foes.turn.header': 'Ход соперника',
+
 }

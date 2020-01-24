@@ -31,4 +31,8 @@ export default {
     'app.manage.not.cancelled': 'Battle search is NOT cancelled.',
     'app.manage.need5': 'Need 5 heroes!',
 
+    //Battle page
+    'app.battle.your.turn.header': 'Your turn',
+    'app.battle.foes.turn.header': 'Foe\'s turn',
+
 }

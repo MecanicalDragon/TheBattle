@@ -35,6 +35,7 @@ class ActionService(@Autowired private val battleService: BattleService,
         if (actor === pair.actionMan) {
             val additionalData = HashMap<String, Any>()
             val comments = StringBuilder()
+            var battleWon = false
             val nextUnit = when (simpleAction.action) {
                 ActionType.WAIT -> {
                     if (actor.initiative > INITIATIVE_BOTTOM_THRESHOLD) {
@@ -47,6 +48,7 @@ class ActionService(@Autowired private val battleService: BattleService,
                     }
                 }
                 ActionType.BLOCK -> {
+                    actor.effects.add(UnitEffects.IN_BLOCK)
                     comments.append("${actor.name} goes into defence.")
                     pair.makeMove()
                 }
@@ -68,15 +70,23 @@ class ActionService(@Autowired private val battleService: BattleService,
                         } else {
                             val position = Position.valueOf(pos)
                             val unit = foesSquad.map[position] as UnitDTO
-                            val result = attackService.sufferDamage(unit, accuracy, attackPower)
+                            val result = attackService.sufferDamage(unit, accuracy, attackPower, foesSquad)
                             comments.append(result)
                         }
                     }
                     additionalData[DAMAGED_SQUAD] = foesSquad;
-                    pair.makeMove()
+                    if (foesSquad.dead == 5) {
+                        battleWon = true
+                        pair.actionMan
+                    } else {
+                        pair.makeMove()
+                    }
                 }
             }
-            val actionResult = ActionResult(simpleAction.action, additionalData, nextUnit, comments.toString())
+            if (battleWon) {
+                comments.append("\n$playerName wins the battle!")
+            }
+            val actionResult = ActionResult(simpleAction.action, additionalData, nextUnit, comments.toString(), battleWon)
             wSocket.convertAndSend("/battle/${foesSquad.playerName}",
                     ObjectMapper().writeValueAsString(actionResult))
             return actionResult

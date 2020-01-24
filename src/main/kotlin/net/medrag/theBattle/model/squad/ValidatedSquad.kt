@@ -19,6 +19,9 @@ data class ValidatedSquad(val playerName: String,
                           val pos5: UnitDTO = mock) {
 
     @JsonIgnore
+    var dead = 0
+
+    @JsonIgnore
     val map = mapOf(Position.POS1 to pos1, Position.POS2 to pos2, Position.POS3 to pos3, Position.POS4 to pos4, Position.POS5 to pos5)
 
     companion object {

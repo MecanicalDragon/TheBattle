@@ -10,4 +10,5 @@ import net.medrag.theBattle.model.squad.ValidatedSquad
 data class ActionResult(val action: ActionType,
                         val additionalData: Map<String, Any>?,
                         val nextUnit: UnitDTO,
-                        val comments: String)
+                        val comments: String,
+                        val finished: Boolean = false)

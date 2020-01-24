@@ -9,6 +9,7 @@ import Img from 'react-image'
 import img_fgt from '@/img/fighter.png';
 import img_rng from '@/img/ranger.png';
 import img_sag from '@/img/sage.png';
+import img_skull from '@/img/skull.png';
 import {
     UNIT_FOES_TURN, UNIT_FOES_TARGET,
     UNIT_NOT_FOES_TARGET,
@@ -120,6 +121,9 @@ export function BattleUnit(props) {
                     setBorders(UNIT_NOT_FOES_TARGET)
                 }
             }
+        } else {
+            setBgc(UNIT_BG_DEFAULT);
+            setBorders(UNIT_NOT_FOES_TARGET)
         }
     }, [characteristics.marked]);
 
@@ -142,6 +146,8 @@ export function BattleUnit(props) {
         if (!yourTurn) {
             clearTargets(foe);
             setBgc(characteristics.marked && foe ? UNIT_BG_MARKED : UNIT_BG_DEFAULT);
+        } else if (foe) {
+            setBgc(UNIT_BG_DEFAULT);
         }
     };
 
@@ -155,11 +161,11 @@ export function BattleUnit(props) {
                    onMouseOver={() => onMouseOver()}
                    onMouseLeave={() => onMouseLeave()}
                    onClick={foe ? () => validateAttack() : null}>
-            <div style={{height: 90, width: 80}}/>
-            {/*<Img style={{maxHeight: 100, maxWidth: 80, transform: foe ? "scaleX(-1)" : "scaleX(1)"}}*/}
-            {/*     src={unitProps.image}/>*/}
+            {/*<div style={{height: 90, width: 80}}/>*/}
+            <Img style={{maxHeight: 100, maxWidth: 80, marginLeft: 10, transform: foe ? "scaleX(-1)" : "scaleX(1)"}}
+                 src={characteristics.hp === 0 ? img_skull : unitProps.image}/>
             <Progress animated color={"success"} value={currentHP}
-                      style={{height: 5, marginRight: 3, marginLeft: 3, backgroundColor: "red"}}/>
+                      style={{height: 5, marginRight: 4, marginLeft: 4, backgroundColor: "red"}}/>
         </UnitPlace>
         : null
 }
@@ -167,11 +173,11 @@ export function BattleUnit(props) {
 function getUnitProps(type) {
     switch (type) {
         case "FIGHTER":
-            return {image: img_fgt, attack: fighter.attack, mark: fighter.markTargets};
+            return {image: img_fgt, mark: fighter.markTargets};
         case "SAGE":
-            return {image: img_sag, attack: sage.attack, mark: sage.markTargets};
+            return {image: img_sag, mark: sage.markTargets};
         case "RANGER":
-            return {image: img_rng, attack: ranger.attack, mark: ranger.markTargets};
+            return {image: img_rng, mark: ranger.markTargets};
         default:
             return null
     }
