@@ -125,6 +125,7 @@ class ManageComp extends Component {
                 pool.delete(draggableId);
                 let newState = {
                     ...this.state, pool: pool,
+                    removeWindow: false,
                     columns: {
                         ...this.state.columns,
                         [newCol.id]: newCol,
@@ -233,6 +234,7 @@ class ManageComp extends Component {
             };
             const newState = {
                 ...this.state,
+                removeWindow: false,
                 columns: {
                     ...this.state.columns,
                     [newCol.id]: newCol

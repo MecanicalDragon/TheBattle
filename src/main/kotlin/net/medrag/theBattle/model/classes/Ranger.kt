@@ -5,7 +5,7 @@ package net.medrag.theBattle.model.classes
  * {@author} Stanislav Tretyakov
  * 18.12.2019
  */
-class Ranger : Unitt() {
+object Ranger : Unitt() {
     override var type: Unit.Type = Unit.Type.RANGER
     override var distance: Unit.Distance = Unit.Distance.RANGED
     override var attack: Int = 5

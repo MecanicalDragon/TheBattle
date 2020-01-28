@@ -5,7 +5,7 @@ package net.medrag.theBattle.model.classes
  * {@author} Stanislav Tretyakov
  * 18.12.2019
  */
-class Sage : Unitt() {
+object Sage : Unitt() {
     override var type: Unit.Type = Unit.Type.SAGE
     override var distance: Unit.Distance = Unit.Distance.ANY
     override var attack: Int = 7

@@ -34,10 +34,10 @@ abstract class Unitt {
 
             fun getInstance(): Unitt {
                 return when (this.className) {
-                    "Fighter" -> Fighter()
-                    "Ranger" -> Ranger()
-                    "Sage" -> Sage()
-                    else -> Sage()
+                    "Fighter" -> Fighter
+                    "Ranger" -> Ranger
+                    "Sage" -> Sage
+                    else -> Sage
                 }
             }
         }

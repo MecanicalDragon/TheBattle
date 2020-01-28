@@ -5,7 +5,7 @@ package net.medrag.theBattle.model.classes
  * {@author} Stanislav Tretyakov
  * 18.12.2019
  */
-class Fighter : Unitt(){
+object Fighter : Unitt(){
     override var type: Unit.Type = Unit.Type.FIGHTER
     override var distance: Unit.Distance = Unit.Distance.CLOSED
     override var attack: Int = 5
