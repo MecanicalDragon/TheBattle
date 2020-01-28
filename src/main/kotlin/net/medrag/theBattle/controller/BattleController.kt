@@ -31,7 +31,7 @@ class BattleController(@Autowired val battleService: BattleService) {
 
         val playerName = extractPlayerName(request, pName)
         if (playerName.isNullOrBlank()) return ResponseEntity.badRequest().build()
-
+        invalidateBattleUUID(request, playerName)
         val resp = battleService.registerBattleBid(playerName, squadDTO)
         return ResponseEntity.ok(resp)
     }
@@ -64,7 +64,12 @@ class BattleController(@Autowired val battleService: BattleService) {
         if (playerName.isNullOrBlank()) return ResponseEntity.badRequest().build()
 
         extractBattleUUID(request, playerName)?.let {
-            return ResponseEntity.ok(battleService.getDislocations(playerName, it))
+            try {
+                return ResponseEntity.ok(battleService.getDislocations(playerName, it))
+            } catch (e: ValidationException) {
+                invalidateBattleUUID(request, pName)
+                return ResponseEntity.badRequest().build()
+            }
         }
         battleService.getBud(playerName)?.let {
             emulateBudSetting(playerName, it, request)

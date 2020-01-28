@@ -18,6 +18,8 @@ import Console from "@/component/battle/Console";
 import * as routes from "@/router/routes";
 import {FormattedMessage} from "react-intl";
 
+const appApi = DEPLOYED_URL;
+
 class BattleComp extends Component {
 
     constructor(props) {
@@ -102,7 +104,7 @@ class BattleComp extends Component {
                         : null
                     }
                 </Jumbotron>
-                <SockJsClient url='http://localhost:9191/battleStomp' topics={['/battle/' + this.state.playerName]}
+                <SockJsClient url={appApi + 'battleStomp'} topics={['/battle/' + this.state.playerName]}
                               onMessage={(msg) => this.actionPerformed(msg)}
                               ref={(client) => {
                                   this.clientRef = client

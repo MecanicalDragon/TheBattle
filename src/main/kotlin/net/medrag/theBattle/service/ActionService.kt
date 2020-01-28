@@ -83,6 +83,7 @@ class ActionService(@Autowired private val battleService: BattleService,
                             logger.error("Database transaction has failed. Exception will be thrown.")
                             logger.error(e.message)
                             throw ProcessingException(e.message ?: "null message")
+                            //TODO: how to finish the battle after this?
                         }
                         battleWon = true
                         pair.actionMan

@@ -10,8 +10,8 @@ import React from "react";
 export const loadState = () => {
     try {
         const serializedState = sessionStorage.getItem('state');
-        console.log("load auth state");
-        console.log(serializedState);
+        // console.log("load auth state");
+        // console.log(serializedState);
         if (serializedState === null) {
             return {auth: null};
         }
@@ -24,8 +24,8 @@ export const loadState = () => {
 export const saveState = (state) => {
     try {
         const serializedState = JSON.stringify(state);
-        console.log("save auth state");
-        console.log(state);
+        // console.log("save auth state");
+        // console.log(state);
         sessionStorage.setItem('state', serializedState);
     } catch {
         // ignore write errors
@@ -47,8 +47,8 @@ store.subscribe(() => {
 //TODO: maybe you wand to bound this request with server?
 export function isPlayerLoggedIn() {
     let auth = store.getState().auth;
-    console.log("is user logged in?");
-    console.log(auth);
+    // console.log("is user logged in?");
+    // console.log(auth);
     return auth !== null && auth.auth !== null;
 }
 
@@ -138,11 +138,11 @@ export async function create(name) {
             NotificationManager.success(name, <FormattedMessage id={"app.input.create.success"}/>, 3000);
             store.dispatch(setAuth(name));
             return resp;
-        }).catch(e => e.text())
+        }).catch(e => e.text()
             .then(msg => {
                 NotificationManager.warning(name, msg, 3000);
                 return null;
-            });
+            }));
     }
     return null;
 }

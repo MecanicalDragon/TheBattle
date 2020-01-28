@@ -78,7 +78,7 @@ module.exports = {
         new CleanWebpackPlugin(),
         new webpack.DefinePlugin({
             'process.env': {ASSET_PATH: JSON.stringify(publicPath)},
-            DEPLOYED_URL: JSON.stringify('http://localhost:9191/'),
+            DEPLOYED_URL: JSON.stringify('http://10.233.23.65:9191/'),
         }),
         new MiniCssExtractPlugin({
             filename: 'assets/stylesheets/[name]/[hash].css'

@@ -23,6 +23,8 @@ import SockJsClient from 'react-stomp';
 import * as routes from '@/router/routes'
 import DescriptionArea from "@/component/common/DescriptionArea";
 
+const appApi = DEPLOYED_URL;
+
 class ManageComp extends Component {
 
     constructor(props) {
@@ -182,7 +184,6 @@ class ManageComp extends Component {
         define();
         if (squad) {
             BattleService.battleBid(this.state.playerName, squad).then(resp => {
-                console.log(resp);
                 if (resp.status === "AWAIT") {
                     this.setState({toBattleDisabled: false, onSearching: true});
                 } else if (resp.status === "START") {
@@ -319,7 +320,7 @@ class ManageComp extends Component {
                         </Row>
                     </DragDropContext>
                 </Jumbotron>
-                <SockJsClient url='http://localhost:9191/battleStomp' topics={['/searching/' + this.state.playerName]}
+                <SockJsClient url={appApi + 'battleStomp'} topics={['/searching/' + this.state.playerName]}
                               onMessage={(msg) => {
                                   if (msg === "GAME_FOUND") this.startBattle()
                               }}
@@ -331,7 +332,6 @@ class ManageComp extends Component {
     }
 
     test() {
-        console.log(this.state.columns);
         if (this.state.playerName === "asdd")
             this.setState({
                 columns: {

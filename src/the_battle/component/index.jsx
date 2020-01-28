@@ -93,8 +93,6 @@ class Index extends Component {
         let name = this.state.enterName;
         player.login(name).then(resp => {
             if (resp !== null) {
-                console.log("Logged in:");
-                console.log(resp);
                 this.setState({wins: resp.wins, gamesTotal: resp.games, playerName: resp.name, authenticated: true})
             }
         });
