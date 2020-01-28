@@ -34,5 +34,6 @@ export default {
     //Battle page
     'app.battle.your.turn.header': 'Your turn',
     'app.battle.foes.turn.header': 'Foe\'s turn',
+    'app.battle.over': 'Looks like your battle has finished...',
 
 }

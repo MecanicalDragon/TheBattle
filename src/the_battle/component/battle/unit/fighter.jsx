@@ -56,11 +56,7 @@ export function markTargets(position, attacker, target) {
         if (target.type === FORCED_FRONT) {
             targets = targets.concat(CLOSE_TARGETS.bf[position]);
             if (target.pos3.hp === 0) {
-                if (position === "pos2" && target.pos1.hp === 0) {
-                    targets.push("pos5")
-                } else if (position === "pos4" && target.pos3.hp === 0) {
-                    targets.push("pos1")
-                }
+                targets.push("pos5", "pos1")
             }
             addBacklineIfTargetIsForcedFront(position);
         } else {    //  Target squad is //  FORCED_BACK

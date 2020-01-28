@@ -36,6 +36,11 @@ fun extractBattleUUID(request: HttpServletRequest, pName: String?): UUID? {
     return sessionStorage[pName]?.bud
 }
 
+fun invalidateBattleUUID(request: HttpServletRequest, pName: String?) {
+    request.getSession(false)?.removeAttribute(BATTLE_UUID)
+    sessionStorage[pName]?.bud == null
+}
+
 fun emulateBudSetting(pName: String, bud: UUID, request: HttpServletRequest) {
     request.getSession(false)?.let {
         it.setAttribute(BATTLE_UUID, bud)

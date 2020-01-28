@@ -131,17 +131,18 @@ export async function create(name) {
                 'Content-Type': 'application/json'
             }
         }).then(function (response) {
-            return response.text();
+            if (response.status === 200)
+                return response.json();
+            else throw response;
         }).then(resp => {
-            if (resp === name) {
-                NotificationManager.success(name, <FormattedMessage id={"app.input.create.success"}/>, 3000);
-                store.dispatch(setAuth(name));
-                return resp;
-            } else {
-                NotificationManager.warning(name, resp, 3000);
+            NotificationManager.success(name, <FormattedMessage id={"app.input.create.success"}/>, 3000);
+            store.dispatch(setAuth(name));
+            return resp;
+        }).catch(e => e.text())
+            .then(msg => {
+                NotificationManager.warning(name, msg, 3000);
                 return null;
-            }
-        });
+            });
     }
     return null;
 }

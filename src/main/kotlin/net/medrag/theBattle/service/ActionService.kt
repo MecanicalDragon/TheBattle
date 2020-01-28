@@ -1,16 +1,16 @@
 package net.medrag.theBattle.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import net.medrag.theBattle.model.ACCURACY_MODIFIER
-import net.medrag.theBattle.model.DAMAGED_SQUAD
-import net.medrag.theBattle.model.INITIATIVE_BOTTOM_THRESHOLD
-import net.medrag.theBattle.model.ValidationException
+import net.medrag.theBattle.model.*
+import net.medrag.theBattle.model.classes.Ranger
+import net.medrag.theBattle.model.classes.Unitt
 import net.medrag.theBattle.model.dto.*
 import net.medrag.theBattle.model.squad.ValidatedSquad
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Service
+import java.lang.Exception
 import java.lang.StringBuilder
 import java.util.*
 import kotlin.collections.HashMap
@@ -39,7 +39,6 @@ class ActionService(@Autowired private val battleService: BattleService,
             val nextUnit = when (simpleAction.action) {
                 ActionType.WAIT -> {
                     if (actor.initiative > INITIATIVE_BOTTOM_THRESHOLD) {
-                        actor.initiative = actor.initiative / 3 * 2
                         comments.append("${actor.name} waits for a moment...")
                         pair.recalculateOrder()
                     } else {
@@ -57,7 +56,7 @@ class ActionService(@Autowired private val battleService: BattleService,
                     //TODO: validate attack
 
                     comments.append("${actor.name} attacks! ")
-                    val accuracy = actor.type.accuracy + ACCURACY_MODIFIER
+                    var accuracy = actor.type.accuracy + ACCURACY_MODIFIER
                     val attackPower = actor.type.attack
                     val targets = simpleAction.additionalData["targets"] as List<*>
                     if (targets.size > 1) comments.append("\n")
@@ -70,12 +69,21 @@ class ActionService(@Autowired private val battleService: BattleService,
                         } else {
                             val position = Position.valueOf(pos)
                             val unit = foesSquad.map[position] as UnitDTO
+                            if (actor.type.distance === Unitt.Unit.Distance.RANGED)
+                                accuracy = attackService.calculateAccuracy(accuracy, simpleAction.actor, pos, player, foesSquad)
                             val result = attackService.sufferDamage(unit, accuracy, attackPower, foesSquad)
                             comments.append(result)
                         }
                     }
                     additionalData[DAMAGED_SQUAD] = foesSquad;
                     if (foesSquad.dead == 5) {
+                        try {
+                            battleService.finishTheBattle(bud, player, foesSquad, actor)
+                        } catch (e: Exception) {
+                            logger.error("Database transaction has failed. Exception will be thrown.")
+                            logger.error(e.message)
+                            throw ProcessingException(e.message ?: "null message")
+                        }
                         battleWon = true
                         pair.actionMan
                     } else {

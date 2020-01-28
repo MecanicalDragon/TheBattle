@@ -10,11 +10,11 @@ const ControlPanel = (props) => {
         <div style={{width: 110, display: 'flex', flexDirection: 'column'}}>
             {foe ? null :
                 <Fragment>
-                    <Button color={"danger"} style={{margin: 5}} disabled={!yourTurn && !won}
+                    <Button color={"danger"} style={{margin: 5}} disabled={!yourTurn || won}
                             onClick={() => simpleAction(ATTACK)}>Attack!</Button>
-                    <Button color={"info"} style={{margin: 5}} disabled={!yourTurn && !won}
+                    <Button color={"info"} style={{margin: 5}} disabled={!yourTurn || won}
                             onClick={() => simpleAction(WAIT)}>Wait</Button>
-                    <Button color={"primary"} style={{margin: 5}} disabled={!yourTurn && !won}
+                    <Button color={"primary"} style={{margin: 5}} disabled={!yourTurn || won}
                             onClick={() => simpleAction(BLOCK)}>Block</Button>
                 </Fragment>
             }

@@ -39,4 +39,10 @@ data class UnitEntity(
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "player_id", nullable = false)
         var player: Player
-)
+
+
+) {
+        override fun toString(): String {
+                return "UnitEntity(id=$id, name='$name', level=$level, experience=$experience, hp=$hp, status=$status, type=$type, playerId=${player.id}, playerName=${player.name})"
+        }
+}

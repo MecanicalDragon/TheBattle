@@ -112,7 +112,7 @@ class Index extends Component {
         let name = this.state.enterName;
         player.create(name).then(resp => {
             if (resp !== null) {
-                this.setState({playerName: resp, authenticated: true})
+                this.setState({playerName: resp.name, authenticated: true, gamesTotal: resp.games, wins: resp.wins})
             }
         });
     }

@@ -44,7 +44,8 @@ abstract class Unitt {
 
         enum class Distance {
             CLOSED,
-            RANGED
+            RANGED,
+            ANY
         }
     }
 }

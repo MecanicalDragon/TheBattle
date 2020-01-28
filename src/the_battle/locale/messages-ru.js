@@ -34,5 +34,6 @@ export default {
     //Battle page
     'app.battle.your.turn.header': 'Ваш ход',
     'app.battle.foes.turn.header': 'Ход соперника',
+    'app.battle.over': 'Похоже, ваш бой уже закончился...',
 
 }

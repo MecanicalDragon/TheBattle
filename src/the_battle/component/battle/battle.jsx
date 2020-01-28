@@ -16,6 +16,7 @@ import {ATTACK} from "@/constants/ingameConstants";
 import SockJsClient from 'react-stomp';
 import Console from "@/component/battle/Console";
 import * as routes from "@/router/routes";
+import {FormattedMessage} from "react-intl";
 
 class BattleComp extends Component {
 
@@ -35,7 +36,8 @@ class BattleComp extends Component {
                 player: false
             },
             battleLogs: "",
-            battleWon: false
+            battleWon: false,
+            badReq: false
         };
     }
 
@@ -53,6 +55,8 @@ class BattleComp extends Component {
                     foesName: foesName,
                     actionMan: actionMan
                 });
+            } else {
+                this.setState({battleWon: true, badReq: true})
             }
         });
     }
@@ -80,13 +84,18 @@ class BattleComp extends Component {
                                 : null}
                         </Col>
                     </Row>
-                    <Row style={{justifyContent: "center", marginTop: 15}}>
-                        <Console battleLogs={this.state.battleLogs}/>
-                    </Row>
+                    {this.state.badReq ? null :
+                        <Row style={{justifyContent: "center", marginTop: 15}}>
+                            <Console battleLogs={this.state.battleLogs}/>
+                        </Row>
+                    }
                     {battleWon ?
                         <Row>
-                            <Col style={{textAlign: "center", cursor: "pointer", color: "magenta"}}
-                                 onClick={() => this.props.history.push(routes.index())}>
+                            <Col style={{textAlign: "center", cursor: "pointer", color: "var(--magenta-color)"}}
+                                 onClick={() => this.props.history.push(routes.manage())}>
+                                {
+                                    this.state.badReq ? <FormattedMessage id={'app.battle.over'}/> : null
+                                }
                                 <h1>EXIT</h1>
                             </Col>
                         </Row>
@@ -113,7 +122,7 @@ class BattleComp extends Component {
                 mySquad: msg.additionalData.DAMAGED_SQUAD,
                 battleLogs: msg.comments,
                 actionMan: actionMan,
-                battleWon: msg.battleWon
+                battleWon: msg.finished
             });
         } else {
             this.setState({
@@ -195,7 +204,7 @@ class BattleComp extends Component {
                     foesSquad: foe,
                     actionMan: newActionMan,
                     battleLogs: resp.comments,
-                    battleWon: resp.battleWon
+                    battleWon: resp.finished
                 });
             }
         })

@@ -21,6 +21,12 @@ interface UnitRepo : CrudRepository<UnitEntity, Long> {
     @Query("delete from UnitEntity u where u.id = ?1 and u.player = ?2")
     fun deleteUnit(id: Long, player: Player)
 
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update UnitEntity u set u.experience = u.experience + ?2 where u.id = ?1")
+    fun giveXP(id: Long, xp: Int)
+
     fun findByIdAndPlayer(id: Long, player: Player): UnitEntity?
+
+    fun findAllByIdIn(ids: List<Long>): List<UnitEntity>
 
 }

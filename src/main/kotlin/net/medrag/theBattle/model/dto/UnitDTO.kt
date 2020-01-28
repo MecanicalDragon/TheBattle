@@ -16,7 +16,6 @@ data class UnitDTO(
         var hp: Int,
         @JsonIgnore
         var initiative: Double = 0.0,
-        var movePerformed: Boolean = false,
         val effects: ArrayList<UnitEffects> = ArrayList(),
         val type: Unitt
 )

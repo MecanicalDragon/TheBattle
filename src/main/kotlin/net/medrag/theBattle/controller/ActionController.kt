@@ -30,7 +30,10 @@ class ActionController(private val actionService: ActionService) {
 
         extractBattleUUID(request, playerName)?.let {
             try {
-                return ResponseEntity.ok(actionService.performSimpleAction(playerName, it, action))
+                val actionResult = actionService.performSimpleAction(playerName, it, action)
+                if (actionResult.finished)
+                    invalidateBattleUUID(request, playerName)
+                return ResponseEntity.ok(actionResult)
             } catch (e: ValidationException) {
                 return ResponseEntity.badRequest().build()
             }

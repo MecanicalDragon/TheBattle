@@ -15,7 +15,8 @@ const DescriptionArea = (props) => {
   attack: ${unit.type.attack}
   defence: ${unit.type.defence}
   accuracy: ${unit.type.accuracy}
-  evasion: ${unit.type.evasion}`;
+  evasion: ${unit.type.evasion}
+  exp: ${unit.exp}`;
         } else return ""
     };
 

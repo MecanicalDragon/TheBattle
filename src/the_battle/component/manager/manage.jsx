@@ -276,7 +276,7 @@ class ManageComp extends Component {
         let longRow = this.getLongRow();
         return (
             <Container>
-                <Jumbotron style={{paddingTop: 30, height: 700}}>
+                <Jumbotron style={{paddingTop: 30, height: 700, minWidth: 1100}}>
                     <DragDropContext onDragEnd={this.onDragEnd} onDragStart={this.onDragStart}
                                      onDragUpdate={this.onDragUpdate}>
                         <Row>
@@ -309,8 +309,8 @@ class ManageComp extends Component {
                                         <FormattedMessage id={this.state.onSearching
                                             ? "app.manage.battle.cancel" : "app.manage.to.battle"}/></Button>
                                     {this.state.onSearching ? <span>Searching...</span> : null}
-                                    <Button onClick={() => this.test()} color={"info"}
-                                            style={{marginBottom: 17, marginRight: 15}}>Test</Button>
+                                    {/*<Button onClick={() => this.test()} color={"info"}*/}
+                                    {/*        style={{marginBottom: 17, marginRight: 15}}>Test</Button>*/}
                                     <br/>
                                     <DescriptionArea description={this.state.descr} height={274}/>
                                     <Remove show={this.state.removeWindow}/>

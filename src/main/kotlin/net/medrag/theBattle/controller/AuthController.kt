@@ -3,6 +3,7 @@ package net.medrag.theBattle.controller
 import net.medrag.theBattle.model.LOGGED_OUT
 import net.medrag.theBattle.model.PLAYER_SESSION
 import net.medrag.theBattle.model.ValidationException
+import net.medrag.theBattle.model.dto.PlayerDTO
 import net.medrag.theBattle.model.entities.Player
 import net.medrag.theBattle.service.PlayerService
 import org.springframework.beans.factory.annotation.Autowired
@@ -20,7 +21,7 @@ import javax.servlet.http.HttpServletRequest
 class AuthController(@Autowired private val playerService: PlayerService) {
 
     @GetMapping("/login")
-    fun getPlayer(@RequestParam name: String, request: HttpServletRequest): ResponseEntity<Player> = try {
+    fun getPlayer(@RequestParam name: String, request: HttpServletRequest): ResponseEntity<PlayerDTO> = try {
         val player = playerService.getPlayerByName(name)
         val session = request.getSession(true)
         session.setAttribute(PLAYER_SESSION, player.name)
@@ -28,16 +29,16 @@ class AuthController(@Autowired private val playerService: PlayerService) {
         loginEmulation(player.name)
         ResponseEntity.ok(player)
     } catch (e: ValidationException) {
-        ResponseEntity.status(204).build<Player>()
+        ResponseEntity.status(204).build<PlayerDTO>()
     }
 
     @PostMapping("/createPlayer")
-    fun createPlayer(@RequestParam name: String, request: HttpServletRequest): ResponseEntity<String> = try {
+    fun createPlayer(@RequestParam name: String, request: HttpServletRequest): ResponseEntity<Any> = try {
         val player = playerService.createPlayer(name)
         val session = request.getSession(true)
         session.setAttribute(PLAYER_SESSION, player)
         //TODO: should be removed in release
-        loginEmulation(player)
+        loginEmulation(player.name)
         ResponseEntity.ok(player)
     } catch (e: ValidationException) {
         ResponseEntity.badRequest().body(e.message)

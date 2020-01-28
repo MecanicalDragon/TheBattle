@@ -8,7 +8,9 @@ import net.medrag.theBattle.model.ValidationException
 import net.medrag.theBattle.model.squad.ValidatedSquad
 import net.medrag.theBattle.model.dto.BattleBidResponse
 import net.medrag.theBattle.model.dto.SquadDTO
+import net.medrag.theBattle.model.dto.UnitDTO
 import net.medrag.theBattle.model.dto.buildUnit
+import net.medrag.theBattle.model.entities.Player
 import net.medrag.theBattle.model.entities.UnitStatus
 import net.medrag.theBattle.model.squad.FoesPair
 import net.medrag.theBattle.repo.PlayerRepo
@@ -90,6 +92,42 @@ class BattleService(
         searching.add(ValidatedSquad(player.name, squadDTO.type, buildUnit(unit1), buildUnit(unit2),
                 buildUnit(unit3), buildUnit(unit4), buildUnit(unit5)))
         return BattleBidResponse(AWAIT)
+    }
+
+    @Transactional
+    fun finishTheBattle(uuid: UUID, winner: ValidatedSquad, looser: ValidatedSquad, actionUnit: UnitDTO){
+        giveExperience(winner, looser, actionUnit)
+        playerRepo.incrementGamesCount(looser.playerName)
+        playerRepo.incrementWinsAndGamesCount(winner.playerName)
+        battleFoes.remove(uuid)
+    }
+
+    @Transactional
+    fun giveExperience(winner: ValidatedSquad, looser: ValidatedSquad, finalAttack: UnitDTO) {
+        if (looser.dead == 5) {
+
+            val wonUnits = winner.map.values
+            val loosedUnits = looser.map.values
+
+            val expForWinner = loosedUnits.asSequence().fold(0) { i, u -> i + (u.type.basicReward * u.level / 2) }
+            val expForLooser = wonUnits.asSequence().filter { it.hp == 0 }.fold(0) { i, u -> i + (u.type.basicReward * u.level / 2) }
+
+            val xps = HashMap<Long, Int>()
+            wonUnits.forEach {
+                if (it.hp == 0) xps[it.id] = expForWinner / 3 * 2
+                else xps[it.id] = expForWinner
+            }
+            loosedUnits.forEach {
+                xps[it.id] = expForLooser / 2
+            }
+            xps[finalAttack.id] = (xps[finalAttack.id] ?: 0 + (expForWinner / 10))
+            val unitsToReward = unitRepo.findAllByIdIn((wonUnits + loosedUnits).map { it.id })
+
+            for (unit in unitsToReward) {
+                unit.experience += xps[unit.id] ?: 0
+            }
+            unitRepo.saveAll(unitsToReward)
+        }
     }
 
     /**

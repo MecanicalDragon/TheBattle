@@ -7,10 +7,6 @@ html, body  {
     min-height: calc(100vh - 76px - 59px);
 }
 
-:root {
-    --magenta-color: #e20074;
-}
-
 .magenta-bg {
     background-color: var(--magenta-color);
 }
