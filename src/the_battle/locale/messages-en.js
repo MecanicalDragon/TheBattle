@@ -9,12 +9,13 @@ export default {
     'app.index.header': 'The App',
     'app.index.start': 'Start it!',
 
-    'app.input.create.short.name': 'Player name should be 4-16 characters of digits and letters.',
-    'app.input.create.trim': 'Remove whitespaces in the beginning and the end of player name.',
+    'app.input.regex': 'Player name and password should be 4-16 characters of digits and letters.',
+    'app.input.create.trim': 'Remove whitespaces in the beginning and the end of input fields.',
     'app.input.create.bad.request': 'Bad request Don\'t you cheating?',
     'app.input.create.success': 'Player have been created successfully.',
 
     'app.input.name': 'Input your name',
+    'app.input.pw': 'Input password',
     'app.input.login.bad': 'No such player',
     'app.input.login.success': 'Successful logging. Welcome back!',
     'app.logout.failed': 'By some unknown reasons logout process has failed. Try again.',

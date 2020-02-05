@@ -24,6 +24,9 @@ data class Player(
         @Column(name = "wins", nullable = false)
         var wins: Int = 0,
 
+        @Column(name = "password", nullable = true)
+        var password: String = "",
+
         @Column(name = "status", nullable = false)
         @Enumerated(value = EnumType.STRING)
         var status: PlayerStatus? = PlayerStatus.FREE,

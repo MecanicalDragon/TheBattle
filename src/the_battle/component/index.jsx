@@ -21,12 +21,14 @@ class Index extends Component {
         this.props.dispatch(setNavPosition(Home));
         this.state = {
             enterName: "",
+            enterPw: "",
             playerName: "",
             authenticated: false,
             wins: 0,
             gamesTotal: 0
         };
-        this.handleChange = this.handleChange.bind(this)
+        this.handleChange = this.handleChange.bind(this);
+        this.handlePwChange = this.handlePwChange.bind(this)
     }
 
     componentDidMount() {
@@ -39,7 +41,7 @@ class Index extends Component {
     render() {
         return (
             <Container>
-                <Jumbotron>
+                <Jumbotron style={{textAlign: "center"}}>
                     <h1 id={"theBattle"}><FormattedMessage id={'app.index.header'}/></h1>
                     {this.state.authenticated ? this.getPlayerForm() : this.getLoginForm()}
                 </Jumbotron>
@@ -66,18 +68,27 @@ class Index extends Component {
         return (
             <Form onSubmit={(e) => this.login(e)}>
                 <Row>
-                    <Col xs={"auto"}>
+                    <Col  xs={{size: 2, offset: 2}} style={{textAlign: "right"}}>
                         <FormattedMessage id={"app.input.name"}/>
                     </Col>
-                    <Col xs={"auto"}>
+                    <Col xs={{size: 4}}>
                         <Input type={"text"} value={this.state.enterName} onChange={this.handleChange}
                                placeholder={"Input your name"}/>
                     </Col>
                     <Col xs={"auto"}>
-                        <Button color={"success"} type={"submit"}>Login</Button>
+                        <Button color={"success"} type={"submit"} style={{height: 35, width: 75}}>Login</Button>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col xs={{size: 2, offset: 2}} style={{textAlign: "right"}}>
+                        <FormattedMessage id={"app.input.pw"}/>
+                    </Col>
+                    <Col xs={{size: 4}}>
+                        <Input type={"text"} value={this.state.enterPw} onChange={this.handlePwChange}
+                               placeholder={"Input password"}/>
                     </Col>
                     <Col xs={"auto"}>
-                        <Button color={"info"} onClick={() => this.create()}>Create</Button>
+                        <Button color={"info"} onClick={() => this.create()} style={{height: 35, width: 75}}>Create</Button>
                     </Col>
                 </Row>
             </Form>
@@ -88,10 +99,15 @@ class Index extends Component {
         this.setState({enterName: event.target.value})
     }
 
+    handlePwChange(event) {
+        this.setState({enterPw: event.target.value})
+    }
+
     login(event) {
         event.preventDefault();
         let name = this.state.enterName;
-        player.login(name).then(resp => {
+        let pw = this.state.enterPw;
+        player.login(name, pw).then(resp => {
             if (resp !== null) {
                 this.setState({wins: resp.wins, gamesTotal: resp.games, playerName: resp.name, authenticated: true})
             }
@@ -108,7 +124,8 @@ class Index extends Component {
 
     create() {
         let name = this.state.enterName;
-        player.create(name).then(resp => {
+        let pw = this.state.enterPw;
+        player.create(name, pw).then(resp => {
             if (resp !== null) {
                 this.setState({playerName: resp.name, authenticated: true, gamesTotal: resp.games, wins: resp.wins})
             }

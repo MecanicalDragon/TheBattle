@@ -15,7 +15,6 @@ fun extractPlayerName(request: HttpServletRequest, pName: String?): String? {
     var playerName = request.getSession(false)?.getAttribute(PLAYER_SESSION) as? String
     if (playerName == null) {
         if (pName != null && pName.isNotBlank()) {
-//            println("========================================= no session request ================================================")
             playerName = sessionStorage[pName]?.playerName
         } else {
             println("==============> No session and no valid 'pName' parameter in the request. This request will not be handled.")
@@ -32,7 +31,6 @@ fun extractBattleUUID(request: HttpServletRequest, pName: String?): UUID? {
         return it.getAttribute(BATTLE_UUID) as? UUID
 
     }
-//    println("========================================= no session UUID request ================================================")
     return sessionStorage[pName]?.bud
 }
 

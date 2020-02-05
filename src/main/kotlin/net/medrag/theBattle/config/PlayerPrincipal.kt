@@ -9,10 +9,10 @@ import org.springframework.security.core.userdetails.UserDetails
  * 25.12.2019
  */
 @Deprecated(message="not in this version")
-data class UserPrincipal(
+data class PlayerPrincipal(
         val playerName: String,
         val pWord: String,
-        val auth: MutableCollection<out GrantedAuthority>) : UserDetails {
+        val auth: MutableCollection<out GrantedAuthority> = role) : UserDetails {
 
     override fun getAuthorities(): MutableCollection<out GrantedAuthority> = auth
     override fun getUsername(): String = playerName
@@ -21,4 +21,8 @@ data class UserPrincipal(
     override fun isCredentialsNonExpired(): Boolean = true
     override fun isAccountNonExpired(): Boolean = true
     override fun isAccountNonLocked(): Boolean = true
+
+    companion object {
+        val role: MutableCollection<out GrantedAuthority> = mutableListOf(GrantedAuthority { "ROLE_PLAYER" })
+    }
 }

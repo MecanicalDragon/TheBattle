@@ -88,39 +88,50 @@ export async function logout() {
  * Login function.
  *
  * @param name - player name
+ * @param pw - player's password
  * @returns null in incorrect login case or Player-dto in correct one.
  */
-export async function login(name) {
+export async function login(name, pw) {
     let url = new URL(appApi + 'auth/login');
-    url.searchParams.append("name", name);
-    return fetch(url).then(function (response) {
+    return fetch(url, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                name: name,
+                pw: pw
+            })
+        }
+    ).then(function (response) {
         if (response.status === 200)
             return response.json();
-        else return null
+        else throw response
     }).then(resp => {
-        if (resp === null) {
-            NotificationManager.warning(name, <FormattedMessage id={"app.input.login.bad"}/>, 3000);
+        store.dispatch(setAuth(resp.name));
+        NotificationManager.success(name, <FormattedMessage id={"app.input.login.success"}/>, 3000);
+        return resp;
+    }).catch(e => e.text()
+        .then(msg => {
+            NotificationManager.warning(name, msg, 3000);
             return null;
-        } else {
-            store.dispatch(setAuth(resp.name));
-            NotificationManager.success(name, <FormattedMessage id={"app.input.login.success"}/>, 3000);
-            return resp;
-        }
-    });
+        })
+    );
 }
 
 /**
  * Creates new player
  *
  * @param name - player name
+ * @param pw - player's password
  * @returns null if input name is incorrect or exists, player name otherwise
  */
-export async function create(name) {
-
-    if (name.length !== name.trim().length) {
+export async function create(name, pw) {
+    if (name.length !== name.trim().length || pw.length !== pw.trim().length) {
         NotificationManager.warning(name, <FormattedMessage id={"app.input.create.trim"}/>, 3000);
-    } else if (!name.match("^[A-Za-z 0-9]{4,16}$")) {
-        NotificationManager.warning(name, <FormattedMessage id={"app.input.create.short.name"}/>, 3000);
+    } else if (!name.match("^[A-Za-z0-9]{4,16}$") || !pw.match("^[A-Za-z0-9]{4,16}$")) {
+        NotificationManager.warning(name, <FormattedMessage id={"app.input.regex"}/>, 3000);
     } else {
         let url = new URL(appApi + 'auth/createPlayer');
         url.searchParams.append("name", name);
@@ -129,7 +140,11 @@ export async function create(name) {
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
-            }
+            },
+            body: JSON.stringify({
+                name: name,
+                pw: pw
+            })
         }).then(function (response) {
             if (response.status === 200)
                 return response.json();
@@ -142,7 +157,8 @@ export async function create(name) {
             .then(msg => {
                 NotificationManager.warning(name, msg, 3000);
                 return null;
-            }));
+            })
+        );
     }
     return null;
 }
