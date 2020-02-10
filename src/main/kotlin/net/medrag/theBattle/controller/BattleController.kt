@@ -8,7 +8,8 @@ import net.medrag.theBattle.service.BattleService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import javax.servlet.http.HttpServletRequest
+import java.util.*
+import javax.servlet.http.HttpSession
 
 
 /**
@@ -23,58 +24,60 @@ class BattleController(@Autowired val battleService: BattleService) {
      * Registers battle bid.
      * Generates and sets 'BATTLE_UUID' parameter to the session.
      */
-    //TODO: TODO_SECURITY: requestParam 'pName' should be removed in release
     @PostMapping("/registerBattleBid")
-    fun registerBattleBid(@RequestBody squadDTO: SquadDTO,
-                          @RequestParam(required = false) pName: String?,
-                          request: HttpServletRequest): ResponseEntity<BattleBidResponse> {
+    fun registerBattleBid(@RequestBody squadDTO: SquadDTO, session: HttpSession): ResponseEntity<BattleBidResponse> {
 
-        val playerName = extractPlayerName(request, pName)
-        if (playerName.isNullOrBlank()) return ResponseEntity.badRequest().build()
-        invalidateBattleUUID(request, playerName)
-        val resp = battleService.registerBattleBid(playerName, squadDTO)
-        return ResponseEntity.ok(resp)
+        (session.getAttribute(PLAYER_SESSION) as? String)?.let {
+            session.removeAttribute(BATTLE_UUID)
+            val resp = battleService.registerBattleBid(it, squadDTO)
+            session.setAttribute(IN_SEARCH, true)
+            return ResponseEntity.ok(resp)
+        }
+        return ResponseEntity.badRequest().build()
     }
 
     /**
      * Cancels battle bid.
      * Sets 'BATTLE_UUID' parameter to null.
      */
-    //TODO: TODO_SECURITY: requestParam 'pName' should be removed in release
     @PostMapping("/cancelBid")
-    fun cancelBid(@RequestParam(required = false) pName: String?, request: HttpServletRequest): ResponseEntity<String> {
+    fun cancelBid(session: HttpSession): ResponseEntity<String> {
 
-        val playerName = extractPlayerName(request, pName)
-        if (playerName.isNullOrBlank()) return ResponseEntity.badRequest().build()
-
-        val cancelled = battleService.cancelBid(playerName)
-        if (cancelled) request.getSession(false)?.setAttribute(BATTLE_UUID, null)
-        return ResponseEntity.ok(if (cancelled) CANCELLED else NOT_CANCELLED)
+        (session.getAttribute(PLAYER_SESSION) as? String)?.let {
+            val cancelled = battleService.cancelBid(it)
+            if (cancelled) {
+                session.removeAttribute(BATTLE_UUID)
+                session.removeAttribute(IN_SEARCH)
+            }
+            return ResponseEntity.ok(if (cancelled) CANCELLED else NOT_CANCELLED)
+        }
+        return ResponseEntity.badRequest().build()
     }
 
     /**
      * Returns foesPair.
      */
-    //TODO: TODO_SECURITY: requestParam 'pName' should be removed in release
     @GetMapping("/getDislocations")
-    fun getDislocations(@RequestParam(required = false) pName: String?,
-                        request: HttpServletRequest): ResponseEntity<FoesPair> {
+    fun getDislocations(session: HttpSession): ResponseEntity<FoesPair> {
 
-        val playerName = extractPlayerName(request, pName)
-        if (playerName.isNullOrBlank()) return ResponseEntity.badRequest().build()
+        (session.getAttribute(PLAYER_SESSION) as? String)?.let { playerName ->
+            (session.getAttribute(BATTLE_UUID) as? UUID)?.let {
+                return try {
+                    ResponseEntity.ok(battleService.getDislocations(playerName, it))
+                } catch (e: ValidationException) {
+                    session.removeAttribute(BATTLE_UUID)
+                    ResponseEntity.badRequest().build()
+                }
+            }
 
-        extractBattleUUID(request, playerName)?.let {
-            try {
+            // 2 cases, if player does not know his bud:
+            // 1. The battle just started, and it's a first request.
+            battleService.getBud(playerName)?.let {
+                session.setAttribute(BATTLE_UUID, it)
                 return ResponseEntity.ok(battleService.getDislocations(playerName, it))
-            } catch (e: ValidationException) {
-                invalidateBattleUUID(request, pName)
-                return ResponseEntity.badRequest().build()
             }
         }
-        battleService.getBud(playerName)?.let {
-            emulateBudSetting(playerName, it, request)
-            return ResponseEntity.ok(battleService.getDislocations(playerName, it))
-        }
+        // 2. Invalid request.
         return ResponseEntity.badRequest().build()
     }
 }

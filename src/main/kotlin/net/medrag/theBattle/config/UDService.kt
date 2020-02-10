@@ -11,7 +11,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException
  * {@author} Stanislav Tretyakov
  * 25.12.2019
  */
-@Deprecated(message="not in this version")
+@Deprecated(message="currently I don't need it")
 class UDService : UserDetailsService {
 
     @Autowired

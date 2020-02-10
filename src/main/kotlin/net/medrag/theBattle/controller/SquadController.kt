@@ -1,5 +1,7 @@
 package net.medrag.theBattle.controller
 
+import net.medrag.theBattle.model.PLAYER_SESSION
+import net.medrag.theBattle.model.RETIRED
 import net.medrag.theBattle.model.ValidationException
 import net.medrag.theBattle.model.classes.Unitt
 import net.medrag.theBattle.model.dto.UnitDTO
@@ -8,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpSession
 
 
 /**
@@ -19,45 +21,40 @@ import javax.servlet.http.HttpServletRequest
 @RequestMapping("/squad")
 class SquadController(@Autowired val squadService: SquadService) {
 
-    //TODO: TODO_SECURITY: requestParam 'name' should be removed in release
     @GetMapping("/getPool")
-    fun getPool(@RequestParam(required = false) pName: String?, request: HttpServletRequest): ResponseEntity<List<UnitDTO>> {
-        val playerName = extractPlayerName(request, pName)
-        if (playerName.isNullOrBlank()) return ResponseEntity.badRequest().build()
-        return ResponseEntity.ok(squadService.getPool(playerName))
+    fun getPool(session: HttpSession): ResponseEntity<List<UnitDTO>> {
+
+        (session.getAttribute(PLAYER_SESSION) as? String)?.let {
+            return ResponseEntity.ok(squadService.getPool(it))
+        }
+        return ResponseEntity.badRequest().build()
     }
 
-    //TODO: TODO_SECURITY: requestParam 'name' should be removed in release
     @PostMapping("/addNew")
-    fun addNew(@RequestParam(required = false) pName: String?,
-               @RequestParam name: String,
+    fun addNew(@RequestParam name: String,
                @RequestParam type: Unitt.Unit.Type,
-               request: HttpServletRequest): ResponseEntity<UnitDTO> {
+               session: HttpSession): ResponseEntity<UnitDTO> {
 
-        try {
-            val playerName = extractPlayerName(request, pName)
-            if (playerName.isNullOrBlank()) return ResponseEntity.badRequest().build()
-            return ResponseEntity.ok(squadService.addNewUnit(playerName, name, type))
-
-        } catch (e: ValidationException) {
-            return ResponseEntity.badRequest().build()
+        (session.getAttribute(PLAYER_SESSION) as? String)?.let {
+            try {
+                return ResponseEntity.ok(squadService.addNewUnit(it, name, type))
+            } catch (e: ValidationException) {
+            }
         }
+        return ResponseEntity.badRequest().build()
     }
 
-    //TODO: TODO_SECURITY: requestParam 'name' should be removed in release
     @DeleteMapping("/retireHero")
-    fun delete(@RequestParam unit: Long,
-               @RequestParam(required = false) pName: String?,
-               request: HttpServletRequest): ResponseEntity<String> {
+    fun delete(@RequestParam unit: Long, session: HttpSession): ResponseEntity<String> {
 
-        val playerName = extractPlayerName(request, pName)
-        if (playerName.isNullOrBlank())
-            return ResponseEntity("Could not extract player's name", HttpStatus.BAD_REQUEST)
-        try {
-            squadService.deleteUnit(unit, playerName)
-        } catch (e: ValidationException) {
-            return ResponseEntity(e.message, HttpStatus.BAD_REQUEST)
+        (session.getAttribute(PLAYER_SESSION) as? String)?.let {
+            return try {
+                squadService.deleteUnit(unit, it)
+                ResponseEntity.ok(RETIRED)
+            } catch (e: ValidationException) {
+                ResponseEntity(e.message, HttpStatus.BAD_REQUEST)
+            }
         }
-        return ResponseEntity.ok("RETIRED")
+        return ResponseEntity("Could not extract player's name", HttpStatus.BAD_REQUEST)
     }
 }

@@ -13,6 +13,8 @@ const val AWAIT = "AWAIT"
 const val START = "START"
 const val CANCELLED = "CANCELLED"
 const val NOT_CANCELLED = "NOT_CANCELLED"
+const val RETIRED = "RETIRED"
+const val IN_SEARCH = "IN_SEARCH"
 
 const val ACCURACY_MODIFIER = 3
 const val INITIATIVE_BOTTOM_THRESHOLD = 5

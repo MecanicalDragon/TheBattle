@@ -1,8 +1,10 @@
 const appApi = DEPLOYED_URL;
+const sendCred = SEND_CREDENTIALS;
 
-//TODO: TODO_SECURITY: requestParam 'pName' should be removed in release
-export async function getPool(pName) {
-    return fetch(appApi + 'squad/getPool?pName=' + pName).then(function (response) {
+export async function getPool() {
+    return fetch(appApi + 'squad/getPool', {
+        credentials: sendCred
+    }).then(function (response) {
         return response.status === 200 ? response.json() : null;
     }).then(resp => {
         let pool = new Map();
@@ -13,16 +15,16 @@ export async function getPool(pName) {
     });
 }
 
-//TODO: TODO_SECURITY: requestParam 'pName' should be removed in release
-export async function retireHero(pName, unit) {
+export async function retireHero(unit) {
     let url = new URL(appApi + 'squad/retireHero');
-    url.search = new URLSearchParams({pName: pName, unit: unit});
+    url.search = new URLSearchParams({unit: unit});
     return fetch(url, {
         method: 'DELETE',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
-        }
+        },
+        credentials: sendCred
     }).then(function (response) {
         return response.status === 200 ? response.text() : null;
     }).then(resp => {
@@ -30,16 +32,16 @@ export async function retireHero(pName, unit) {
     });
 }
 
-//TODO: TODO_SECURITY: requestParam 'pName' should be removed in release
-export async function addNewHero(pName, name, type) {
+export async function addNewHero(name, type) {
     let url = new URL(appApi + 'squad/addNew');
-    url.search = new URLSearchParams({pName: pName, name: name, type: type.toUpperCase()});
+    url.search = new URLSearchParams({name: name, type: type.toUpperCase()});
     return fetch(url, {
         method: 'POST',
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
-        }
+        },
+        credentials: sendCred
     }).then(function (response) {
         return response.status === 200 ? response.json() : null;
     }).then(resp => {

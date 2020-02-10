@@ -1,4 +1,5 @@
 const appApi = DEPLOYED_URL;
+const sendCred = SEND_CREDENTIALS;
 import {createStore} from 'redux';
 import {reducers} from '@/reducer/reducers'
 import {setAuth} from "@/constants/actions";
@@ -59,7 +60,7 @@ export function getPlayerName() {
 /**
  * Just logout
  *
- * @returns true if ok
+ * @returns true if successful
  */
 export async function logout() {
     let url = new URL(appApi + 'auth/logout');
@@ -68,13 +69,15 @@ export async function logout() {
         headers: {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
-        }
+        },
+        credentials: sendCred
     }).then(function (response) {
         if (response.status === 200)
             return response.text();
         else return response
     }).then(resp => {
         if (resp === "LOGGED_OUT") {
+            //TODO: get rid of this auth store
             store.dispatch(setAuth(null));
             return true;
         } else {
@@ -106,18 +109,25 @@ export async function login(name, pw) {
         }
     ).then(function (response) {
         if (response.status === 200)
-            return response.json();
+            return response.json().then(resp => {
+                store.dispatch(setAuth(resp.name));
+                NotificationManager.success(name, <FormattedMessage id={"app.input.login.success"}/>, 3000);
+                return resp;
+            });
         else throw response
-    }).then(resp => {
-        store.dispatch(setAuth(resp.name));
-        NotificationManager.success(name, <FormattedMessage id={"app.input.login.success"}/>, 3000);
-        return resp;
-    }).catch(e => e.text()
-        .then(msg => {
-            NotificationManager.warning(name, msg, 3000);
-            return null;
-        })
-    );
+    }).catch(e => {
+        switch (e.status) {
+            case 400:
+                NotificationManager.warning(name, <FormattedMessage id={"app.login.bad.input"}/>, 5000);
+                break;
+            case 428:
+                NotificationManager.warning(name, <FormattedMessage id={"app.login.should.logout"}/>, 3000);
+                break;
+            default:
+                NotificationManager.error(name, <FormattedMessage id={"app.login.unexpected.error"}/>, 5000);
+        }
+        return null;
+    });
 }
 
 /**
@@ -147,18 +157,28 @@ export async function create(name, pw) {
             })
         }).then(function (response) {
             if (response.status === 200)
-                return response.json();
+                return response.json().then(resp => {
+                    NotificationManager.success(name, <FormattedMessage id={"app.input.create.success"}/>, 3000);
+                    store.dispatch(setAuth(name));
+                    return resp;
+                });
             else throw response;
-        }).then(resp => {
-            NotificationManager.success(name, <FormattedMessage id={"app.input.create.success"}/>, 3000);
-            store.dispatch(setAuth(name));
-            return resp;
-        }).catch(e => e.text()
-            .then(msg => {
-                NotificationManager.warning(name, msg, 3000);
-                return null;
-            })
-        );
+        }).catch(e => {
+            switch (e.status) {
+                case 400:
+                    NotificationManager.warning(name, <FormattedMessage id={"app.create.bad.input"}/>, 5000);
+                    break;
+                case 409:
+                    NotificationManager.warning(name, <FormattedMessage id={"app.create.user.exists"}/>, 5000);
+                    break;
+                case 428:
+                    NotificationManager.warning(name, <FormattedMessage id={"app.login.should.logout"}/>, 3000);
+                    break;
+                default:
+                    NotificationManager.error(name, <FormattedMessage id={"app.login.unexpected.error"}/>, 5000);
+            }
+            return null;
+        });
     }
     return null;
 }

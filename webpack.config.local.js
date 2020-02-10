@@ -75,10 +75,12 @@ module.exports = {
         }
     },
     plugins: [
-        new CleanWebpackPlugin(),
+        // new CleanWebpackPlugin(),
         new webpack.DefinePlugin({
             'process.env': {ASSET_PATH: JSON.stringify(publicPath)},
+            //BTW: changing port will break cookie communication with port other than 8080 in war-container
             DEPLOYED_URL: JSON.stringify('http://localhost:9191/'),
+            SEND_CREDENTIALS: JSON.stringify('include'),
         }),
         new MiniCssExtractPlugin({
             filename: 'assets/stylesheets/[name]/[hash].css'

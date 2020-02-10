@@ -72,7 +72,7 @@ class ManageComp extends Component {
     }
 
     componentDidMount() {
-        SquadService.getPool(this.state.playerName).then(resp => {
+        SquadService.getPool().then(resp => {
             let inReserve = [];
             for (let i of resp) {
                 inReserve.push(i[0]);
@@ -91,7 +91,7 @@ class ManageComp extends Component {
     }
 
     addNewHero = (name, type) => {
-        SquadService.addNewHero(this.state.playerName, name, type).then(
+        SquadService.addNewHero(name, type).then(
             resp => {
                 if (resp !== null) {
                     let updCol = this.state.columns["reserve"];
@@ -111,7 +111,7 @@ class ManageComp extends Component {
     };
 
     retireHero = (draggableId, start, index) => {
-        SquadService.retireHero(this.state.playerName, draggableId).then(resp => {
+        SquadService.retireHero(draggableId).then(resp => {
             if (resp !== null) {
 
                 const newIds = Array.from(start.heroes);
@@ -145,7 +145,7 @@ class ManageComp extends Component {
     toBattle = () => {
         this.setState({toBattleDisabled: true});
         if (this.state.onSearching) {
-            BattleService.cancelBid(this.state.playerName).then(
+            BattleService.cancelBid().then(
                 resp => {
                     if (resp === "CANCELLED") {
                         NotificationManager.success("", <FormattedMessage id={"app.manage.cancelled"}/>, 5000);
@@ -184,7 +184,7 @@ class ManageComp extends Component {
         let squad = undefined;
         define();
         if (squad) {
-            BattleService.battleBid(this.state.playerName, squad).then(resp => {
+            BattleService.battleBid(squad).then(resp => {
                 if (resp.status === "AWAIT") {
                     this.setState({toBattleDisabled: false, onSearching: true});
                 } else if (resp.status === "START") {

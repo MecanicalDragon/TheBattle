@@ -18,7 +18,12 @@ export default {
     'app.input.pw': 'Input password',
     'app.input.login.bad': 'No such player',
     'app.input.login.success': 'Successful logging. Welcome back!',
-    'app.logout.failed': 'By some unknown reasons logout process has failed. Try again.',
+    'app.login.should.logout': 'To perform this action, please, logout first.',
+    'app.login.bad.input': 'Incorrect credentials.',
+    'app.login.unexpected.error': 'Congratulations! You\'ve done something unpredictable and received absolutely unexpected error!',
+    'app.create.bad.input': 'You must use 4-16 symbols of any case latin letters and digits as user login/password.',
+    'app.create.user.exists': 'Sorry, but player with this name already exists :(',
+    'app.logout.failed': 'By some unknown reason logout process has failed. Try again.',
 
     // Manage page
     'app.manage.pool.header': 'Heroes pool',

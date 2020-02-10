@@ -18,11 +18,11 @@ module.exports = {
         port: 9095,
         publicPath: `${publicPath}`,
         // proxy: [{
-        //     context: ['/api', '/endpoint'],
+        //     context: ['/auth', '/battle', '/squad'],
         //     target: {
         //         host: "localhost",
         //         protocol: 'http:',
-        //         port: 8090
+        //         port: 9191
         //     }
         // }]
     },
@@ -78,7 +78,9 @@ module.exports = {
         new CleanWebpackPlugin(),
         new webpack.DefinePlugin({
             'process.env': {ASSET_PATH: JSON.stringify(publicPath)},
-            DEPLOYED_URL: JSON.stringify('http://10.233.25.41:9191/'),
+            //BTW: changing port will break cookie communication with port other than 8080 in war-container
+            DEPLOYED_URL: JSON.stringify('http://localhost:9191/'),
+            SEND_CREDENTIALS: JSON.stringify('include'),
         }),
         new MiniCssExtractPlugin({
             filename: 'assets/stylesheets/[name]/[hash].css'

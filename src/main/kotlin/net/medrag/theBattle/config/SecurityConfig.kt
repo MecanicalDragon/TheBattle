@@ -1,5 +1,6 @@
 package net.medrag.theBattle.config
 
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
@@ -31,14 +32,28 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
     private val resources = arrayOf("/", "/**/*.woff", "/**/*.ttf", "/favicon.ico", "/**/*.png", "/**/*.gif",
             "/**/*.svg", "/**/*.jpg", "/**/*.html", "/**/*.css", "/**/*.js")
 
+//    @Throws(Exception::class)
+//    override fun configure(authenticationManagerBuilder: AuthenticationManagerBuilder) {
+//        authenticationManagerBuilder
+//                .userDetailsService<UserDetailsService>(udService)
+//                .passwordEncoder(passwordEncoder())
+//    }
+//
+//    @Bean(BeanIds.AUTHENTICATION_MANAGER)
+//    @Throws(Exception::class)
+//    override fun authenticationManagerBean(): AuthenticationManager? {
+//        return super.authenticationManagerBean()
+//    }
+
     override fun configure(http: HttpSecurity) {
         http.cors().and().csrf().disable()
-//                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+//                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+//                .and()
 //                .authorizeRequests()
 //                .antMatchers(HttpMethod.OPTIONS).permitAll()
-//                .antMatchers(*welcomePage).permitAll()
 //                .antMatchers(*resources).permitAll()
-//                .antMatchers("/**").hasRole("PLAYER")
+//                .antMatchers(*welcomePage).permitAll()
+//                .antMatchers("/**").permitAll()
 //                .anyRequest().authenticated()
     }
 
@@ -50,7 +65,6 @@ class SecurityConfig : WebSecurityConfigurerAdapter() {
         config.addAllowedOrigin("*")
         config.addAllowedHeader("*")
         config.addAllowedMethod("*")
-        config.allowCredentials = true
         source.registerCorsConfiguration("/**", config)
         return source
     }

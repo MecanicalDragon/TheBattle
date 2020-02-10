@@ -1,7 +1,7 @@
 const appApi = DEPLOYED_URL;
+const sendCred = SEND_CREDENTIALS;
 
-//TODO: TODO_SECURITY: requestParam 'pName' should be removed in release
-export async function performAction(pName, actor, action, data) {
+export async function performAction(actor, action, data) {
     let url = new URL(appApi + 'action/performAction');
     url.search = new URLSearchParams({pName: pName});
     let simpleAction = {
@@ -15,6 +15,7 @@ export async function performAction(pName, actor, action, data) {
             'Accept': 'application/json',
             'Content-Type': 'application/json'
         },
+        credentials: sendCred,
         body: JSON.stringify(simpleAction)
     }).then(function (response) {
         return response.status === 200 ? response.json() : null;

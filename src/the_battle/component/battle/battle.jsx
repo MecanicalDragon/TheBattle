@@ -44,8 +44,7 @@ class BattleComp extends Component {
     }
 
     componentDidMount() {
-        let {playerName} = this.state;
-        BattleService.getBattle(playerName).then(resp => {
+        BattleService.getBattle().then(resp => {
             if (resp) {
                 let mySquad = resp.foe1.playerName === playerName ? resp.foe1 : resp.foe2;
                 let foesSquad = resp.foe1.playerName === playerName ? resp.foe2 : resp.foe1;
@@ -180,8 +179,8 @@ class BattleComp extends Component {
         if (action === ATTACK) {
             alert("This button is just for fancy view here, but two of others work, we assure)")
         } else {
-            let {actionMan, playerName} = this.state;
-            performAction(playerName, actionMan.pos, action).then(resp => {
+            let {actionMan} = this.state;
+            performAction(actionMan.pos, action).then(resp => {
                 let newActionMan = this.defineActionMan(resp.nextUnit);
                 this.setState({
                     actionMan: newActionMan,
@@ -196,9 +195,9 @@ class BattleComp extends Component {
      * @param targets - targets positions
      */
     selectTargets = (targets) => {
-        let {playerName, actionMan} = this.state;
+        let {actionMan} = this.state;
         let data = {targets: targets};
-        performAction(playerName, actionMan.pos, ATTACK, data).then(resp => {
+        performAction(actionMan.pos, ATTACK, data).then(resp => {
             if (resp) {
                 let foe = resp.additionalData.DAMAGED_SQUAD;
                 let newActionMan = this.defineActionMan(resp.nextUnit);
