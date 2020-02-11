@@ -181,11 +181,13 @@ class BattleComp extends Component {
         } else {
             let {actionMan} = this.state;
             performAction(actionMan.pos, action).then(resp => {
-                let newActionMan = this.defineActionMan(resp.nextUnit);
-                this.setState({
-                    actionMan: newActionMan,
-                    battleLogs: resp.comments
-                });
+                if (resp) {
+                    let newActionMan = this.defineActionMan(resp.nextUnit);
+                    this.setState({
+                        actionMan: newActionMan,
+                        battleLogs: resp.comments
+                    });
+                }
             })
         }
     };

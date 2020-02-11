@@ -1,6 +1,7 @@
 package net.medrag.theBattle.controller
 
 import net.medrag.theBattle.model.BATTLE_UUID
+import net.medrag.theBattle.model.NO_SESSION
 import net.medrag.theBattle.model.PLAYER_SESSION
 import net.medrag.theBattle.model.ValidationException
 import net.medrag.theBattle.model.dto.SimpleAction
@@ -14,11 +15,21 @@ import javax.servlet.http.HttpServletRequest
 /**
  * {@author} Stanislav Tretyakov
  * 15.01.2020
+ *
+ * Controller for handling battle actions
  */
 @RestController
 @RequestMapping("/action")
 class ActionController(private val actionService: ActionService) {
 
+    /**
+     * SimpleAction handling
+     * @param action SimpleAction
+     * @param request HttpServletRequest
+     * @return ResponseEntity<Any>:
+     *      - 200 if action successfully handled
+     *      - 400 if action is invalid
+     */
     @PostMapping("/performAction")
     fun performAction(@RequestBody action: SimpleAction, request: HttpServletRequest): ResponseEntity<Any> {
 
@@ -38,6 +49,6 @@ class ActionController(private val actionService: ActionService) {
                 }
             }
         }
-        return ResponseEntity.badRequest().build()
+        return ResponseEntity.badRequest().body(NO_SESSION)
     }
 }

@@ -73,20 +73,22 @@ class ManageComp extends Component {
 
     componentDidMount() {
         SquadService.getPool().then(resp => {
-            let inReserve = [];
-            for (let i of resp) {
-                inReserve.push(i[0]);
-            }
-            this.setState({
-                pool: resp,
-                columns: {
-                    ...this.state.columns,
-                    "reserve": {
-                        id: 'reserve',
-                        heroes: inReserve
-                    }
+            if (resp) {
+                let inReserve = [];
+                for (let i of resp) {
+                    inReserve.push(i[0]);
                 }
-            });
+                this.setState({
+                    pool: resp,
+                    columns: {
+                        ...this.state.columns,
+                        "reserve": {
+                            id: 'reserve',
+                            heroes: inReserve
+                        }
+                    }
+                });
+            }
         });
     }
 

@@ -19,12 +19,22 @@ import kotlin.collections.HashMap
 /**
  * {@author} Stanislav Tretyakov
  * 21.01.2020
+ * SimpleAction handler
  */
 @Service
 class ActionService(@Autowired private val battleService: BattleService,
                     @Autowired private val attackService: AttackService,
                     @Autowired private val wSocket: SimpMessagingTemplate) {
 
+    /**
+     * SimpleAction handling
+     * @param playerName String - action performer
+     * @param bud UUID - battle UUID
+     * @param simpleAction SimpleAction - action itself
+     * @return ActionResult - result data object
+     * @throws ValidationException if action unit is invalid or position is passed incorrectly
+     */
+    @Throws(ValidationException::class)
     fun performSimpleAction(playerName: String, bud: UUID, simpleAction: SimpleAction): ActionResult {
         val pair = battleService.getDislocations(playerName, bud)
         val player: ValidatedSquad = if (pair.foe1.playerName == playerName) pair.foe1 else pair.foe2
