@@ -7,5 +7,6 @@ package net.medrag.theBattle.model.entities
  */
 enum class PlayerStatus {
     FREE,
+    IN_SEARCH,
     IN_BATTLE
 }

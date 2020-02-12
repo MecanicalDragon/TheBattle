@@ -42,7 +42,19 @@ data class UnitEntity(
 
 
 ) {
-        override fun toString(): String {
-                return "UnitEntity(id=$id, name='$name', level=$level, experience=$experience, hp=$hp, status=$status, type=$type, playerId=${player.id}, playerName=${player.name})"
-        }
+
+    override fun toString(): String {
+        return "UnitEntity(id=$id, name='$name', level=$level, experience=$experience, hp=$hp, status=$status, type=$type, playerId=${player.id}, playerName=${player.name})"
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+        other as UnitEntity
+        return id == other.id
+    }
+
+    override fun hashCode(): Int {
+        return id?.hashCode() ?: 0
+    }
 }

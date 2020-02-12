@@ -8,5 +8,6 @@ package net.medrag.theBattle.model.entities
 enum class UnitStatus {
     IN_POOL,
     IN_BATTLE,
-    IN_SQUAD
+    IN_SQUAD,
+    IN_SEARCH
 }

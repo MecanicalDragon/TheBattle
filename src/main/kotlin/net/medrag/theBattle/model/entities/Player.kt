@@ -31,6 +31,9 @@ data class Player(
         @Enumerated(value = EnumType.STRING)
         var status: PlayerStatus? = PlayerStatus.FREE,
 
+        @Column(name = "bud", nullable = true, unique = false)
+        val bud: String? = null,
+
         @JsonIgnore
         @OneToMany(mappedBy = "player")
         var pool: List<UnitEntity> = ArrayList()) {

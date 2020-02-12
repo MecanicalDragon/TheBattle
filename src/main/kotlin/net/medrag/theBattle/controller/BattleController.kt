@@ -23,15 +23,24 @@ class BattleController(@Autowired val battleService: BattleService) {
     /**
      * Registers battle bid.
      * Generates and sets 'BATTLE_UUID' parameter to the session.
+     * @param squadDTO SquadDTO - squad, that goes into battle
+     * @param session HttpSession
+     * @return ResponseEntity<BattleBidResponse>:
+     *      - 200 if battle bid have been registered
+     *      - 400 if there are no player name in session
      */
     @PostMapping("/registerBattleBid")
     fun registerBattleBid(@RequestBody squadDTO: SquadDTO, session: HttpSession): ResponseEntity<BattleBidResponse> {
 
+        //TODO: handle 555 everywhere
         (session.getAttribute(PLAYER_SESSION) as? String)?.let {
             session.removeAttribute(BATTLE_UUID)
-            val resp = battleService.registerBattleBid(it, squadDTO)
-            session.setAttribute(IN_SEARCH, true)
-            return ResponseEntity.ok(resp)
+            return try {
+                val resp = battleService.registerBattleBid(it, squadDTO)
+                ResponseEntity.ok(resp)
+            } catch (e: ValidationException) {
+                ResponseEntity.badRequest().build()
+            }
         }
         return ResponseEntity.badRequest().build()
     }
@@ -73,8 +82,9 @@ class BattleController(@Autowired val battleService: BattleService) {
             // 2 cases, if player does not know his bud:
             // 1. The battle just started, and it's a first request.
             battleService.getBud(playerName)?.let {
-                session.setAttribute(BATTLE_UUID, it)
-                return ResponseEntity.ok(battleService.getDislocations(playerName, it))
+                val bud = UUID.fromString(it)
+                session.setAttribute(BATTLE_UUID, bud)
+                return ResponseEntity.ok(battleService.getDislocations(playerName, bud))
             }
         }
         // 2. Invalid request.
