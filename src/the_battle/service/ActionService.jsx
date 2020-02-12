@@ -9,11 +9,10 @@ const sendCred = SEND_CREDENTIALS;
  * @param actor - acting unit position (pos5)
  * @param action - action itself (ATTACK, BLOCK, WAIT)
  * @param data - additional data (targets positions array)
- * @returns {Promise<Response | Promise<Response>>}
+ * @returns new state data
  */
 export async function performAction(actor, action, data) {
     let url = new URL(appApi + 'action/performAction');
-    url.search = new URLSearchParams({pName: pName});
     let simpleAction = {
         actor: actor.toString().toUpperCase(),
         action: action,
@@ -28,9 +27,11 @@ export async function performAction(actor, action, data) {
         credentials: sendCred,
         body: JSON.stringify(simpleAction)
     }).then(function (response) {
-        return response.status === 200 ? response.json().then(r => {
-            return r
-        }) : throw response;
+        if (response.status === 200) {
+            return response.json().then(r => {
+                return r
+            })
+        } else throw response;
     }).catch(e => {
         return e.text().then(msg => {
             NotificationManager.error(action, msg, 3000);

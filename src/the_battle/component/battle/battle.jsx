@@ -46,6 +46,7 @@ class BattleComp extends Component {
     componentDidMount() {
         BattleService.getBattle().then(resp => {
             if (resp) {
+                let {playerName} = this.state;
                 let mySquad = resp.foe1.playerName === playerName ? resp.foe1 : resp.foe2;
                 let foesSquad = resp.foe1.playerName === playerName ? resp.foe2 : resp.foe1;
                 let foesName = foesSquad.playerName;

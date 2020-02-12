@@ -11,7 +11,9 @@ export async function getPool() {
     return fetch(appApi + 'squad/getPool', {
         credentials: sendCred
     }).then(function (response) {
-        return response.status === 200 ? response.json() : throw response;
+        if (response.status === 200)
+            return response.json();
+        else throw response;
     }).then(resp => {
         let pool = new Map();
         resp.forEach(function (entry) {
@@ -42,7 +44,9 @@ export async function retireHero(unit) {
         },
         credentials: sendCred
     }).then(function (response) {
-        return response.status === 200 ? response.text() : throw response;
+        if (response.status === 200)
+            return response.text();
+        else throw response;
     }).then(resp => {
         return resp;
     }).catch(e => {

@@ -88,7 +88,7 @@ class ManageComp extends Component {
                         }
                     }
                 });
-            }
+            } else history.push(routes.index())
         });
     }
 
