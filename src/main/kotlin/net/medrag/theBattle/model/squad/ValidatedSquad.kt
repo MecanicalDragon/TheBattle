@@ -37,4 +37,9 @@ data class ValidatedSquad(val playerName: String,
     }
 
     override fun hashCode() = playerName.hashCode()
+
+    override fun toString(): String {
+        return "ValidatedSquad(playerName='$playerName', type=$type, dead=$dead)"
+    }
+
 }

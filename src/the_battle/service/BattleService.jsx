@@ -1,13 +1,20 @@
+import defaultHandling from "@/service/ErrorService";
+
 const appApi = DEPLOYED_URL;
 const sendCred = SEND_CREDENTIALS;
 
 export async function getBattle() {
     let url = new URL(appApi + 'battle/getDislocations');
     return fetch(url, {credentials: sendCred}).then(function (response) {
-        return response.status === 200 ? response.json() : null;
-    }).then(resp => {
-        return resp;
-    });
+        if (response.status === 200) {
+            return response.json().then(resp => {
+                return resp;
+            });
+        } else throw response;
+    }).catch(e => {
+        defaultHandling(e);
+        return null;
+    })
 }
 
 export async function battleBid(squad) {
@@ -20,10 +27,15 @@ export async function battleBid(squad) {
         }, credentials: sendCred,
         body: JSON.stringify(squad)
     }).then(function (response) {
-        return response.status === 200 ? response.json() : null;
-    }).then(resp => {
-        return resp;
-    });
+        if (response.status === 200) {
+            return response.json().then(resp => {
+                return resp;
+            });
+        } else throw response;
+    }).catch(e => {
+        defaultHandling(e);
+        return null;
+    })
 }
 
 export async function cancelBid() {
@@ -35,8 +47,13 @@ export async function cancelBid() {
             'Content-Type': 'application/json'
         }, credentials: sendCred
     }).then(function (response) {
-        return response.status === 200 ? response.text() : null;
-    }).then(resp => {
-        return resp;
-    });
+        if (response.status === 200) {
+            return response.text().then(resp => {
+                return resp;
+            });
+        } else throw response;
+    }).catch(e => {
+        defaultHandling(e);
+        return null;
+    })
 }

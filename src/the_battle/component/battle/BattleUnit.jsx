@@ -79,6 +79,7 @@ export function BattleUnit(props) {
     /**
      * If unit's turn, sets it's and it's targets' borders or backgrounds
      */
+    //TODO: does not work if two turns in a row 
     useEffect(() => {
         if (yourTurn && foe) {
             setBorders(UNIT_FOES_TURN);

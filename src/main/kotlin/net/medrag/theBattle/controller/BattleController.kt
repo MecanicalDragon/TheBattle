@@ -6,6 +6,7 @@ import net.medrag.theBattle.model.dto.SquadDTO
 import net.medrag.theBattle.model.squad.FoesPair
 import net.medrag.theBattle.service.BattleService
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.util.*
@@ -22,17 +23,18 @@ class BattleController(@Autowired val battleService: BattleService) {
 
     /**
      * Registers battle bid.
-     * Generates and sets 'BATTLE_UUID' parameter to the session.
+     * Generates and attaches 'BATTLE_UUID' parameter to the session.
      * @param squadDTO SquadDTO - squad, that goes into battle
      * @param session HttpSession
      * @return ResponseEntity<BattleBidResponse>:
      *      - 200 if battle bid have been registered
-     *      - 400 if there are no player name in session
+     *      - 400 if request is invalid
+     *      - 401 if there are no player name in session
+     *      - 555 if database problem occurs
      */
     @PostMapping("/registerBattleBid")
     fun registerBattleBid(@RequestBody squadDTO: SquadDTO, session: HttpSession): ResponseEntity<BattleBidResponse> {
 
-        //TODO: handle 555 everywhere
         (session.getAttribute(PLAYER_SESSION) as? String)?.let {
             session.removeAttribute(BATTLE_UUID)
             return try {
@@ -42,29 +44,42 @@ class BattleController(@Autowired val battleService: BattleService) {
                 ResponseEntity.badRequest().build()
             }
         }
-        return ResponseEntity.badRequest().build()
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
     }
 
+
     /**
-     * Cancels battle bid.
-     * Sets 'BATTLE_UUID' parameter to null.
+     * Cancels battle bid
+     * @param session HttpSession
+     * @return ResponseEntity<String>:
+     *      - 200 if ok (Cancelled or not)
+     *      - 401 if player is unrecognized
+     *      - 555 if database fails
      */
     @PostMapping("/cancelBid")
     fun cancelBid(session: HttpSession): ResponseEntity<String> {
 
         (session.getAttribute(PLAYER_SESSION) as? String)?.let {
-            val cancelled = battleService.cancelBid(it)
-            if (cancelled) {
+            try {
+                battleService.cancelBid(it)
                 session.removeAttribute(BATTLE_UUID)
-                session.removeAttribute(IN_SEARCH)
+            } catch (e: ProcessingException) {
+                return ResponseEntity.ok(NOT_CANCELLED)
             }
-            return ResponseEntity.ok(if (cancelled) CANCELLED else NOT_CANCELLED)
+            return ResponseEntity.ok(CANCELLED)
         }
-        return ResponseEntity.badRequest().build()
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
     }
 
+
     /**
-     * Returns foesPair.
+     * Request of FoesPair. Been called
+     * @param session HttpSession
+     * @return ResponseEntity<FoesPair>:
+     *      - 200 if request handled correctly
+     *      - 400 if there is no battle uuid in session or database
+     *      - 401 if there is no session
+     *      - 555 if database fails
      */
     @GetMapping("/getDislocations")
     fun getDislocations(session: HttpSession): ResponseEntity<FoesPair> {
@@ -86,8 +101,9 @@ class BattleController(@Autowired val battleService: BattleService) {
                 session.setAttribute(BATTLE_UUID, bud)
                 return ResponseEntity.ok(battleService.getDislocations(playerName, bud))
             }
+            return ResponseEntity.badRequest().build()
         }
         // 2. Invalid request.
-        return ResponseEntity.badRequest().build()
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
     }
 }

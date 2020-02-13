@@ -1,5 +1,5 @@
-import {NotificationManager} from "react-notifications";
 import React from "react";
+import defaultHandling from "@/service/ErrorService";
 
 const appApi = DEPLOYED_URL;
 const sendCred = SEND_CREDENTIALS;
@@ -33,9 +33,7 @@ export async function performAction(actor, action, data) {
             })
         } else throw response;
     }).catch(e => {
-        return e.text().then(msg => {
-            NotificationManager.error(action, msg, 3000);
-            return null;
-        })
+        defaultHandling(e, true);
+        return null;
     });
 }

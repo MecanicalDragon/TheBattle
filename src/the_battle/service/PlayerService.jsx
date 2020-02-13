@@ -33,7 +33,7 @@ export const saveState = (state) => {
     }
 };
 
-const store = createStore(
+export const store = createStore(
     reducers,
     loadState()
 );
@@ -78,6 +78,7 @@ export async function logout() {
     }).then(resp => {
         if (resp === "LOGGED_OUT") {
             //TODO: get rid of this auth store
+            //TODO: complete with rest player data
             store.dispatch(setAuth(null));
             return true;
         } else {

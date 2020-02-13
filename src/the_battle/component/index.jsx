@@ -84,7 +84,7 @@ class Index extends Component {
                         <FormattedMessage id={"app.input.pw"}/>
                     </Col>
                     <Col xs={{size: 4}}>
-                        <Input type={"text"} value={this.state.enterPw} onChange={this.handlePwChange}
+                        <Input type={"password"} value={this.state.enterPw} onChange={this.handlePwChange}
                                placeholder={"Input password"}/>
                     </Col>
                     <Col xs={"auto"}>

@@ -20,12 +20,12 @@ interface PlayerRepo : CrudRepository<Player, Long> {
     fun getIdByName(name: String): Long?
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("update Player p set p.games = p.games + 1 where p.name = ?1")
-    fun incrementGamesCount(name: String)
+    @Query("update Player p set p.games = p.games + 1, p.status = ?2 where p.name = ?1")
+    fun incrementGamesCount(name: String, status: PlayerStatus = PlayerStatus.FREE)
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
-    @Query("update Player p set p.games = p.games + 1, p.wins = p.wins + 1 where p.name = ?1")
-    fun incrementWinsAndGamesCount(name: String)
+    @Query("update Player p set p.games = p.games + 1, p.wins = p.wins + 1, p.status = ?2 where p.name = ?1")
+    fun incrementWinsAndGamesCount(name: String, status: PlayerStatus = PlayerStatus.FREE)
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("update Player u set u.status = ?1, u.bud = ?2 where u.name in ?3")

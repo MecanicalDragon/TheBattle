@@ -24,7 +24,8 @@ class SquadController(@Autowired val squadService: SquadService) {
      * @param session HttpSession
      * @return ResponseEntity<Any>:
      *      - 200 List of UnitDTO
-     *      - 400 Error string
+     *      - 401 Error string
+     *      - 555 if db fails
      */
     @GetMapping("/getPool")
     fun getPool(session: HttpSession): ResponseEntity<Any> {
@@ -32,7 +33,7 @@ class SquadController(@Autowired val squadService: SquadService) {
         (session.getAttribute(PLAYER_SESSION) as? String)?.let {
             return ResponseEntity.ok(squadService.getPool(it))
         }
-        return ResponseEntity.badRequest().body(NO_SESSION)
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
     }
 
     /**
@@ -42,8 +43,10 @@ class SquadController(@Autowired val squadService: SquadService) {
      * @param session HttpSession - player's session
      * @return ResponseEntity<Any>:
      *      - 200 if everything is OK
-     *      - 400 if user is not registered
+     *      - 400 if user is absent in database
+     *      - 401 if user is not registered
      *      - 412 if new unit name does not match regex pattern
+     *      - 555 if db fails
      */
     @PostMapping("/addNew")
     fun addNew(@RequestParam name: String,
@@ -59,7 +62,7 @@ class SquadController(@Autowired val squadService: SquadService) {
                 ResponseEntity.badRequest().build()
             }
         }
-        return ResponseEntity.badRequest().build()
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
     }
 
     /**
@@ -68,7 +71,9 @@ class SquadController(@Autowired val squadService: SquadService) {
      * @param session HttpSession - player's session
      * @return ResponseEntity<String>:
      *      - 200 if OK
-     *      - 400 if not)
+     *      - 400 if smth went wrong
+     *      - 401 if no session
+     *      - 555 if db fails
      */
     @DeleteMapping("/retireHero")
     fun delete(@RequestParam unit: Long, session: HttpSession): ResponseEntity<String> {
@@ -81,6 +86,6 @@ class SquadController(@Autowired val squadService: SquadService) {
                 ResponseEntity(e.message, HttpStatus.BAD_REQUEST)
             }
         }
-        return ResponseEntity("Could not extract player's name", HttpStatus.BAD_REQUEST)
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
     }
 }

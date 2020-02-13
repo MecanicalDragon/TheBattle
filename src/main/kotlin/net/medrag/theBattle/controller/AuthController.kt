@@ -23,7 +23,6 @@ import javax.servlet.http.HttpServletRequest
 @RequestMapping("/auth")
 class AuthController(@Autowired private val playerService: PlayerService) {
 
-    //TODO: forbid double logging in
     /**
      * Login attempt.
      * @param pair PPPair - name\password pair
@@ -61,7 +60,7 @@ class AuthController(@Autowired private val playerService: PlayerService) {
         val session = request.getSession(true)
         (session.getAttribute(PLAYER_SESSION) as? String)?.let { return ResponseEntity(HttpStatus.PRECONDITION_REQUIRED) }
         val player = playerService.createPlayer(pair.name, pair.pw)
-        session.setAttribute(PLAYER_SESSION, player)
+        session.setAttribute(PLAYER_SESSION, player.name)
         ResponseEntity.ok(player)
     } catch (e: ValidationException) {
         ResponseEntity.badRequest().body(e.message)

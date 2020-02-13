@@ -1,21 +1,19 @@
 package net.medrag.theBattle.service
 
-import net.medrag.theBattle.model.AWAIT
-import net.medrag.theBattle.model.GAME_FOUND
-import net.medrag.theBattle.model.START
-import net.medrag.theBattle.model.ValidationException
+import net.medrag.theBattle.model.*
 import net.medrag.theBattle.model.squad.ValidatedSquad
 import net.medrag.theBattle.model.dto.BattleBidResponse
 import net.medrag.theBattle.model.dto.SquadDTO
 import net.medrag.theBattle.model.dto.UnitDTO
 import net.medrag.theBattle.model.dto.buildUnit
+import net.medrag.theBattle.model.entities.Player
 import net.medrag.theBattle.model.entities.PlayerStatus
 import net.medrag.theBattle.model.entities.UnitStatus
 import net.medrag.theBattle.model.squad.FoesPair
 import net.medrag.theBattle.repo.PlayerRepo
 import net.medrag.theBattle.repo.UnitRepo
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.dao.DataAccessException
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -61,7 +59,13 @@ class BattleService(
 
         val ids = setOf(squadDTO.pos1.id, squadDTO.pos2.id, squadDTO.pos3.id, squadDTO.pos4.id, squadDTO.pos5.id)
         val units = unitRepo.findAllByPlayer_NameAndIdIn(playerName, ids)
-        if (units.size != 5) throw ValidationException("Squad should contain 5 members, yet $playerName has ${units.size} in declared squad.")
+        if (units.size != 5) {
+            val msg = "Squad should contain 5 members, but $playerName has ${units.size} in declared squad."
+            logger.error(msg)
+            logger.error("Declared squad:")
+            logger.error("$units")
+            throw ValidationException(msg)
+        }
 
         val unit1 = units.find { squadDTO.pos1.id == it.id }
         val unit2 = units.find { squadDTO.pos2.id == it.id }
@@ -70,11 +74,21 @@ class BattleService(
         val unit5 = units.find { squadDTO.pos5.id == it.id }
 
         if (unit1 == null || unit2 == null || unit3 == null || unit4 == null || unit5 == null) {
-            throw ValidationException("Someone cheats: there are no such heroes in your pool!")
+            val msg = "Someone cheats: there are no such heroes in your pool!"
+            logger.error(msg)
+            logger.error("$unit1")
+            logger.error("$unit2")
+            logger.error("$unit3")
+            logger.error("$unit4")
+            logger.error("$unit5")
+            throw ValidationException(msg)
         }
         for (unit in listOf(unit1, unit2, unit3, unit4, unit5)) {
-            if (unit.status != UnitStatus.IN_POOL)
-                throw ValidationException("Someone cheats: $unit is not free fo pick!")
+            if (unit.status != UnitStatus.IN_POOL){
+                val msg = "Someone cheats: $unit is not free fo pick!"
+                logger.error(msg)
+                throw ValidationException(msg)
+            }
         }
 
         val squad = ValidatedSquad(playerName, squadDTO.type, buildUnit(unit1), buildUnit(unit2),
@@ -83,7 +97,7 @@ class BattleService(
         searching.poll()?.let {
             val uuid = UUID.randomUUID()
 
-            unitRepo.setInStatus(UnitStatus.IN_BATTLE, ids + setOf(it.pos1.id, it.pos2.id, it.pos3.id, it.pos4.id, it.pos5.id))
+            unitRepo.setStatus(UnitStatus.IN_BATTLE, ids + setOf(it.pos1.id, it.pos2.id, it.pos3.id, it.pos4.id, it.pos5.id))
             playerRepo.setStatusAndUUID(PlayerStatus.IN_BATTLE, uuid.toString(), listOf(playerName, it.playerName))
 
             battleFoes[uuid] = FoesPair(it, squad)
@@ -91,13 +105,21 @@ class BattleService(
             return BattleBidResponse(START)
         }
 
-        unitRepo.setInStatus(UnitStatus.IN_SEARCH, ids)
+        unitRepo.setStatus(UnitStatus.IN_SEARCH, ids)
         playerRepo.setStatusAndUUID(PlayerStatus.IN_SEARCH, null, listOf(playerName))
 
         searching.add(squad)
         return BattleBidResponse(AWAIT)
     }
 
+
+    /**
+     * Finish the battle
+     * @param uuid UUID - battle uuid
+     * @param winner ValidatedSquad
+     * @param looser ValidatedSquad
+     * @param actionUnit UnitDTO - the one, who made final attack
+     */
     @Transactional
     fun finishTheBattle(uuid: UUID, winner: ValidatedSquad, looser: ValidatedSquad, actionUnit: UnitDTO) {
         giveExperience(winner, looser, actionUnit)
@@ -106,6 +128,12 @@ class BattleService(
         battleFoes.remove(uuid)
     }
 
+    /**
+     * Share exp among units
+     * @param winner ValidatedSquad
+     * @param looser ValidatedSquad
+     * @param finalAttack UnitDTO - who made final attack
+     */
     @Transactional
     fun giveExperience(winner: ValidatedSquad, looser: ValidatedSquad, finalAttack: UnitDTO) {
         if (looser.dead == 5) {
@@ -129,29 +157,56 @@ class BattleService(
 
             for (unit in unitsToReward) {
                 unit.experience += xps[unit.id] ?: 0
+                unit.status = UnitStatus.IN_POOL
             }
             unitRepo.saveAll(unitsToReward)
         }
     }
 
     /**
-     * Removes squad from the searching queue. Returns true if succeeds, otherwise false.
+     * Removes squad from the searching queue.
+     * @param playerName String
+     * @throws ProcessingException to prevent collision if Validated squad has been removed already from searching queue
      */
-    fun cancelBid(playerName: String) = searching.remove(ValidatedSquad(playerName))
+    @Transactional
+    @Throws(ProcessingException::class)
+    fun cancelBid(playerName: String) {
+        val id = playerRepo.getIdByName(playerName)
+        unitRepo.changeStatus(UnitStatus.IN_POOL, UnitStatus.IN_SEARCH, Player(id, playerName))
+        playerRepo.setStatusAndUUID(PlayerStatus.FREE, null, listOf(playerName))
+        if (!searching.remove(ValidatedSquad(playerName))) throw ProcessingException("The battle has already started!")
+
+        //TODO: for debug. Remove
+        logger.info("Searching queue now:")
+        logger.info("$searching")
+    }
 
     /**
      * Returns player's battle uuid
+     * @param playerName String
      */
     fun getBud(playerName: String) = playerRepo.getBud(playerName)
 
+
     /**
      * Returns foesPair, based on Battle UUID
+     * @param playerName String
+     * @param bud UUID
+     * @return FoesPair
+     * @throws ValidationException if byd is invalid or if there is no playerName in FoesPair
      */
+    @Throws(ValidationException::class)
     fun getDislocations(playerName: String, bud: UUID): FoesPair {
         battleFoes[bud]?.let {
             if (it.foe1.playerName == playerName || it.foe2.playerName == playerName) return it
             throw ValidationException("Your name is not in battle data, cheater.")
         }
         throw ValidationException("Your battle id is not in battle data, cheater.")
+    }
+
+    companion object {
+        @Suppress("JAVA_CLASS_ON_COMPANION")
+        @JvmStatic
+        private val logger = LoggerFactory.getLogger(javaClass.enclosingClass)
     }
 }

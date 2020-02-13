@@ -71,6 +71,7 @@ class ManageComp extends Component {
         this.props.dispatch(setNavPosition(Manage));
     }
 
+    //TODO: load status (in search\in battle)
     componentDidMount() {
         SquadService.getPool().then(resp => {
             if (resp) {
@@ -88,7 +89,7 @@ class ManageComp extends Component {
                         }
                     }
                 });
-            } else history.push(routes.index())
+            }
         });
     }
 
@@ -114,7 +115,7 @@ class ManageComp extends Component {
 
     retireHero = (draggableId, start, index) => {
         SquadService.retireHero(draggableId).then(resp => {
-            if (resp !== null) {
+            if (resp === true) {
 
                 const newIds = Array.from(start.heroes);
                 newIds.splice(index, 1);

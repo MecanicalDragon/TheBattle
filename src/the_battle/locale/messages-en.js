@@ -1,5 +1,13 @@
 export default {
 
+    // Common
+    'app.unauthorized': 'Authorization',
+    'app.unauthorized.message': 'Authorization required!',
+    'app.db': 'Ooops!',
+    'app.db.message': 'Some error occurred. Try to repeat your action.',
+    'app.oops': 'Ooops!',
+    'app.oops.message': 'This error was absolutely unexpected. Try to reload the page.',
+
     // BreadCrump
     'app.breadcrump.home': 'Home',
     'app.breadcrump.battle': 'Battle',
@@ -29,6 +37,7 @@ export default {
     'app.manage.pool.header': 'Heroes pool',
     'app.manage.squad.type': 'Squad type:',
     'app.manage.squad.add': 'Add new',
+    'app.manage.unit.name': 'Name must be 2-16 symbols of latin letters and digits without whitespaces in the beginning and in the end.',
     'app.manage.squad.inout.name.for.new': 'Input a name for your new ',
     'app.manage.delete.unit': 'Delete unit',
     'app.manage.to.battle': 'To Battle!',

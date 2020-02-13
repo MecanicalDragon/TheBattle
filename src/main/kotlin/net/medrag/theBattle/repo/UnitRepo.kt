@@ -16,7 +16,7 @@ import org.springframework.stereotype.Repository
 @Repository
 interface UnitRepo : CrudRepository<UnitEntity, Long> {
 
-    fun findAllByPlayer_Name(name: String): List<UnitEntity>
+    fun findAllByPlayer_NameAndStatus(name: String, status: UnitStatus): List<UnitEntity>
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("delete from UnitEntity u where u.id = ?1 and u.player = ?2")
@@ -32,7 +32,11 @@ interface UnitRepo : CrudRepository<UnitEntity, Long> {
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("update UnitEntity u set u.status = ?1 where u.id in ?2")
-    fun setInStatus(status: UnitStatus, ids: Collection<Long>)
+    fun setStatus(status: UnitStatus, ids: Collection<Long>)
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update UnitEntity u set u.status = ?1 where u.status = ?2 and u.player = ?3")
+    fun changeStatus(newStatus: UnitStatus, oldStatus: UnitStatus, player: Player)
 
     fun findAllByIdIn(ids: List<Long>): List<UnitEntity>
 

@@ -1,6 +1,7 @@
 package net.medrag.theBattle.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import kotlinx.coroutines.*
 import net.medrag.theBattle.model.*
 import net.medrag.theBattle.model.classes.Ranger
 import net.medrag.theBattle.model.classes.Unitt
@@ -12,6 +13,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Service
 import java.lang.Exception
 import java.lang.StringBuilder
+import java.time.LocalTime
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -87,13 +89,18 @@ class ActionService(@Autowired private val battleService: BattleService,
                     }
                     additionalData[DAMAGED_SQUAD] = foesSquad;
                     if (foesSquad.dead == 5) {
-                        try {
-                            battleService.finishTheBattle(bud, player, foesSquad, actor)
-                        } catch (e: Exception) {
-                            logger.error("Database transaction has failed. Exception will be thrown.")
-                            logger.error(e.message)
-                            throw ProcessingException(e.message ?: "null message")
-                            //TODO: how to finish the battle after this?
+                        GlobalScope.launch {
+                            var finished = false
+                            while (!finished) {
+                                try {
+                                    battleService.finishTheBattle(bud, player, foesSquad, actor)
+                                    finished = true
+                                } catch (e: Exception) {
+                                    logger.error("Database transaction has failed.")
+                                    logger.error(e.message)
+                                    delay(300)
+                                }
+                            }
                         }
                         battleWon = true
                         pair.actionMan

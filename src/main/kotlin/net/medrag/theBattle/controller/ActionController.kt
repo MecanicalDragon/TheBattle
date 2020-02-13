@@ -6,6 +6,7 @@ import net.medrag.theBattle.model.PLAYER_SESSION
 import net.medrag.theBattle.model.ValidationException
 import net.medrag.theBattle.model.dto.SimpleAction
 import net.medrag.theBattle.service.ActionService
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.util.*
@@ -29,6 +30,8 @@ class ActionController(private val actionService: ActionService) {
      * @return ResponseEntity<Any>:
      *      - 200 if action successfully handled
      *      - 400 if action is invalid
+     *      - 401 if httpSession is missed
+     *      - 555 if db fails
      */
     @PostMapping("/performAction")
     fun performAction(@RequestBody action: SimpleAction, request: HttpServletRequest): ResponseEntity<Any> {
@@ -49,6 +52,6 @@ class ActionController(private val actionService: ActionService) {
                 }
             }
         }
-        return ResponseEntity.badRequest().body(NO_SESSION)
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
     }
 }

@@ -1,4 +1,7 @@
 import {NotificationManager} from "react-notifications";
+import defaultHandling from "@/service/ErrorService";
+import {FormattedMessage} from "react-intl";
+import React from "react";
 
 const appApi = DEPLOYED_URL;
 const sendCred = SEND_CREDENTIALS;
@@ -21,10 +24,8 @@ export async function getPool() {
         });
         return pool;
     }).catch(e => {
-        return e.text().then(msg => {
-            NotificationManager.error("ERROR", msg, 3000);
-            return null;
-        })
+        defaultHandling(e);
+        return null;
     });
 }
 
@@ -45,15 +46,11 @@ export async function retireHero(unit) {
         credentials: sendCred
     }).then(function (response) {
         if (response.status === 200)
-            return response.text();
+            return true;
         else throw response;
-    }).then(resp => {
-        return resp;
     }).catch(e => {
-        return e.text().then(msg => {
-            NotificationManager.error("ERROR", msg, 3000);
-            return null;
-        })
+        defaultHandling(e, true);
+        return null;
     });
 }
 
@@ -74,8 +71,15 @@ export async function addNewHero(name, type) {
         },
         credentials: sendCred
     }).then(function (response) {
-        return response.status === 200 ? response.json() : null;
-    }).then(resp => {
-        return resp;
+        if (response.status === 200)
+            return response.json().then(r => {
+                return r
+            });
+        else throw response;
+    }).catch(e => {
+        if (e.status === 412) {
+            NotificationManager.warning(name, <FormattedMessage id={"app.manage.unit.name"}/>, 5000);
+        } else defaultHandling(e);
+        return null;
     });
 }

@@ -7,6 +7,7 @@ import net.medrag.theBattle.model.dto.UnitDTO
 import net.medrag.theBattle.model.dto.buildUnit
 import net.medrag.theBattle.model.dto.buildUnitEntity
 import net.medrag.theBattle.model.entities.Player
+import net.medrag.theBattle.model.entities.UnitStatus
 import net.medrag.theBattle.repo.PlayerRepo
 import net.medrag.theBattle.repo.UnitRepo
 import org.springframework.beans.factory.annotation.Autowired
@@ -22,14 +23,13 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class SquadService(@Autowired val unitRepo: UnitRepo, @Autowired val playerRepo: PlayerRepo) {
 
-
     /**
      * Returns Player's hero pool or empty list
      * @param playerName String
      * @return List<UnitDTO> player's heroes
      */
     fun getPool(playerName: String): List<UnitDTO> {
-        val list = unitRepo.findAllByPlayer_Name(playerName)
+        val list = unitRepo.findAllByPlayer_NameAndStatus(playerName, UnitStatus.IN_POOL)
         val result = ArrayList<UnitDTO>(list.size)
         for (unit in list) result.add(buildUnit(unit))
         return result;
@@ -46,9 +46,9 @@ class SquadService(@Autowired val unitRepo: UnitRepo, @Autowired val playerRepo:
      */
     @Throws(ValidationException::class, IncompatibleDataException::class)
     fun addNewUnit(pName: String, name: String, type: Unitt.Unit.Type): UnitDTO {
-        if (name.matches(Regex(regex))) {
+        if (name.trim().matches(Regex(regex))) {
             val id = playerRepo.getIdByName(pName)
-                    ?: throw IncompatibleDataException("Player with specified name '$pName' name doesn't exist.")
+                    ?: throw IncompatibleDataException("Player with specified name '$pName' name doesn't exist. Seriously?")
             val player = Player(id, pName)
             val unit = buildUnitEntity(name, type, player)
             val saved = unitRepo.save(unit)
@@ -72,6 +72,6 @@ class SquadService(@Autowired val unitRepo: UnitRepo, @Autowired val playerRepo:
     }
 
     companion object {
-        const val regex = "^[A-Za-z0-9]{2,16}\$";
+        const val regex = "^[A-Za-z 0-9]{2,16}\$";
     }
 }

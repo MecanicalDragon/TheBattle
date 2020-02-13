@@ -1,5 +1,13 @@
 export default {
 
+    // Common
+    'app.unauthorized': 'Авторизация',
+    'app.unauthorized.message': 'Авторизация необходима!',
+    'app.db': 'Упс...',
+    'app.db.message': 'Что-то пошло не так. Попробуйте снова.',
+    'app.oops': 'Упс...',
+    'app.oops.message': 'Случилась некая ошибка. Попробуйте перезагрузить страницу.',
+
     // BreadCrump
     'app.breadcrump.home': 'Главная',
     'app.breadcrump.battle': 'Бой',
@@ -31,6 +39,7 @@ export default {
     'app.manage.squad.add': 'Добавить',
     'app.manage.squad.inout.name.for.new': 'Введите имя для нового ',
     'app.manage.delete.unit': 'Удалить бойца',
+    'app.manage.unit.name': 'Имя должно состоять из 2-16 символов лфтинских букв и цифр без пробелов в начале и конце.',
     'app.manage.to.battle': 'В Бой!',
     'app.manage.battle.cancel': 'Отмена',
     'app.manage.cancelled': 'Поиск битвы отменен.',
