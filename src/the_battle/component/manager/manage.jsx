@@ -22,10 +22,9 @@ import {NotificationManager} from "react-notifications";
 import SockJsClient from 'react-stomp';
 import * as routes from '@/router/routes'
 import DescriptionArea from "@/component/common/DescriptionArea";
+import {STATUS} from "@/constants/ingameConstants";
 
 const appApi = DEPLOYED_URL;
-
-const STATUS = ["FREE", "IN_SEARCH", "IN_BATTLE"];
 
 class ManageComp extends Component {
 

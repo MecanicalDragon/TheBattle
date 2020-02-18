@@ -37,6 +37,20 @@ class PlayerService(
     }
 
     /**
+     * Retrieves player by it's name
+     * @param name String
+     * @return PlayerDTO
+     * @throws ValidationException if there is no player with such name
+     */
+    @Throws(ValidationException::class)
+    fun getPlayerData(name: String): PlayerDTO {
+        playerRepo.findByName(name)?.let {
+            return PlayerDTO(it.name, it.games, it.wins, it.status)
+        }
+        throw ValidationException("No such player in database")
+    }
+
+    /**
      * Tries to create new user
      * @param name String - player name
      * @param pw String - password

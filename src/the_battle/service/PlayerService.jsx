@@ -46,6 +46,22 @@ store.subscribe(() => {
 
 /// Redux
 
+export function isPlayerLoggedInWithData() {
+    let url = new URL(appApi + 'auth/isAuthenticatedWithData');
+    return fetch(url, {
+        credentials: sendCred
+    }).then(function (response) {
+        if (response.status === 200)
+            return response.json();
+        else throw response
+    }).then(player => {
+        return player;
+    }).catch(e => {
+        store.dispatch(setAuth(null));
+        return null;
+    })
+}
+
 export function isPlayerLoggedIn() {
     let url = new URL(appApi + 'auth/isAuthenticated');
     return fetch(url, {

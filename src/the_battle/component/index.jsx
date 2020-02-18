@@ -13,9 +13,11 @@ import * as player from '@/service/PlayerService'
 import {setNavPosition} from "@/constants/actions";
 import {Home} from "@/constants/paths";
 import {FormattedMessage} from 'react-intl';
+import {STATUS} from "@/constants/ingameConstants";
 
 class Index extends Component {
 
+    //TODO: update advertise
     constructor(props) {
         super(props);
         this.props.dispatch(setNavPosition(Home));
@@ -25,17 +27,26 @@ class Index extends Component {
             playerName: "",
             authenticated: undefined,
             wins: 0,
-            gamesTotal: 0
+            gamesTotal: 0,
+            status: STATUS[0],
+            newsUrl: "http://localhost:9191/assets/no-add_1.jpg"
         };
         this.handleChange = this.handleChange.bind(this);
         this.handlePwChange = this.handlePwChange.bind(this)
     }
 
     componentDidMount() {
-        player.isPlayerLoggedIn().then(r => {
-            if (r === true) {
-                let pn = player.getPlayerName();
-                this.setState({playerName: pn, authenticated: true});
+        player.isPlayerLoggedInWithData().then(player => {
+            if (player) {
+                this.setState({
+                    playerName: player.name,
+                    gamesTotal: player.games,
+                    wins: player.wins,
+                    status: player.status,
+                    authenticated: true
+                });
+            } else {
+                this.setState({authenticated: false});
             }
         })
     }
@@ -44,7 +55,9 @@ class Index extends Component {
         return (
             <Container>
                 <Jumbotron style={{textAlign: "center"}}>
-                    <h1 id={"theBattle"}><FormattedMessage id={'app.index.header'}/></h1>
+                    <h1 id={"theBattle"} style={{color: "var(--magenta-color)"}}><FormattedMessage
+                        id={'app.index.header'}/></h1>
+                    <br/>
                     {this.state.authenticated === true ? this.getPlayerForm() :
                         this.state.authenticated === false ? this.getLoginForm() : null}
                 </Jumbotron>
@@ -52,19 +65,43 @@ class Index extends Component {
         )
     }
 
-    //TODO: add ad
-    //TODO: update game statistics
     getPlayerForm() {
-        let {playerName} = this.state;
+        let {playerName, gamesTotal, wins} = this.state;
         return (
             <Fragment>
-                <h2 style={{marginLeft: 20}}>{playerName}</h2>
-                <span>Games: </span><span>{this.state.gamesTotal}</span>
-                <br/>
-                <span>Wins: </span><span>{this.state.wins}</span>
-                <br/>
-                <Button color={"info"} onClick={() => this.props.history.push(routes.manage())}>Manage squad</Button>
-                <Button onClick={() => this.logout()}>Logout</Button>
+                <Row>
+                    <Col>
+                        <h2 style={{color: "black"}}>{playerName}</h2>
+                        <br/>
+                        <Row>
+                            <Col>
+                                <h6 style={{color: "blue"}}>Games: {gamesTotal}</h6>
+                            </Col>
+                            <Col>
+                                <h6 style={{color: "darkgreen"}}>Wins: {wins}</h6>
+                            </Col>
+                        </Row>
+                        <br/>
+                        {
+                            gamesTotal === 0 ? null :
+                                <h5 style={{color: "green"}}>Win Rate: {(wins * 100 / gamesTotal).toPrecision(4)}%</h5>
+                        }
+                        <br/>
+                        <Button color={"info"} onClick={() => this.props.history.push(routes.manage())}>Manage
+                            squad</Button>
+                        <br/>
+                        <br/>
+                        <Button onClick={() => this.logout()}>Logout</Button>
+                    </Col>
+                    <Col>
+                        <img src={this.state.newsUrl} alt="HOT_NEWS" style={{
+                            borderStyle: "solid",
+                            borderWidth: 5,
+                            borderRadius: 15,
+                            borderColor: "var(--magenta-color)"
+                        }}/>
+                    </Col>
+                </Row>
             </Fragment>
         )
     }

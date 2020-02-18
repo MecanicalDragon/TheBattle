@@ -35,10 +35,22 @@ class AuthController(@Autowired private val playerService: PlayerService) {
     /**
      * Checks if user authenticated
      * @param httpSession HttpSession
-     * @return ResponseEntity - 'authenticated' boolean
+     * @return ResponseEntity:
+     *      - 200 if playerDTO is nested
+     *      - 401 if player unauthorized
+     *      - 555 if database fails
      */
-//    @GetMapping("/isAuthenticated")
-//    fun isAuthenticated(httpSession: HttpSession) = ResponseEntity.ok(httpSession.getAttribute(PLAYER_NAME) != null)
+    @GetMapping("/isAuthenticatedWithData")
+    fun isAuthenticatedWithData(httpSession: HttpSession): ResponseEntity<Any> {
+        (httpSession.getAttribute(PLAYER_NAME) as? String)?.let {
+            try {
+                return ResponseEntity.ok(playerService.getPlayerData(it))
+            } catch (e: ValidationException) {
+                httpSession.invalidate()
+            }
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
+    }
 
     /**
      * Login attempt.

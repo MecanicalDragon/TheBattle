@@ -13,6 +13,8 @@ export const UNIT_FOES_TARGET = "red";
 export const UNIT_FOES_TURN = "green";
 export const UNIT_NOT_FOES_TARGET = "grey";
 
+export const STATUS = ["FREE", "IN_SEARCH", "IN_BATTLE"];
+
 export const ATTACK = "ATTACK";
 export const WAIT = "WAIT";
 export const BLOCK = "BLOCK";
