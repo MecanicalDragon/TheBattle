@@ -16,6 +16,7 @@ export const UNIT_NOT_FOES_TARGET = "grey";
 export const ATTACK = "ATTACK";
 export const WAIT = "WAIT";
 export const BLOCK = "BLOCK";
+export const CONCEDE = "CONCEDE";
 
 export const CLOSE_TARGETS = {
     "ff": {

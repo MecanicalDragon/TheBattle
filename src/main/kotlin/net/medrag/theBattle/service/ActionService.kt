@@ -44,7 +44,7 @@ class ActionService(@Autowired private val battleService: BattleService,
         val actor = player.map[simpleAction.actor] as UnitDTO
         actor.effects.remove(UnitEffects.IN_BLOCK)
 
-        if (actor === pair.actionMan) {
+        if (actor === pair.actionMan || simpleAction.action === ActionType.CONCEDE) {
             val additionalData = HashMap<String, Any>()
             val comments = StringBuilder()
             var battleWon = false
@@ -62,6 +62,26 @@ class ActionService(@Autowired private val battleService: BattleService,
                     actor.effects.add(UnitEffects.IN_BLOCK)
                     comments.append("${actor.name} goes into defence.")
                     pair.makeMove()
+                }
+                ActionType.CONCEDE -> {
+                    if (pair.concedeInProcess.compareAndSet(false, true)) {
+                        comments.append("$playerName concedes! ${foesSquad.playerName} wins the battle!")
+                        GlobalScope.launch {
+                            var finished = false
+                            while (!finished) {
+                                try {
+                                    battleService.finishTheBattle(bud, foesSquad, player, actor, true)
+                                    finished = true
+                                } catch (e: Exception) {
+                                    logger.error("Database transaction has failed.")
+                                    logger.error(e.message)
+                                    delay(300)
+                                }
+                            }
+                        }
+                        battleWon = true
+                    }
+                    pair.actionMan
                 }
                 ActionType.ATTACK -> {
 
@@ -89,28 +109,28 @@ class ActionService(@Autowired private val battleService: BattleService,
                     }
                     additionalData[DAMAGED_SQUAD] = foesSquad;
                     if (foesSquad.dead == 5) {
-                        GlobalScope.launch {
-                            var finished = false
-                            while (!finished) {
-                                try {
-                                    battleService.finishTheBattle(bud, player, foesSquad, actor)
-                                    finished = true
-                                } catch (e: Exception) {
-                                    logger.error("Database transaction has failed.")
-                                    logger.error(e.message)
-                                    delay(300)
+                        if (pair.concedeInProcess.compareAndSet(false, true)) {
+                            GlobalScope.launch {
+                                var finished = false
+                                while (!finished) {
+                                    try {
+                                        battleService.finishTheBattle(bud, player, foesSquad, actor)
+                                        finished = true
+                                    } catch (e: Exception) {
+                                        logger.error("Database transaction has failed.")
+                                        logger.error(e.message)
+                                        delay(300)
+                                    }
                                 }
                             }
+                            battleWon = true
+                            comments.append("\n$playerName wins the battle!")
                         }
-                        battleWon = true
                         pair.actionMan
                     } else {
                         pair.makeMove()
                     }
                 }
-            }
-            if (battleWon) {
-                comments.append("\n$playerName wins the battle!")
             }
             val actionResult = ActionResult(simpleAction.action, additionalData, nextUnit, comments.toString(), battleWon)
             wSocket.convertAndSend("/battle/${foesSquad.playerName}",

@@ -23,7 +23,7 @@ class Index extends Component {
             enterName: "",
             enterPw: "",
             playerName: "",
-            authenticated: false,
+            authenticated: undefined,
             wins: 0,
             gamesTotal: 0
         };
@@ -32,10 +32,12 @@ class Index extends Component {
     }
 
     componentDidMount() {
-        if (player.isPlayerLoggedIn()) {
-            let pn = player.getPlayerName();
-            this.setState({playerName: pn, authenticated: true});
-        }
+        player.isPlayerLoggedIn().then(r => {
+            if (r === true) {
+                let pn = player.getPlayerName();
+                this.setState({playerName: pn, authenticated: true});
+            }
+        })
     }
 
     render() {
@@ -43,12 +45,15 @@ class Index extends Component {
             <Container>
                 <Jumbotron style={{textAlign: "center"}}>
                     <h1 id={"theBattle"}><FormattedMessage id={'app.index.header'}/></h1>
-                    {this.state.authenticated ? this.getPlayerForm() : this.getLoginForm()}
+                    {this.state.authenticated === true ? this.getPlayerForm() :
+                        this.state.authenticated === false ? this.getLoginForm() : null}
                 </Jumbotron>
             </Container>
         )
     }
 
+    //TODO: add ad
+    //TODO: update game statistics
     getPlayerForm() {
         let {playerName} = this.state;
         return (
@@ -68,7 +73,7 @@ class Index extends Component {
         return (
             <Form onSubmit={(e) => this.login(e)}>
                 <Row>
-                    <Col  xs={{size: 2, offset: 2}} style={{textAlign: "right"}}>
+                    <Col xs={{size: 2, offset: 2}} style={{textAlign: "right"}}>
                         <FormattedMessage id={"app.input.name"}/>
                     </Col>
                     <Col xs={{size: 4}}>
@@ -88,7 +93,8 @@ class Index extends Component {
                                placeholder={"Input password"}/>
                     </Col>
                     <Col xs={"auto"}>
-                        <Button color={"info"} onClick={() => this.create()} style={{height: 35, width: 75}}>Create</Button>
+                        <Button color={"info"} onClick={() => this.create()}
+                                style={{height: 35, width: 75}}>Create</Button>
                     </Col>
                 </Row>
             </Form>

@@ -29,7 +29,7 @@ data class Player(
 
         @Column(name = "status", nullable = false)
         @Enumerated(value = EnumType.STRING)
-        var status: PlayerStatus? = PlayerStatus.FREE,
+        var status: PlayerStatus = PlayerStatus.FREE,
 
         @Column(name = "bud", nullable = true, unique = false)
         val bud: String? = null,

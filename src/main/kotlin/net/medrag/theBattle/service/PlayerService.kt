@@ -32,7 +32,7 @@ class PlayerService(
     fun login(name: String, pw: String): PlayerDTO {
         val player = playerRepo.findByName(name) ?: throw ValidationException("There is no player with name $name")
         if (pwEncoder.matches(pw, player.password)) {
-            return PlayerDTO(player.name, player.games, player.wins)
+            return PlayerDTO(player.name, player.games, player.wins, player.status)
         } else throw ValidationException("Incorrect password for player $name")
     }
 

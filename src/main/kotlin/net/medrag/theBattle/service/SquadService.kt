@@ -3,9 +3,7 @@ package net.medrag.theBattle.service
 import net.medrag.theBattle.model.IncompatibleDataException
 import net.medrag.theBattle.model.ValidationException
 import net.medrag.theBattle.model.classes.Unitt
-import net.medrag.theBattle.model.dto.UnitDTO
-import net.medrag.theBattle.model.dto.buildUnit
-import net.medrag.theBattle.model.dto.buildUnitEntity
+import net.medrag.theBattle.model.dto.*
 import net.medrag.theBattle.model.entities.Player
 import net.medrag.theBattle.model.entities.UnitStatus
 import net.medrag.theBattle.repo.PlayerRepo
@@ -33,6 +31,22 @@ class SquadService(@Autowired val unitRepo: UnitRepo, @Autowired val playerRepo:
         val result = ArrayList<UnitDTO>(list.size)
         for (unit in list) result.add(buildUnit(unit))
         return result;
+    }
+
+
+    /**
+     * Retrieves player data for manage page start request
+     * @param playerName String
+     * @param pool List<UnitDTO> - list of free heroes
+     * @return ManagePageResponse - data for render manage page
+     * @throws IncompatibleDataException if playerName is incorrect
+     */
+    @Throws(IncompatibleDataException::class)
+    fun compileResponse(playerName: String, pool: List<UnitDTO>): ManagePageResponse {
+//        playerRepo.getStatusByName(playerName)
+        val player = playerRepo.findByName(playerName)
+                ?: throw IncompatibleDataException("Invalid playername: $playerName")
+        return ManagePageResponse(PlayerDTO(playerName, player.games, player.wins, player.status), pool)
     }
 
     /**

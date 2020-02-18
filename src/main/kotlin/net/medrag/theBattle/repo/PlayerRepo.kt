@@ -16,6 +16,10 @@ import org.springframework.stereotype.Repository
 interface PlayerRepo : CrudRepository<Player, Long> {
     fun findByName(name: String): Player?
 
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update Player p set p.status = ?1, p.bud = null where p.id > 0")
+    fun setDefaultStatus(status: PlayerStatus = PlayerStatus.FREE)
+
     @Query("select p.id from Player p where p.name = ?1")
     fun getIdByName(name: String): Long?
 

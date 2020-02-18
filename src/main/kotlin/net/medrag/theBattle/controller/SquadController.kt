@@ -30,8 +30,31 @@ class SquadController(@Autowired val squadService: SquadService) {
     @GetMapping("/getPool")
     fun getPool(session: HttpSession): ResponseEntity<Any> {
 
-        (session.getAttribute(PLAYER_SESSION) as? String)?.let {
+        (session.getAttribute(PLAYER_NAME) as? String)?.let {
             return ResponseEntity.ok(squadService.getPool(it))
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
+    }
+
+    /**
+     * Returns free heroes pool
+     * @param session HttpSession
+     * @return ResponseEntity<Any>:
+     *      - 200 List of UnitDTO
+     *      - 401 Error string
+     *      - 555 if db fails
+     */
+    @GetMapping("/getPoolAndData")
+    fun getPoolAndData(session: HttpSession): ResponseEntity<Any> {
+
+        (session.getAttribute(PLAYER_NAME) as? String)?.let {
+            try {
+                val pool = squadService.getPool(it)
+                val resp = squadService.compileResponse(it, pool)
+                session.setAttribute(PLAYER_STATUS, resp.player.status)
+                return ResponseEntity.ok(resp)
+            } catch (e: IncompatibleDataException) {
+            }
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
     }
@@ -53,12 +76,12 @@ class SquadController(@Autowired val squadService: SquadService) {
                @RequestParam type: Unitt.Unit.Type,
                session: HttpSession): ResponseEntity<Any> {
 
-        (session.getAttribute(PLAYER_SESSION) as? String)?.let {
+        (session.getAttribute(PLAYER_NAME) as? String)?.let {
             return try {
                 ResponseEntity.ok(squadService.addNewUnit(it, name, type))
             } catch (e: ValidationException) {
                 ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).build<Any>()
-            } catch (e: IncompatibleDataException){
+            } catch (e: IncompatibleDataException) {
                 ResponseEntity.badRequest().build()
             }
         }
@@ -78,7 +101,7 @@ class SquadController(@Autowired val squadService: SquadService) {
     @DeleteMapping("/retireHero")
     fun delete(@RequestParam unit: Long, session: HttpSession): ResponseEntity<String> {
 
-        (session.getAttribute(PLAYER_SESSION) as? String)?.let {
+        (session.getAttribute(PLAYER_NAME) as? String)?.let {
             return try {
                 squadService.deleteUnit(unit, it)
                 ResponseEntity.ok(RETIRED)

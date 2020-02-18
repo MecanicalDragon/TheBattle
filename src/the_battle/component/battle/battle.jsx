@@ -129,7 +129,8 @@ class BattleComp extends Component {
         } else {
             this.setState({
                 actionMan: actionMan,
-                battleLogs: msg.comments
+                battleLogs: msg.comments,
+                battleWon: msg.finished
             });
         }
     };
@@ -178,7 +179,7 @@ class BattleComp extends Component {
      */
     simpleAction = (action) => {
         if (action === ATTACK) {
-            alert("This button is just for fancy view here, but two of others work, we assure)")
+            alert("This button is just for fancy view here, but others work, we assure)")
         } else {
             let {actionMan} = this.state;
             performAction(actionMan.pos, action).then(resp => {
@@ -186,7 +187,8 @@ class BattleComp extends Component {
                     let newActionMan = this.defineActionMan(resp.nextUnit);
                     this.setState({
                         actionMan: newActionMan,
-                        battleLogs: resp.comments
+                        battleLogs: resp.comments,
+                        battleWon: resp.finished
                     });
                 }
             })

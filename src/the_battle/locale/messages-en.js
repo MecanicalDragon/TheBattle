@@ -41,14 +41,17 @@ export default {
     'app.manage.squad.inout.name.for.new': 'Input a name for your new ',
     'app.manage.delete.unit': 'Delete unit',
     'app.manage.to.battle': 'To Battle!',
+    'app.manage.battle.goes': 'Join!!!',
     'app.manage.battle.cancel': 'Cancel',
     'app.manage.cancelled': 'Battle search is cancelled.',
     'app.manage.not.cancelled': 'Battle search is NOT cancelled.',
-    'app.manage.need5': 'Need 5 heroes!',
+    'app.manage.need5': '5 heroes required!',
 
     //Battle page
     'app.battle.your.turn.header': 'Your turn',
     'app.battle.foes.turn.header': 'Foe\'s turn',
     'app.battle.over': 'Looks like your battle has finished...',
+    'app.battle.concede.header': 'WARNING!!!',
+    'app.battle.concede.body': 'This action end the battle immediately revoking for you all gained in this battle experience!',
 
 }

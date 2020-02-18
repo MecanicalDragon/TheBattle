@@ -1,10 +1,11 @@
 package net.medrag.theBattle.controller
 
 import net.medrag.theBattle.model.BATTLE_UUID
-import net.medrag.theBattle.model.NO_SESSION
-import net.medrag.theBattle.model.PLAYER_SESSION
+import net.medrag.theBattle.model.PLAYER_NAME
+import net.medrag.theBattle.model.PLAYER_STATUS
 import net.medrag.theBattle.model.ValidationException
 import net.medrag.theBattle.model.dto.SimpleAction
+import net.medrag.theBattle.model.entities.PlayerStatus
 import net.medrag.theBattle.service.ActionService
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -38,7 +39,7 @@ class ActionController(private val actionService: ActionService) {
 
         val session = request.getSession(false)
         if (session != null) {
-            val playerName = session.getAttribute(PLAYER_SESSION) as? String
+            val playerName = session.getAttribute(PLAYER_NAME) as? String
             if (playerName != null) {
                 (session.getAttribute(BATTLE_UUID) as? UUID)?.let {
                     return try {

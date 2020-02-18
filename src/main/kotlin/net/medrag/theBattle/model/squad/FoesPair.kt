@@ -2,6 +2,7 @@ package net.medrag.theBattle.model.squad
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import net.medrag.theBattle.model.dto.UnitDTO
+import java.util.concurrent.atomic.AtomicBoolean
 
 
 /**
@@ -12,6 +13,9 @@ data class FoesPair(
         val foe1: ValidatedSquad,
         val foe2: ValidatedSquad) {
 
+    @JsonIgnore
+    @Volatile
+    var concedeInProcess: AtomicBoolean = AtomicBoolean(false)
     @JsonIgnore
     private var turnOrder = ArrayList<UnitDTO>(10)
     @JsonIgnore

@@ -43,10 +43,23 @@ store.subscribe(() => {
         auth: store.getState().auth
     });
 });
+
 /// Redux
 
-//TODO: maybe you wand to bound this request with server?
 export function isPlayerLoggedIn() {
+    let url = new URL(appApi + 'auth/isAuthenticated');
+    return fetch(url, {
+        credentials: sendCred
+    }).then(function (response) {
+        if (response.status === 200)
+            return response.text();
+        else return response
+    }).then(r => {
+        return r === 'true'
+    })
+}
+
+export function isPlayerLoggedInInRedux() {
     let auth = store.getState().auth;
     // console.log("is user logged in?");
     // console.log(auth);
@@ -54,7 +67,7 @@ export function isPlayerLoggedIn() {
 }
 
 export function getPlayerName() {
-    return store.getState().auth.auth;
+    return store.getState().auth ? store.getState().auth.auth : null;
 }
 
 /**
@@ -77,8 +90,6 @@ export async function logout() {
         else return response
     }).then(resp => {
         if (resp === "LOGGED_OUT") {
-            //TODO: get rid of this auth store
-            //TODO: complete with rest player data
             store.dispatch(setAuth(null));
             return true;
         } else {

@@ -11,7 +11,7 @@ const sendCred = SEND_CREDENTIALS;
  * @returns free heroes pool or null
  */
 export async function getPool() {
-    return fetch(appApi + 'squad/getPool', {
+    return fetch(appApi + 'squad/getPoolAndData', {
         credentials: sendCred
     }).then(function (response) {
         if (response.status === 200)
@@ -19,10 +19,10 @@ export async function getPool() {
         else throw response;
     }).then(resp => {
         let pool = new Map();
-        resp.forEach(function (entry) {
+        resp.pool.forEach(function (entry) {
             pool.set(entry.id, entry);
         });
-        return pool;
+        return {pool: pool, playerData: resp.player};
     }).catch(e => {
         defaultHandling(e);
         return null;

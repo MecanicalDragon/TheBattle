@@ -3,7 +3,7 @@ package net.medrag.theBattle.controller
 import net.medrag.theBattle.config.PPPair
 import net.medrag.theBattle.model.IncompatibleDataException
 import net.medrag.theBattle.model.LOGGED_OUT
-import net.medrag.theBattle.model.PLAYER_SESSION
+import net.medrag.theBattle.model.PLAYER_NAME
 import net.medrag.theBattle.model.ValidationException
 import net.medrag.theBattle.service.PlayerService
 import org.springframework.beans.factory.annotation.Autowired
@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import javax.servlet.http.HttpServletRequest
+import javax.servlet.http.HttpSession
 
 
 /**
@@ -22,6 +23,22 @@ import javax.servlet.http.HttpServletRequest
 @RestController
 @RequestMapping("/auth")
 class AuthController(@Autowired private val playerService: PlayerService) {
+
+    /**
+     * Checks if user authenticated
+     * @param httpSession HttpSession
+     * @return ResponseEntity - 'authenticated' boolean
+     */
+    @GetMapping("/isAuthenticated")
+    fun isAuthenticated(httpSession: HttpSession) = ResponseEntity.ok(httpSession.getAttribute(PLAYER_NAME) != null)
+
+    /**
+     * Checks if user authenticated
+     * @param httpSession HttpSession
+     * @return ResponseEntity - 'authenticated' boolean
+     */
+//    @GetMapping("/isAuthenticated")
+//    fun isAuthenticated(httpSession: HttpSession) = ResponseEntity.ok(httpSession.getAttribute(PLAYER_NAME) != null)
 
     /**
      * Login attempt.
@@ -36,9 +53,9 @@ class AuthController(@Autowired private val playerService: PlayerService) {
     fun login(@RequestBody pair: PPPair, request: HttpServletRequest): ResponseEntity<Any> = try {
 
         val session = request.getSession(true)
-        (session.getAttribute(PLAYER_SESSION) as? String)?.let { return ResponseEntity(HttpStatus.PRECONDITION_REQUIRED) }
+        (session.getAttribute(PLAYER_NAME) as? String)?.let { return ResponseEntity(HttpStatus.PRECONDITION_REQUIRED) }
         val player = playerService.login(pair.name, pair.pw)
-        session.setAttribute(PLAYER_SESSION, player.name)
+        session.setAttribute(PLAYER_NAME, player.name)
         ResponseEntity.ok(player)
     } catch (e: ValidationException) {
         ResponseEntity.badRequest().body(e.message)
@@ -58,9 +75,9 @@ class AuthController(@Autowired private val playerService: PlayerService) {
     fun createPlayer(@RequestBody pair: PPPair, request: HttpServletRequest): ResponseEntity<Any> = try {
 
         val session = request.getSession(true)
-        (session.getAttribute(PLAYER_SESSION) as? String)?.let { return ResponseEntity(HttpStatus.PRECONDITION_REQUIRED) }
+        (session.getAttribute(PLAYER_NAME) as? String)?.let { return ResponseEntity(HttpStatus.PRECONDITION_REQUIRED) }
         val player = playerService.createPlayer(pair.name, pair.pw)
-        session.setAttribute(PLAYER_SESSION, player.name)
+        session.setAttribute(PLAYER_NAME, player.name)
         ResponseEntity.ok(player)
     } catch (e: ValidationException) {
         ResponseEntity.badRequest().body(e.message)
@@ -68,6 +85,8 @@ class AuthController(@Autowired private val playerService: PlayerService) {
         ResponseEntity(HttpStatus.CONFLICT)
     }
 
+    //TODO: cancel the battle search if logout
+    //TODO: concede the battle if logout
     //TODO: what about logging out during game search?
     //TODO: what about clearing cookies during battle or game searching by one or two players?
     /**

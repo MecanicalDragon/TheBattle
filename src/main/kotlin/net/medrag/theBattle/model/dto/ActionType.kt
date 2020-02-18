@@ -8,5 +8,6 @@ package net.medrag.theBattle.model.dto
 enum class ActionType {
     ATTACK,
     WAIT,
-    BLOCK
+    BLOCK,
+    CONCEDE
 }

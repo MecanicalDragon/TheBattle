@@ -3,6 +3,7 @@ package net.medrag.theBattle.controller
 import net.medrag.theBattle.model.*
 import net.medrag.theBattle.model.dto.BattleBidResponse
 import net.medrag.theBattle.model.dto.SquadDTO
+import net.medrag.theBattle.model.entities.PlayerStatus
 import net.medrag.theBattle.model.squad.FoesPair
 import net.medrag.theBattle.service.BattleService
 import org.springframework.beans.factory.annotation.Autowired
@@ -35,10 +36,11 @@ class BattleController(@Autowired val battleService: BattleService) {
     @PostMapping("/registerBattleBid")
     fun registerBattleBid(@RequestBody squadDTO: SquadDTO, session: HttpSession): ResponseEntity<BattleBidResponse> {
 
-        (session.getAttribute(PLAYER_SESSION) as? String)?.let {
+        (session.getAttribute(PLAYER_NAME) as? String)?.let {
             session.removeAttribute(BATTLE_UUID)
             return try {
                 val resp = battleService.registerBattleBid(it, squadDTO)
+                session.setAttribute(PLAYER_STATUS, PlayerStatus.IN_SEARCH)
                 ResponseEntity.ok(resp)
             } catch (e: ValidationException) {
                 ResponseEntity.badRequest().build()
@@ -59,13 +61,14 @@ class BattleController(@Autowired val battleService: BattleService) {
     @PostMapping("/cancelBid")
     fun cancelBid(session: HttpSession): ResponseEntity<String> {
 
-        (session.getAttribute(PLAYER_SESSION) as? String)?.let {
+        (session.getAttribute(PLAYER_NAME) as? String)?.let {
             try {
                 battleService.cancelBid(it)
                 session.removeAttribute(BATTLE_UUID)
             } catch (e: ProcessingException) {
                 return ResponseEntity.ok(NOT_CANCELLED)
             }
+            session.setAttribute(PLAYER_STATUS, PlayerStatus.FREE)
             return ResponseEntity.ok(CANCELLED)
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
@@ -84,7 +87,9 @@ class BattleController(@Autowired val battleService: BattleService) {
     @GetMapping("/getDislocations")
     fun getDislocations(session: HttpSession): ResponseEntity<FoesPair> {
 
-        (session.getAttribute(PLAYER_SESSION) as? String)?.let { playerName ->
+        (session.getAttribute(PLAYER_NAME) as? String)?.let { playerName ->
+
+            // Common request.
             (session.getAttribute(BATTLE_UUID) as? UUID)?.let {
                 return try {
                     ResponseEntity.ok(battleService.getDislocations(playerName, it))
@@ -99,6 +104,7 @@ class BattleController(@Autowired val battleService: BattleService) {
             battleService.getBud(playerName)?.let {
                 val bud = UUID.fromString(it)
                 session.setAttribute(BATTLE_UUID, bud)
+                session.setAttribute(PLAYER_STATUS, PlayerStatus.IN_BATTLE)
                 return ResponseEntity.ok(battleService.getDislocations(playerName, bud))
             }
             return ResponseEntity.badRequest().build()

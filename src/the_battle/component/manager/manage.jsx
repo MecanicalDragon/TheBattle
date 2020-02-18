@@ -16,7 +16,7 @@ import * as BattleService from '@/service/BattleService'
 import {getPlayerName} from '@/service/PlayerService'
 import Pool from "@/component/manager/Pool";
 import {FormattedMessage} from 'react-intl';
-import {DragDropContext, Droppable} from "react-beautiful-dnd";
+import {DragDropContext} from "react-beautiful-dnd";
 import Remove from "@/component/manager/remove";
 import {NotificationManager} from "react-notifications";
 import SockJsClient from 'react-stomp';
@@ -25,6 +25,8 @@ import DescriptionArea from "@/component/common/DescriptionArea";
 
 const appApi = DEPLOYED_URL;
 
+const STATUS = ["FREE", "IN_SEARCH", "IN_BATTLE"];
+
 class ManageComp extends Component {
 
     constructor(props) {
@@ -32,6 +34,9 @@ class ManageComp extends Component {
         this.state = {
             playerName: getPlayerName(),
             descr: "",
+            playerData: {
+                status: STATUS[0]
+            },
             pool: {},
             columns: {
                 'reserve': {
@@ -65,22 +70,21 @@ class ManageComp extends Component {
             },
             sqType: 1,
             removeWindow: false,
-            toBattleDisabled: false,
-            onSearching: false
+            toBattleDisabled: false
         };
         this.props.dispatch(setNavPosition(Manage));
     }
 
-    //TODO: load status (in search\in battle)
     componentDidMount() {
         SquadService.getPool().then(resp => {
             if (resp) {
                 let inReserve = [];
-                for (let i of resp) {
+                for (let i of resp.pool) {
                     inReserve.push(i[0]);
                 }
                 this.setState({
-                    pool: resp,
+                    playerData: resp.playerData,
+                    pool: resp.pool,
                     columns: {
                         ...this.state.columns,
                         "reserve": {
@@ -142,17 +146,29 @@ class ManageComp extends Component {
 
     setDescription = (text) => this.setState({descr: text});
 
-    //TODO: what if player reloads the page after searching start?
     //TODO: what if player starts the search and logs out?
-    //TODO: what if player clears cookies after searching start or battle start?
     toBattle = () => {
+
+        // If the battle already goes
+        if (this.state.playerData.status === STATUS[2]) {
+            this.props.history.push(routes.battle());
+            return;
+        }
+
         this.setState({toBattleDisabled: true});
-        if (this.state.onSearching) {
+
+        // If player is in process of battle searching
+        if (this.state.playerData.status === STATUS[1]) {
             BattleService.cancelBid().then(
                 resp => {
                     if (resp === "CANCELLED") {
                         NotificationManager.success("", <FormattedMessage id={"app.manage.cancelled"}/>, 5000);
-                        this.setState({toBattleDisabled: false, onSearching: false})
+                        this.setState({
+                            toBattleDisabled: false, playerData: {
+                                ...this.state.playerData,
+                                status: STATUS[0]
+                            }
+                        })
                     } else {
                         NotificationManager.warning("", <FormattedMessage id={"app.manage.not.cancelled"}/>, 5000);
                         this.setState({toBattleDisabled: false})
@@ -161,6 +177,8 @@ class ManageComp extends Component {
             );
             return;
         }
+
+        // Otherwise
         let {columns} = this.state;
         let {sqType} = this.state;
         let {pool} = this.state;
@@ -189,7 +207,12 @@ class ManageComp extends Component {
         if (squad) {
             BattleService.battleBid(squad).then(resp => {
                 if (resp.status === "AWAIT") {
-                    this.setState({toBattleDisabled: false, onSearching: true});
+                    this.setState({
+                        toBattleDisabled: false, playerData: {
+                            ...this.state.playerData,
+                            status: STATUS[1]
+                        }
+                    });
                 } else if (resp.status === "START") {
                     this.startBattle();
                 } else {
@@ -277,7 +300,7 @@ class ManageComp extends Component {
     };
 
     render() {
-        let {sqType} = this.state;
+        let {sqType, playerData} = this.state;
         let smallRow = this.getSmallRow();
         let longRow = this.getLongRow();
         return (
@@ -310,11 +333,13 @@ class ManageComp extends Component {
                             <Col xs={"auto"}>
                                 <Col xs={"auto"} style={{marginTop: 92}}>
                                     <Button onClick={() => this.toBattle()} disabled={this.state.toBattleDisabled}
-                                            color={this.state.onSearching ? "danger" : "success"}
-                                            style={{marginBottom: 17, marginRight: 15}}>
-                                        <FormattedMessage id={this.state.onSearching
-                                            ? "app.manage.battle.cancel" : "app.manage.to.battle"}/></Button>
-                                    {this.state.onSearching ? <span>Searching...</span> : null}
+                                            color={playerData.status === STATUS[1] ? "danger"
+                                                : playerData.status === STATUS[0] ? "success" : "info"}
+                                            style={{marginBottom: 17, marginRight: 15, width: 100}}>
+                                        <FormattedMessage id={playerData.status === STATUS[1]
+                                            ? "app.manage.battle.cancel" : playerData.status === STATUS[0] ?
+                                                "app.manage.to.battle" : "app.manage.battle.goes"}/></Button>
+                                    {playerData.status === STATUS[1] ? <span>Searching...</span> : null}
                                     {/*<Button onClick={() => this.test()} color={"info"}*/}
                                     {/*        style={{marginBottom: 17, marginRight: 15}}>Test</Button>*/}
                                     <br/>

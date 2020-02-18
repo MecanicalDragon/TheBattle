@@ -1,5 +1,6 @@
 package net.medrag.theBattle.service
 
+import net.medrag.theBattle.config.AfterStart
 import net.medrag.theBattle.model.*
 import net.medrag.theBattle.model.squad.ValidatedSquad
 import net.medrag.theBattle.model.dto.BattleBidResponse
@@ -84,7 +85,7 @@ class BattleService(
             throw ValidationException(msg)
         }
         for (unit in listOf(unit1, unit2, unit3, unit4, unit5)) {
-            if (unit.status != UnitStatus.IN_POOL){
+            if (unit.status != UnitStatus.IN_POOL) {
                 val msg = "Someone cheats: $unit is not free fo pick!"
                 logger.error(msg)
                 throw ValidationException(msg)
@@ -119,10 +120,11 @@ class BattleService(
      * @param winner ValidatedSquad
      * @param looser ValidatedSquad
      * @param actionUnit UnitDTO - the one, who made final attack
+     * @param conceded Boolean - true if battle conceded
      */
     @Transactional
-    fun finishTheBattle(uuid: UUID, winner: ValidatedSquad, looser: ValidatedSquad, actionUnit: UnitDTO) {
-        giveExperience(winner, looser, actionUnit)
+    fun finishTheBattle(uuid: UUID, winner: ValidatedSquad, looser: ValidatedSquad, actionUnit: UnitDTO, conceded: Boolean = false) {
+        giveExperience(winner, looser, actionUnit, conceded)
         playerRepo.incrementGamesCount(looser.playerName)
         playerRepo.incrementWinsAndGamesCount(winner.playerName)
         battleFoes.remove(uuid)
@@ -133,16 +135,17 @@ class BattleService(
      * @param winner ValidatedSquad
      * @param looser ValidatedSquad
      * @param finalAttack UnitDTO - who made final attack
+     * @param conceded Boolean - true if battle conceded
      */
     @Transactional
-    fun giveExperience(winner: ValidatedSquad, looser: ValidatedSquad, finalAttack: UnitDTO) {
-        if (looser.dead == 5) {
+    fun giveExperience(winner: ValidatedSquad, looser: ValidatedSquad, finalAttack: UnitDTO, conceded: Boolean = false) {
+        if (looser.dead == 5 || conceded) {
 
             val wonUnits = winner.map.values
             val loosedUnits = looser.map.values
 
-            val expForWinner = loosedUnits.asSequence().fold(0) { i, u -> i + (u.type.basicReward * u.level / 2) }
-            val expForLooser = wonUnits.asSequence().filter { it.hp == 0 }.fold(0) { i, u -> i + (u.type.basicReward * u.level / 2) }
+            val expForWinner = loosedUnits.asSequence().filter { it.hp == 0 }.fold(0) { i, u -> i + (u.type.basicReward * u.level / 2) }
+            val expForLooser = if (conceded) 0 else wonUnits.asSequence().filter { it.hp == 0 }.fold(0) { i, u -> i + (u.type.basicReward * u.level / 2) }
 
             val xps = HashMap<Long, Int>()
             wonUnits.forEach {
@@ -152,7 +155,8 @@ class BattleService(
             loosedUnits.forEach {
                 xps[it.id] = expForLooser / 2
             }
-            xps[finalAttack.id] = (xps[finalAttack.id] ?: 0 + (expForWinner / 10))
+            if (!conceded)
+                xps[finalAttack.id] = (xps[finalAttack.id] ?: 0 + (expForWinner / 10))
             val unitsToReward = unitRepo.findAllByIdIn((wonUnits + loosedUnits).map { it.id })
 
             for (unit in unitsToReward) {
@@ -202,6 +206,13 @@ class BattleService(
             throw ValidationException("Your name is not in battle data, cheater.")
         }
         throw ValidationException("Your battle id is not in battle data, cheater.")
+    }
+
+    @AfterStart
+    @Transactional
+    fun afterStart(){
+        playerRepo.setDefaultStatus()
+        unitRepo.setDefaultStatus()
     }
 
     companion object {

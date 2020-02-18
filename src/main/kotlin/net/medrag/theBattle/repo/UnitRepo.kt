@@ -19,6 +19,10 @@ interface UnitRepo : CrudRepository<UnitEntity, Long> {
     fun findAllByPlayer_NameAndStatus(name: String, status: UnitStatus): List<UnitEntity>
 
     @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("update UnitEntity u set u.status = ?1 where u.id > 0")
+    fun setDefaultStatus(status: UnitStatus = UnitStatus.IN_POOL)
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("delete from UnitEntity u where u.id = ?1 and u.player = ?2")
     fun deleteUnit(id: Long, player: Player)
 

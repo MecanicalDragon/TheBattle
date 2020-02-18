@@ -41,6 +41,7 @@ export default {
     'app.manage.delete.unit': 'Удалить бойца',
     'app.manage.unit.name': 'Имя должно состоять из 2-16 символов лфтинских букв и цифр без пробелов в начале и конце.',
     'app.manage.to.battle': 'В Бой!',
+    'app.manage.battle.goes': 'Продолжить!',
     'app.manage.battle.cancel': 'Отмена',
     'app.manage.cancelled': 'Поиск битвы отменен.',
     'app.manage.not.cancelled': 'Поиск битвы НЕ отменен.',
@@ -50,5 +51,7 @@ export default {
     'app.battle.your.turn.header': 'Ваш ход',
     'app.battle.foes.turn.header': 'Ход соперника',
     'app.battle.over': 'Похоже, ваш бой уже закончился...',
+    'app.battle.concede.header': 'ВНИМАНИЕ!!!',
+    'app.battle.concede.body': 'Это действие немедленно заканчивает бой, аннулируя весь заработанный вами в этом бою опыт!',
 
 }
