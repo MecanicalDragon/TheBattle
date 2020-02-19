@@ -20,22 +20,28 @@ class AfterStartHandler {
 
     @EventListener
     fun handleAfterStart(event: ContextRefreshedEvent) {
-        val ctx = event.applicationContext
-        val beanDefinitionNames = ctx.beanDefinitionNames
-        for (name in beanDefinitionNames) {
-            val beanDefinition = factory.getBeanDefinition(name)
-            beanDefinition.beanClassName?.let {
-                val beanClass = ClassUtils.resolveClassName(it, ClassLoader.getSystemClassLoader())
-                val methods = beanClass.methods
-                for (m in methods) {
-                    if (m.isAnnotationPresent(AfterStart::class.java)) {
-                        val bean = ctx.getBean(name)
-                        m.invoke(bean)
+        if (!initialized) {
+            initialized = true
+            val ctx = event.applicationContext
+            val beanDefinitionNames = ctx.beanDefinitionNames
+            for (name in beanDefinitionNames) {
+                val beanDefinition = factory.getBeanDefinition(name)
+                beanDefinition.beanClassName?.let {
+                    val beanClass = ClassUtils.resolveClassName(it, ClassLoader.getSystemClassLoader())
+                    val methods = beanClass.methods
+                    for (m in methods) {
+                        if (m.isAnnotationPresent(AfterStart::class.java)) {
+                            val bean = ctx.getBean(name)
+                            m.invoke(bean)
+                        }
                     }
                 }
             }
         }
     }
 
+    companion object {
+        var initialized = false
+    }
 
 }
