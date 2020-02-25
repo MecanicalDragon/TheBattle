@@ -4,8 +4,9 @@ import java.lang.RuntimeException
 
 
 /**
+ * Throw it in case when data is invalid somehow
+ *
  * {@author} Stanislav Tretyakov
  * 23.12.2019
- * Thrown in any invalid data case
  */
 class ValidationException(message: String) : RuntimeException(message)

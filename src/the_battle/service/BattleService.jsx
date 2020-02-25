@@ -48,12 +48,12 @@ export async function cancelBid() {
         }, credentials: sendCred
     }).then(function (response) {
         if (response.status === 200) {
-            return response.text().then(resp => {
-                return resp;
-            });
-        } else throw response;
-    }).catch(e => {
-        defaultHandling(e);
-        return null;
+            return true;
+        } else if (response.status === 230) {
+            return false;
+        } else {
+            defaultHandling(response);
+            return null;
+        }
     })
 }

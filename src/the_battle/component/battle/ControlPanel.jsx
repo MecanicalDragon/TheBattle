@@ -3,6 +3,9 @@ import {Button, Popover, PopoverHeader, PopoverBody} from "reactstrap";
 import {ATTACK, BLOCK, CONCEDE, WAIT} from "@/constants/ingameConstants";
 import {FormattedMessage} from "react-intl";
 
+//TODO: messaging
+//TODO: avatars
+//TODO: timer
 const ControlPanel = (props) => {
 
     let {simpleAction, foe, yourTurn, won} = props;
@@ -20,8 +23,11 @@ const ControlPanel = (props) => {
                             onClick={() => simpleAction(WAIT)}>Wait</Button>
                     <Button color={"primary"} style={{margin: 5}} disabled={!yourTurn || won}
                             onClick={() => simpleAction(BLOCK)}>Block</Button>
-                    <Button id={"concede_button"} color={"secondary"} style={{margin: 5}}
-                            onClick={() => simpleAction(CONCEDE)}
+                    <Button id={"concede_button"} color={"secondary"} style={{margin: 5}} disabled={won}
+                            onClick={() => {
+                                toggle(false);
+                                simpleAction(CONCEDE)
+                            }}
                             onMouseOver={() => toggle(true)}
                             onMouseLeave={() => toggle(false)}
                     >Concede</Button>

@@ -1,17 +1,13 @@
 package net.medrag.theBattle.controller
 
-import net.medrag.theBattle.model.BATTLE_UUID
-import net.medrag.theBattle.model.PLAYER_NAME
-import net.medrag.theBattle.model.PLAYER_STATUS
 import net.medrag.theBattle.model.ValidationException
 import net.medrag.theBattle.model.dto.SimpleAction
-import net.medrag.theBattle.model.entities.PlayerStatus
 import net.medrag.theBattle.service.ActionService
+import net.medrag.theBattle.service.PlayerSession
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import java.util.*
-import javax.servlet.http.HttpServletRequest
 
 
 /**
@@ -22,12 +18,12 @@ import javax.servlet.http.HttpServletRequest
  */
 @RestController
 @RequestMapping("/action")
-class ActionController(private val actionService: ActionService) {
+class ActionController(@Autowired private val actionService: ActionService,
+                       @Autowired private val session: PlayerSession) {
 
     /**
      * SimpleAction handling
      * @param action SimpleAction
-     * @param request HttpServletRequest
      * @return ResponseEntity<Any>:
      *      - 200 if action successfully handled
      *      - 400 if action is invalid
@@ -35,21 +31,17 @@ class ActionController(private val actionService: ActionService) {
      *      - 555 if db fails
      */
     @PostMapping("/performAction")
-    fun performAction(@RequestBody action: SimpleAction, request: HttpServletRequest): ResponseEntity<Any> {
+    fun performAction(@RequestBody action: SimpleAction): ResponseEntity<Any> {
 
-        val session = request.getSession(false)
-        if (session != null) {
-            val playerName = session.getAttribute(PLAYER_NAME) as? String
-            if (playerName != null) {
-                (session.getAttribute(BATTLE_UUID) as? UUID)?.let {
-                    return try {
-                        val actionResult = actionService.performSimpleAction(playerName, it, action)
-                        if (actionResult.finished)
-                            session.removeAttribute(BATTLE_UUID)
-                        ResponseEntity.ok(actionResult)
-                    } catch (e: ValidationException) {
-                        ResponseEntity.badRequest().body(e.message)
-                    }
+        session.playerName?.let { name ->
+            session.bud?.let {
+                return try {
+                    val actionResult = actionService.performSimpleAction(name, it, action)
+                    if (actionResult.finished)
+                        session.bud = null
+                    ResponseEntity.ok(actionResult)
+                } catch (e: ValidationException) {
+                    ResponseEntity.badRequest().body(e.message)
                 }
             }
         }

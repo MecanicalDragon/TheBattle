@@ -32,7 +32,7 @@ class PlayerService(
     fun login(name: String, pw: String): PlayerDTO {
         val player = playerRepo.findByName(name) ?: throw ValidationException("There is no player with name $name")
         if (pwEncoder.matches(pw, player.password)) {
-            return PlayerDTO(player.name, player.games, player.wins, player.status)
+            return PlayerDTO(player.name, player.games, player.wins, player.status, player.id)
         } else throw ValidationException("Incorrect password for player $name")
     }
 
@@ -69,7 +69,7 @@ class PlayerService(
                 } catch (e: Exception) {
                     throw IncompatibleDataException("Player with name '$name' already exists.")
                 }
-                return PlayerDTO(name)
+                return PlayerDTO(name, id = player.id)
             } else throw ValidationException("Your password does not match regex '$regex'")
         } else throw ValidationException("Your name does not match regex '$regex'")
     }

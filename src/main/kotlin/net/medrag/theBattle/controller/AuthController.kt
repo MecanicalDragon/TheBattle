@@ -1,16 +1,19 @@
 package net.medrag.theBattle.controller
 
 import net.medrag.theBattle.config.PPPair
-import net.medrag.theBattle.model.IncompatibleDataException
-import net.medrag.theBattle.model.LOGGED_OUT
-import net.medrag.theBattle.model.PLAYER_NAME
-import net.medrag.theBattle.model.ValidationException
+import net.medrag.theBattle.model.*
+import net.medrag.theBattle.model.dto.ActionType
+import net.medrag.theBattle.model.dto.Position
+import net.medrag.theBattle.model.dto.SimpleAction
+import net.medrag.theBattle.model.entities.PlayerStatus
+import net.medrag.theBattle.service.ActionService
+import net.medrag.theBattle.service.BattleService
 import net.medrag.theBattle.service.PlayerService
+import net.medrag.theBattle.service.PlayerSession
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpSession
 
 
@@ -22,31 +25,32 @@ import javax.servlet.http.HttpSession
  */
 @RestController
 @RequestMapping("/auth")
-class AuthController(@Autowired private val playerService: PlayerService) {
+class AuthController(@Autowired private val playerService: PlayerService,
+                     @Autowired private val session: PlayerSession,
+                     @Autowired private val battleService: BattleService,
+                     @Autowired private val actionService: ActionService) {
 
     /**
      * Checks if user authenticated
-     * @param httpSession HttpSession
      * @return ResponseEntity - 'authenticated' boolean
      */
     @GetMapping("/isAuthenticated")
-    fun isAuthenticated(httpSession: HttpSession) = ResponseEntity.ok(httpSession.getAttribute(PLAYER_NAME) != null)
+    fun isAuthenticated() = ResponseEntity.ok(session.playerName != null)
 
     /**
      * Checks if user authenticated
-     * @param httpSession HttpSession
      * @return ResponseEntity:
      *      - 200 if playerDTO is nested
      *      - 401 if player unauthorized
      *      - 555 if database fails
      */
     @GetMapping("/isAuthenticatedWithData")
-    fun isAuthenticatedWithData(httpSession: HttpSession): ResponseEntity<Any> {
-        (httpSession.getAttribute(PLAYER_NAME) as? String)?.let {
+    fun isAuthenticatedWithData(): ResponseEntity<Any> {
+        session.playerName?.let {
             try {
                 return ResponseEntity.ok(playerService.getPlayerData(it))
             } catch (e: ValidationException) {
-                httpSession.invalidate()
+                session.invalidate()
             }
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
@@ -55,19 +59,19 @@ class AuthController(@Autowired private val playerService: PlayerService) {
     /**
      * Login attempt.
      * @param pair PPPair - name\password pair
-     * @param request HttpServletRequest
      * @return ResponseEntity<Any>:
      *      - 200 with PlayerDTO if login was successful
      *      - 400 with error message if bad cred have been input
      *      - 428 if user already logged in
      */
     @PostMapping("/login")
-    fun login(@RequestBody pair: PPPair, request: HttpServletRequest): ResponseEntity<Any> = try {
+    fun login(@RequestBody pair: PPPair): ResponseEntity<Any> = try {
 
-        val session = request.getSession(true)
-        (session.getAttribute(PLAYER_NAME) as? String)?.let { return ResponseEntity(HttpStatus.PRECONDITION_REQUIRED) }
+        session.playerName?.let { return ResponseEntity(HttpStatus.PRECONDITION_REQUIRED) }
         val player = playerService.login(pair.name, pair.pw)
-        session.setAttribute(PLAYER_NAME, player.name)
+        session.playerId = player.id.also { player.id = session.playerId }
+        session.playerName = player.name
+        session.playerStatus = player.status
         ResponseEntity.ok(player)
     } catch (e: ValidationException) {
         ResponseEntity.badRequest().body(e.message)
@@ -76,7 +80,6 @@ class AuthController(@Autowired private val playerService: PlayerService) {
     /**
      * Create new player and login with it.
      * @param pair PPPair - name\password pair
-     * @param request HttpServletRequest
      * @return ResponseEntity<Any>:
      *      - 200 with PlayerDTO if login was successful
      *      - 400 with error message if bad cred have been input
@@ -84,12 +87,13 @@ class AuthController(@Autowired private val playerService: PlayerService) {
      *      - 409 if user with this name already exists
      */
     @PostMapping("/createPlayer")
-    fun createPlayer(@RequestBody pair: PPPair, request: HttpServletRequest): ResponseEntity<Any> = try {
+    fun createPlayer(@RequestBody pair: PPPair): ResponseEntity<Any> = try {
 
-        val session = request.getSession(true)
-        (session.getAttribute(PLAYER_NAME) as? String)?.let { return ResponseEntity(HttpStatus.PRECONDITION_REQUIRED) }
+        session.playerName?.let { return ResponseEntity(HttpStatus.PRECONDITION_REQUIRED) }
         val player = playerService.createPlayer(pair.name, pair.pw)
-        session.setAttribute(PLAYER_NAME, player.name)
+        session.playerId = player.id.also { player.id = session.playerId }
+        session.playerName = player.name
+        session.playerStatus = player.status
         ResponseEntity.ok(player)
     } catch (e: ValidationException) {
         ResponseEntity.badRequest().body(e.message)
@@ -97,18 +101,31 @@ class AuthController(@Autowired private val playerService: PlayerService) {
         ResponseEntity(HttpStatus.CONFLICT)
     }
 
-    //TODO: cancel the battle search if logout
-    //TODO: concede the battle if logout
-    //TODO: what about logging out during game search?
-    //TODO: what about clearing cookies during battle or game searching by one or two players?
     /**
      * Logout
-     * @param request HttpServletRequest
-     * @return ResponseEntity<String> - LOGGED_OUT const string
+     * @return ResponseEntity<Void>:
+     *      - 200 if logout was successful
+     *      - 230 if player obtains a second chance to think once more, cause the battle just started.
      */
+    //TODO: what about clearing cookies during battle or game searching by both players?
     @PostMapping("/logout")
-    fun logout(request: HttpServletRequest): ResponseEntity<String> {
-        request.getSession(false)?.invalidate()
-        return ResponseEntity.ok(LOGGED_OUT)
+    fun logout(httpSession: HttpSession): ResponseEntity<Void> {
+        try {
+            session.playerName?.let { name ->
+                if (session.playerStatus === PlayerStatus.IN_SEARCH) {
+                    session.playerId?.let {
+                        battleService.cancelBid(it, name)
+                    }
+                } else if (session.playerStatus === PlayerStatus.IN_BATTLE) {
+                    session.bud?.let {
+                        actionService.performSimpleAction(name, it, SimpleAction(Position.POS1, ActionType.CONCEDE, emptyMap()))
+                    }
+                }
+                httpSession.invalidate()
+            }
+        } catch (e: ProcessingException) {
+            return ResponseEntity.status(230).build()
+        }
+        return ResponseEntity.status(200).build()
     }
 }

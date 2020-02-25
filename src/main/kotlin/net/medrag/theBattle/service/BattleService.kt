@@ -174,9 +174,8 @@ class BattleService(
      */
     @Transactional
     @Throws(ProcessingException::class)
-    fun cancelBid(playerName: String) {
-        val id = playerRepo.getIdByName(playerName)
-        unitRepo.changeStatus(UnitStatus.IN_POOL, UnitStatus.IN_SEARCH, Player(id, playerName))
+    fun cancelBid(playerId: Long, playerName: String) {
+        unitRepo.changeStatus(UnitStatus.IN_POOL, UnitStatus.IN_SEARCH, Player(playerId, playerName))
         playerRepo.setStatusAndUUID(PlayerStatus.FREE, null, listOf(playerName))
         if (!searching.remove(ValidatedSquad(playerName))) throw ProcessingException("The battle has already started!")
 

@@ -145,7 +145,6 @@ class ManageComp extends Component {
 
     setDescription = (text) => this.setState({descr: text});
 
-    //TODO: what if player starts the search and logs out?
     toBattle = () => {
 
         // If the battle already goes
@@ -160,7 +159,7 @@ class ManageComp extends Component {
         if (this.state.playerData.status === STATUS[1]) {
             BattleService.cancelBid().then(
                 resp => {
-                    if (resp === "CANCELLED") {
+                    if (resp) {
                         NotificationManager.success("", <FormattedMessage id={"app.manage.cancelled"}/>, 5000);
                         this.setState({
                             toBattleDisabled: false, playerData: {

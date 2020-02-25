@@ -2,12 +2,12 @@ package net.medrag.theBattle.controller
 
 import net.medrag.theBattle.model.*
 import net.medrag.theBattle.model.classes.Unitt
+import net.medrag.theBattle.service.PlayerSession
 import net.medrag.theBattle.service.SquadService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
-import javax.servlet.http.HttpSession
 
 
 /**
@@ -17,20 +17,20 @@ import javax.servlet.http.HttpSession
  */
 @RestController
 @RequestMapping("/squad")
-class SquadController(@Autowired val squadService: SquadService) {
+class SquadController(@Autowired private val squadService: SquadService,
+                      @Autowired private val session: PlayerSession) {
 
     /**
      * Returns free heroes pool
-     * @param session HttpSession
      * @return ResponseEntity<Any>:
      *      - 200 List of UnitDTO
      *      - 401 Error string
      *      - 555 if db fails
      */
     @GetMapping("/getPool")
-    fun getPool(session: HttpSession): ResponseEntity<Any> {
+    fun getPool(): ResponseEntity<Any> {
 
-        (session.getAttribute(PLAYER_NAME) as? String)?.let {
+        session.playerName?.let {
             return ResponseEntity.ok(squadService.getPool(it))
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
@@ -38,20 +38,19 @@ class SquadController(@Autowired val squadService: SquadService) {
 
     /**
      * Returns free heroes pool
-     * @param session HttpSession
      * @return ResponseEntity<Any>:
      *      - 200 List of UnitDTO
      *      - 401 Error string
      *      - 555 if db fails
      */
     @GetMapping("/getPoolAndData")
-    fun getPoolAndData(session: HttpSession): ResponseEntity<Any> {
+    fun getPoolAndData(): ResponseEntity<Any> {
 
-        (session.getAttribute(PLAYER_NAME) as? String)?.let {
+        session.playerName?.let {
             try {
                 val pool = squadService.getPool(it)
                 val resp = squadService.compileResponse(it, pool)
-                session.setAttribute(PLAYER_STATUS, resp.player.status)
+                session.playerStatus = resp.player.status
                 return ResponseEntity.ok(resp)
             } catch (e: IncompatibleDataException) {
             }
@@ -63,7 +62,6 @@ class SquadController(@Autowired val squadService: SquadService) {
      * Adds new hero to player's pool
      * @param name String - new unit name
      * @param type Type - unit type
-     * @param session HttpSession - player's session
      * @return ResponseEntity<Any>:
      *      - 200 if everything is OK
      *      - 400 if user is absent in database
@@ -73,10 +71,9 @@ class SquadController(@Autowired val squadService: SquadService) {
      */
     @PostMapping("/addNew")
     fun addNew(@RequestParam name: String,
-               @RequestParam type: Unitt.Unit.Type,
-               session: HttpSession): ResponseEntity<Any> {
+               @RequestParam type: Unitt.Unit.Type): ResponseEntity<Any> {
 
-        (session.getAttribute(PLAYER_NAME) as? String)?.let {
+        session.playerName?.let {
             return try {
                 ResponseEntity.ok(squadService.addNewUnit(it, name, type))
             } catch (e: ValidationException) {
@@ -91,7 +88,6 @@ class SquadController(@Autowired val squadService: SquadService) {
     /**
      * Removes unit from player's pool
      * @param unit Long - unit id
-     * @param session HttpSession - player's session
      * @return ResponseEntity<String>:
      *      - 200 if OK
      *      - 400 if smth went wrong
@@ -99,9 +95,9 @@ class SquadController(@Autowired val squadService: SquadService) {
      *      - 555 if db fails
      */
     @DeleteMapping("/retireHero")
-    fun delete(@RequestParam unit: Long, session: HttpSession): ResponseEntity<String> {
+    fun delete(@RequestParam unit: Long): ResponseEntity<String> {
 
-        (session.getAttribute(PLAYER_NAME) as? String)?.let {
+        session.playerName?.let {
             return try {
                 squadService.deleteUnit(unit, it)
                 ResponseEntity.ok(RETIRED)

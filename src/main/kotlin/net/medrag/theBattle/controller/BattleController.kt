@@ -6,12 +6,12 @@ import net.medrag.theBattle.model.dto.SquadDTO
 import net.medrag.theBattle.model.entities.PlayerStatus
 import net.medrag.theBattle.model.squad.FoesPair
 import net.medrag.theBattle.service.BattleService
+import net.medrag.theBattle.service.PlayerSession
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 import java.util.*
-import javax.servlet.http.HttpSession
 
 
 /**
@@ -20,13 +20,13 @@ import javax.servlet.http.HttpSession
  */
 @RestController
 @RequestMapping("/battle")
-class BattleController(@Autowired val battleService: BattleService) {
+class BattleController(@Autowired private val battleService: BattleService,
+                       @Autowired private val session: PlayerSession) {
 
     /**
      * Registers battle bid.
      * Generates and attaches 'BATTLE_UUID' parameter to the session.
      * @param squadDTO SquadDTO - squad, that goes into battle
-     * @param session HttpSession
      * @return ResponseEntity<BattleBidResponse>:
      *      - 200 if battle bid have been registered
      *      - 400 if request is invalid
@@ -34,13 +34,13 @@ class BattleController(@Autowired val battleService: BattleService) {
      *      - 555 if database problem occurs
      */
     @PostMapping("/registerBattleBid")
-    fun registerBattleBid(@RequestBody squadDTO: SquadDTO, session: HttpSession): ResponseEntity<BattleBidResponse> {
+    fun registerBattleBid(@RequestBody squadDTO: SquadDTO): ResponseEntity<BattleBidResponse> {
 
-        (session.getAttribute(PLAYER_NAME) as? String)?.let {
-            session.removeAttribute(BATTLE_UUID)
+        session.playerName?.let {
+            session.bud = null
             return try {
                 val resp = battleService.registerBattleBid(it, squadDTO)
-                session.setAttribute(PLAYER_STATUS, PlayerStatus.IN_SEARCH)
+                session.playerStatus = PlayerStatus.IN_SEARCH
                 ResponseEntity.ok(resp)
             } catch (e: ValidationException) {
                 ResponseEntity.badRequest().build()
@@ -52,24 +52,26 @@ class BattleController(@Autowired val battleService: BattleService) {
 
     /**
      * Cancels battle bid
-     * @param session HttpSession
      * @return ResponseEntity<String>:
-     *      - 200 if ok (Cancelled or not)
+     *      - 200 if cancelled
+     *      - 230 if battle has started already
      *      - 401 if player is unrecognized
      *      - 555 if database fails
      */
     @PostMapping("/cancelBid")
-    fun cancelBid(session: HttpSession): ResponseEntity<String> {
+    fun cancelBid(): ResponseEntity<Void> {
 
-        (session.getAttribute(PLAYER_NAME) as? String)?.let {
-            try {
-                battleService.cancelBid(it)
-                session.removeAttribute(BATTLE_UUID)
-            } catch (e: ProcessingException) {
-                return ResponseEntity.ok(NOT_CANCELLED)
+        session.playerName?.let { name ->
+            session.playerId?.let {
+                try {
+                    battleService.cancelBid(it, name)
+                    session.bud = null
+                    session.playerStatus = PlayerStatus.FREE
+                    return ResponseEntity.status(200).build()
+                } catch (e: ProcessingException) {
+                    return ResponseEntity.status(230).build()
+                }
             }
-            session.setAttribute(PLAYER_STATUS, PlayerStatus.FREE)
-            return ResponseEntity.ok(CANCELLED)
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
     }
@@ -77,7 +79,6 @@ class BattleController(@Autowired val battleService: BattleService) {
 
     /**
      * Request of FoesPair. Been called
-     * @param session HttpSession
      * @return ResponseEntity<FoesPair>:
      *      - 200 if request handled correctly
      *      - 400 if there is no battle uuid in session or database
@@ -85,16 +86,16 @@ class BattleController(@Autowired val battleService: BattleService) {
      *      - 555 if database fails
      */
     @GetMapping("/getDislocations")
-    fun getDislocations(session: HttpSession): ResponseEntity<FoesPair> {
+    fun getDislocations(): ResponseEntity<FoesPair> {
 
-        (session.getAttribute(PLAYER_NAME) as? String)?.let { playerName ->
+        session.playerName?.let { playerName ->
 
             // Common request.
-            (session.getAttribute(BATTLE_UUID) as? UUID)?.let {
+            session.bud?.let {
                 return try {
                     ResponseEntity.ok(battleService.getDislocations(playerName, it))
                 } catch (e: ValidationException) {
-                    session.removeAttribute(BATTLE_UUID)
+                    session.bud = null
                     ResponseEntity.badRequest().build()
                 }
             }
@@ -103,8 +104,8 @@ class BattleController(@Autowired val battleService: BattleService) {
             // 1. The battle just started, and it's a first request.
             battleService.getBud(playerName)?.let {
                 val bud = UUID.fromString(it)
-                session.setAttribute(BATTLE_UUID, bud)
-                session.setAttribute(PLAYER_STATUS, PlayerStatus.IN_BATTLE)
+                session.bud = bud
+                session.playerStatus = PlayerStatus.IN_BATTLE
                 return ResponseEntity.ok(battleService.getDislocations(playerName, bud))
             }
             return ResponseEntity.badRequest().build()

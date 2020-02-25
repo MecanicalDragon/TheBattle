@@ -43,30 +43,31 @@ class AttackService {
         val atkP = atkPosition.toString().substring(3).toInt()
         var reduced = false;
         if (attackerSquad.type === SquadType.FORCED_FRONT && atkP % 2 == 1) {
-            if (sufferingSquad.type === SquadType.FORCED_FRONT) {
-                if (sufferingSquad.pos3.hp != 0) {
-                    reduced = true;
-                } else if ((atkPosition === Position.POS1 && sufferingSquad.pos1.hp != 0)
-                        || (atkPosition === Position.POS5 && sufferingSquad.pos5.hp != 0)) {
-                    reduced = true;
-                }
-            } else {    //  FF vs FB
-                if ((sufferingSquad.pos2.hp != 0 && atkP != 5) || (sufferingSquad.pos4.hp != 0 && atkP != 1)) reduced = true;
-            }
+//            if (sufferingSquad.type === SquadType.FORCED_FRONT) {
+//                if (sufferingSquad.pos3.hp != 0) {
+//                    reduced = true;
+//                } else if ((atkPosition === Position.POS1 && sufferingSquad.pos1.hp != 0)
+//                        || (atkPosition === Position.POS5 && sufferingSquad.pos5.hp != 0)) {
+//                    reduced = true;
+//                }
+//            } else {    //  FF vs FB
+//                if ((sufferingSquad.pos2.hp != 0 && atkP != 5) || (sufferingSquad.pos4.hp != 0 && atkP != 1)) reduced = true;
+//            }
             reduced = true
         } else if (attackerSquad.type === SquadType.FORCED_BACK && atkP % 2 == 0) {    //  FORCED_BACK
-            if (sufferingSquad.type === SquadType.FORCED_BACK) {
-                if (sufferingSquad.pos2.hp != 0 || sufferingSquad.pos4.hp != 0) reduced = true;
-            } else {    //  FB vs FF
-                if (sufferingSquad.pos3.hp != 0) {
-                    reduced = true
-                } else {
-                    if ((atkP == 2 && sufferingSquad.pos1.hp != 0) || (atkP == 4 && sufferingSquad.pos5.hp != 0)) reduced = true
-                }
-            }
+//            if (sufferingSquad.type === SquadType.FORCED_BACK) {
+//                if (sufferingSquad.pos2.hp != 0 || sufferingSquad.pos4.hp != 0) reduced = true;
+//            } else {    //  FB vs FF
+//                if (sufferingSquad.pos3.hp != 0) {
+//                    reduced = true
+//                } else {
+//                    if ((atkP == 2 && sufferingSquad.pos1.hp != 0) || (atkP == 4 && sufferingSquad.pos5.hp != 0)) reduced = true
+//                }
+//            }
             reduced = true
         }
         if (reduced) {
+            //TODO: for Debug. Remove.
             println("Ranged attack performed with disadvantage from pos$atkP")
             println("Ranged attack performed with disadvantage from pos$atkP")
             println("Ranged attack performed with disadvantage from pos$atkP")

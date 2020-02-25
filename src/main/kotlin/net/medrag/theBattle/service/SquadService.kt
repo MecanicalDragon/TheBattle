@@ -43,7 +43,6 @@ class SquadService(@Autowired val unitRepo: UnitRepo, @Autowired val playerRepo:
      */
     @Throws(IncompatibleDataException::class)
     fun compileResponse(playerName: String, pool: List<UnitDTO>): ManagePageResponse {
-//        playerRepo.getStatusByName(playerName)
         val player = playerRepo.findByName(playerName)
                 ?: throw IncompatibleDataException("Invalid playername: $playerName")
         return ManagePageResponse(PlayerDTO(playerName, player.games, player.wins, player.status), pool)

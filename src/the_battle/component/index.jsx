@@ -151,17 +151,7 @@ class Index extends Component {
         let name = this.state.enterName;
         let pw = this.state.enterPw;
         player.login(name, pw).then(resp => {
-            if (resp !== null) {
-                this.setState({wins: resp.wins, gamesTotal: resp.games, playerName: resp.name, authenticated: true})
-            }
-        });
-    }
-
-    logout() {
-        player.logout().then(logout => {
-            if (logout) {
-                this.setState({playerName: "", authenticated: false})
-            }
+            this.successfulLogin(resp)
         });
     }
 
@@ -169,8 +159,28 @@ class Index extends Component {
         let name = this.state.enterName;
         let pw = this.state.enterPw;
         player.create(name, pw).then(resp => {
-            if (resp !== null) {
-                this.setState({playerName: resp.name, authenticated: true, gamesTotal: resp.games, wins: resp.wins})
+            this.successfulLogin(resp)
+        });
+    }
+
+    successfulLogin(resp) {
+        if (resp !== null) {
+            this.setState({
+                playerName: resp.name,
+                wins: resp.wins,
+                gamesTotal: resp.games,
+                enterName: "",
+                enterPw: "",
+                authenticated: true
+            })
+        }
+    }
+
+    //TODO: give warning about consequences
+    logout() {
+        player.logout().then(logout => {
+            if (logout) {
+                this.setState({playerName: "", authenticated: false})
             }
         });
     }

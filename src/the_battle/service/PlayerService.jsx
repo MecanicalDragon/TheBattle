@@ -101,13 +101,11 @@ export async function logout() {
         },
         credentials: sendCred
     }).then(function (response) {
-        if (response.status === 200)
-            return response.text();
-        else return response
-    }).then(resp => {
-        if (resp === "LOGGED_OUT") {
+        if (response.status === 200) {
             store.dispatch(setAuth(null));
             return true;
+        } else if (response.status === 230) {
+            return false;
         } else {
             NotificationManager.error("", <FormattedMessage id={"app.logout.failed"}/>, 5000);
             return false;
