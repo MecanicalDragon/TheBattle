@@ -61,8 +61,13 @@ export async function retireHero(unit) {
  * @returns newly created hero or null
  */
 export async function addNewHero(name, type) {
+    let n = name.toString().trim();
+    if (n.length < 2 || n.length > 16){
+        NotificationManager.warning(n, <FormattedMessage id={"app.manage.unit.name"}/>, 5000);
+        return null;
+    }
     let url = new URL(appApi + 'squad/addNew');
-    url.search = new URLSearchParams({name: name, type: type.toUpperCase()});
+    url.search = new URLSearchParams({name: n, type: type.toUpperCase()});
     return fetch(url, {
         method: 'POST',
         headers: {
@@ -78,7 +83,7 @@ export async function addNewHero(name, type) {
         else throw response;
     }).catch(e => {
         if (e.status === 412) {
-            NotificationManager.warning(name, <FormattedMessage id={"app.manage.unit.name"}/>, 5000);
+            NotificationManager.warning(n, <FormattedMessage id={"app.manage.unit.name"}/>, 5000);
         } else defaultHandling(e);
         return null;
     });

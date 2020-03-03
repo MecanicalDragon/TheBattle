@@ -7,11 +7,11 @@ const LongLine = styled.div`
     background-color: ${props => (props.drag ? 'cyan' : 'azure')};
     display: flex;
     flex-direction: column;
-    width: 175px;
+    width: 177px;
     height: 90px;
     border-style: solid;
     border-width: 1px;
-    border-radius: 7px;
+    border-radius: 10px;
     text-align: center;
     border-color: darkgray;
     margin: 2px;
@@ -22,11 +22,11 @@ const ShortLine = styled.div`
     background-color: ${props => (props.drag ? 'cyan' : 'azure')};
     display: flex;
     flex-direction: column;
-    width: 175px;
+    width: 177px;
     height: 90px;
     border-style: solid;
     border-width: 1px;
-    border-radius: 7px;
+    border-radius: 10px;
     text-align: center;
     border-color: darkgray;
     margin: 2px;

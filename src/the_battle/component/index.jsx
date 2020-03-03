@@ -6,7 +6,7 @@ import {
     Button,
     Row,
     Col,
-    Input, Form
+    Input, Form, Popover, PopoverHeader, PopoverBody
 } from 'reactstrap'
 import * as routes from '@/router/routes'
 import * as player from '@/service/PlayerService'
@@ -29,10 +29,12 @@ class Index extends Component {
             wins: 0,
             gamesTotal: 0,
             status: STATUS[0],
+            logoutWarning: false,
             newsUrl: "http://localhost:9191/assets/no-add_1.jpg"
         };
         this.handleChange = this.handleChange.bind(this);
-        this.handlePwChange = this.handlePwChange.bind(this)
+        this.handlePwChange = this.handlePwChange.bind(this);
+        this.toggleLogoutWarning = this.toggleLogoutWarning.bind(this)
     }
 
     componentDidMount() {
@@ -91,7 +93,27 @@ class Index extends Component {
                             squad</Button>
                         <br/>
                         <br/>
-                        <Button onClick={() => this.logout()}>Logout</Button>
+                        <Button id={"logoutButton"} onClick={() => this.toggleLogoutWarning()}>Logout</Button>
+                        <Popover placement="bottom" isOpen={this.state.logoutWarning} target="logoutButton"
+                                 toggle={this.toggleLogoutWarning}>
+                            <PopoverHeader>Warning!!!</PopoverHeader>
+                            {/*//TODO: do formatted message*/}
+                            <PopoverBody>
+                                If you're searching the game, we'll try to cancel it.
+                                <br/>
+                                If you're fighting in the battle, that battle will be conceded!
+                                <br/>
+                                <Row style={{paddingTop: 7}}>
+                                    <Col style={{textAlign: "center"}}>
+                                        <Button color={"secondary"}
+                                                onClick={() => this.toggleLogoutWarning()}>Cancel</Button>
+                                    </Col>
+                                    <Col style={{textAlign: "center"}}>
+                                        <Button color={"danger"} onClick={() => this.logout()}>Logout</Button>
+                                    </Col>
+                                </Row>
+                            </PopoverBody>
+                        </Popover>
                     </Col>
                     <Col>
                         <img src={this.state.newsUrl} alt="HOT_NEWS" style={{
@@ -109,30 +131,33 @@ class Index extends Component {
     getLoginForm() {
         return (
             <Form onSubmit={(e) => this.login(e)}>
-                <Row>
-                    <Col xs={{size: 2, offset: 2}} style={{textAlign: "right"}}>
-                        <FormattedMessage id={"app.input.name"}/>
-                    </Col>
+                <Row style={{margin: 7}}>
+                    <Col xs={{size: 4}}/>
                     <Col xs={{size: 4}}>
                         <Input type={"text"} value={this.state.enterName} onChange={this.handleChange}
                                placeholder={"Input your name"}/>
                     </Col>
-                    <Col xs={"auto"}>
-                        <Button color={"success"} type={"submit"} style={{height: 35, width: 75}}>Login</Button>
-                    </Col>
                 </Row>
-                <Row>
-                    <Col xs={{size: 2, offset: 2}} style={{textAlign: "right"}}>
-                        <FormattedMessage id={"app.input.pw"}/>
-                    </Col>
+                <Row style={{margin: 7}}>
+                    <Col xs={{size: 4}}/>
                     <Col xs={{size: 4}}>
                         <Input type={"password"} value={this.state.enterPw} onChange={this.handlePwChange}
                                placeholder={"Input password"}/>
                     </Col>
-                    <Col xs={"auto"}>
-                        <Button color={"info"} onClick={() => this.create()}
-                                style={{height: 35, width: 75}}>Create</Button>
+                </Row>
+                <Row style={{margin: 7}}>
+                    <Col xs={{size: 4}}/>
+
+                    <Col xs={{size: 2}}>
+                        <Button color={"success"} type={"submit"}
+                                style={{width: 140}}>Login</Button>
                     </Col>
+                    <Col xs={{size: 2}}>
+                        <Button color={"info"} onClick={() => this.create()}
+                                style={{width: 140}}>Create</Button>
+                    </Col>
+                    <Col xs={{size: 4}}/>
+
                 </Row>
             </Form>
         )
@@ -144,6 +169,10 @@ class Index extends Component {
 
     handlePwChange(event) {
         this.setState({enterPw: event.target.value})
+    }
+
+    toggleLogoutWarning() {
+        this.setState({logoutWarning: !this.state.logoutWarning})
     }
 
     login(event) {
@@ -176,7 +205,6 @@ class Index extends Component {
         }
     }
 
-    //TODO: give warning about consequences
     logout() {
         player.logout().then(logout => {
             if (logout) {

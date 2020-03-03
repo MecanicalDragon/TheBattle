@@ -359,6 +359,7 @@ class ManageComp extends Component {
         )
     }
 
+    //TODO: should be removed in release
     test() {
         if (this.state.playerName === "asdd")
             this.setState({

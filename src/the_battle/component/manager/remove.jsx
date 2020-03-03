@@ -8,15 +8,15 @@ const Bin = styled.div`
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-    width: 200px;
+    width: 201px;
     height: 100px;
     background-color: ${props => (props.drag ? 'orangered' : 'red')}
     border-style: solid;
-    border-width: 1px;
-    border-radius: 7px;;
+    border-width: 4px;
+    border-radius: 10px;
+    border-color: darkred;
     justify-content: center;
     align-items: center;
-    border-color: red;
     color: white;
 `;
 
@@ -28,7 +28,7 @@ const Remove = (props) => {
             {(provided, snapshot) => (
                 <Bin ref={provided.innerRef} {...provided.droppableProps} drag={snapshot.isDraggingOver}
                      show={props.show}>
-                    <FormattedMessage id={"app.manage.delete.unit"}/>
+                    {snapshot.isDraggingOver ? "" : <FormattedMessage id={"app.manage.delete.unit"}/>}
                     {provided.placeholder}
                 </Bin>
             )}

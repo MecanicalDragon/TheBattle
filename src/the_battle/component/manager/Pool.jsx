@@ -47,7 +47,7 @@ export default class Pool extends Component {
                                 borderStyle: "solid",
                                 borderColor: "green",
                                 borderWidth: 1,
-                                borderRadius: 7,
+                                borderRadius: 10,
                                 backgroundColor: "azure"
                             }}>
                                 <Reserve ref={provided.innerRef} drag={snapshot.isDraggingOver}

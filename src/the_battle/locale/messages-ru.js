@@ -37,6 +37,7 @@ export default {
     'app.manage.pool.header': 'Резерв героев',
     'app.manage.squad.type': 'Тип отряда:',
     'app.manage.squad.add': 'Добавить',
+    'app.manage.squad.cancel': 'Отмена',
     'app.manage.squad.inout.name.for.new': 'Введите имя для нового ',
     'app.manage.delete.unit': 'Удалить бойца',
     'app.manage.unit.name': 'Имя должно состоять из 2-16 символов лфтинских букв и цифр без пробелов в начале и конце.',
