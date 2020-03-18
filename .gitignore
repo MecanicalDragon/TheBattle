@@ -1,5 +1,11 @@
 !**/src/**
 
+### Gradle ###
+.gradle
+gradle
+gradlew
+gradlew.bat
+
 ### STS ###
 .apt_generated
 .classpath
@@ -40,5 +46,4 @@ yarn-error.log
 
 # react-generated
 /src/main/resources/static/
-/the_battle.lock.db
-/the_battle.mv.db
+/database
