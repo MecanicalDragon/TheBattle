@@ -1,5 +1,6 @@
 package net.medrag.theBattle.controller
 
+import net.medrag.theBattle.model.ProcessingException
 import net.medrag.theBattle.model.ValidationException
 import net.medrag.theBattle.model.dto.SimpleAction
 import net.medrag.theBattle.service.ActionService
@@ -26,6 +27,7 @@ class ActionController(@Autowired private val actionService: ActionService,
      * @param action SimpleAction
      * @return ResponseEntity<Any>:
      *      - 200 if action successfully handled
+     *      - 230 if another player already acts
      *      - 400 if action is invalid
      *      - 401 if httpSession is missed
      *      - 555 if db fails
@@ -42,9 +44,20 @@ class ActionController(@Autowired private val actionService: ActionService,
                     ResponseEntity.ok(actionResult)
                 } catch (e: ValidationException) {
                     ResponseEntity.badRequest().body(e.message)
+                } catch (e: ProcessingException) {
+                    ResponseEntity.status(230).body(Unit)
                 }
             }
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
+    }
+
+    @PostMapping("/pingTurn")
+    fun pingTurn() {
+        session.playerName?.let {
+            session.bud?.let { bud ->
+                actionService.pingTurn(it, bud)
+            }
+        }
     }
 }

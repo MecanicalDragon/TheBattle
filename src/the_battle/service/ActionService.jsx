@@ -31,6 +31,8 @@ export async function performAction(actor, action, data) {
             return response.json().then(r => {
                 return r
             })
+        } else if (response.status === 230) {
+            return null;
         } else throw response;
     }).catch(e => {
         defaultHandling(e, true);

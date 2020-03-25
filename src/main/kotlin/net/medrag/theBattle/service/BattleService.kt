@@ -139,32 +139,30 @@ class BattleService(
      */
     @Transactional
     fun giveExperience(winner: ValidatedSquad, looser: ValidatedSquad, finalAttack: UnitDTO, conceded: Boolean = false) {
-        if (looser.dead == 5 || conceded) {
 
-            val wonUnits = winner.map.values
-            val loosedUnits = looser.map.values
+        val wonUnits = winner.map.values
+        val loosedUnits = looser.map.values
 
-            val expForWinner = loosedUnits.asSequence().filter { it.hp == 0 }.fold(0) { i, u -> i + (u.type.basicReward * u.level / 2) }
-            val expForLooser = if (conceded) 0 else wonUnits.asSequence().filter { it.hp == 0 }.fold(0) { i, u -> i + (u.type.basicReward * u.level / 2) }
+        val expForWinner = loosedUnits.asSequence().filter { it.hp == 0 }.fold(0) { i, u -> i + (u.type.basicReward * u.level / 2) }
+        val expForLooser = if (conceded) 0 else wonUnits.asSequence().filter { it.hp == 0 }.fold(0) { i, u -> i + (u.type.basicReward * u.level / 2) }
 
-            val xps = HashMap<Long, Int>()
-            wonUnits.forEach {
-                if (it.hp == 0) xps[it.id] = expForWinner / 3 * 2
-                else xps[it.id] = expForWinner
-            }
-            loosedUnits.forEach {
-                xps[it.id] = expForLooser / 2
-            }
-            if (!conceded)
-                xps[finalAttack.id] = (xps[finalAttack.id] ?: 0 + (expForWinner / 10))
-            val unitsToReward = unitRepo.findAllByIdIn((wonUnits + loosedUnits).map { it.id })
-
-            for (unit in unitsToReward) {
-                unit.experience += xps[unit.id] ?: 0
-                unit.status = UnitStatus.IN_POOL
-            }
-            unitRepo.saveAll(unitsToReward)
+        val xps = HashMap<Long, Int>()
+        wonUnits.forEach {
+            if (it.hp == 0) xps[it.id] = expForWinner / 3 * 2
+            else xps[it.id] = expForWinner
         }
+        loosedUnits.forEach {
+            xps[it.id] = expForLooser / 2
+        }
+        if (!conceded)
+            xps[finalAttack.id] = (xps[finalAttack.id] ?: 0 + (expForWinner / 10))
+        val unitsToReward = unitRepo.findAllByIdIn((wonUnits + loosedUnits).map { it.id })
+
+        for (unit in unitsToReward) {
+            unit.experience += xps[unit.id] ?: 0
+            unit.status = UnitStatus.IN_POOL
+        }
+        unitRepo.saveAll(unitsToReward)
     }
 
     /**
@@ -209,7 +207,7 @@ class BattleService(
 
     @AfterStart
     @Transactional
-    fun afterStart(){
+    fun afterStart() {
         playerRepo.setDefaultStatus()
         unitRepo.setDefaultStatus()
     }

@@ -11,7 +11,15 @@ import kotlin.math.roundToInt
 @Service
 class AttackService {
 
-    fun sufferDamage(target: UnitDTO, accuracy: Int, attackPower: Int, squad: ValidatedSquad): String {
+    /**
+     * Deal damage to target
+     *
+     * @param target UnitDTO
+     * @param accuracy Int
+     * @param attackPower Int
+     * @return Pair<String, Boolean> - battle logs and boolean of 'is target died'
+     */
+    fun sufferDamage(target: UnitDTO, accuracy: Int, attackPower: Int): Pair<String, Boolean> {
         if (Math.random() * accuracy > target.type.evasion) {
             val inDefence = target.effects.contains(UnitEffects.IN_BLOCK)
             val comments: StringBuilder = StringBuilder(if (inDefence) "${target.name} in defence" else target.name)
@@ -27,14 +35,12 @@ class AttackService {
                 target.hp = hp
             }
             comments.append(" receives $damage of damage")
-            if (target.hp == 0) {
+            if (target.hp == 0)
                 comments.append(" and dies")
-                squad.dead++
-            }
             comments.append(".")
-            return comments.toString()
+            return Pair(comments.toString(), target.hp == 0)
         } else {
-            return "${target.name} dodges the attack!"
+            return Pair("${target.name} dodges the attack!", false)
         }
     }
 

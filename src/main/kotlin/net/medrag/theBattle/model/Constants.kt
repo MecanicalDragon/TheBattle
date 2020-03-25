@@ -13,3 +13,5 @@ const val RETIRED = "RETIRED"
 const val ACCURACY_MODIFIER = 3
 const val INITIATIVE_BOTTOM_THRESHOLD = 5
 const val DAMAGED_SQUAD = "DAMAGED_SQUAD"
+
+const val TURN_TIME = 20L

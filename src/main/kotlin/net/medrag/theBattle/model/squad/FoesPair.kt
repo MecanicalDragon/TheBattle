@@ -2,6 +2,7 @@ package net.medrag.theBattle.model.squad
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import net.medrag.theBattle.model.dto.UnitDTO
+import java.time.LocalTime
 import java.util.concurrent.atomic.AtomicBoolean
 
 
@@ -11,15 +12,18 @@ import java.util.concurrent.atomic.AtomicBoolean
  */
 data class FoesPair(
         val foe1: ValidatedSquad,
-        val foe2: ValidatedSquad) {
+        val foe2: ValidatedSquad,
+        var lastMove: LocalTime = LocalTime.now()) {
 
     @JsonIgnore
-    @Volatile
-    var concedeInProcess: AtomicBoolean = AtomicBoolean(false)
+    var actionInProcess: AtomicBoolean = AtomicBoolean(false)
+
     @JsonIgnore
     private var turnOrder = ArrayList<UnitDTO>(10)
+
     @JsonIgnore
     private var turn = 0
+
     @JsonIgnore
     private var limit = 10
 
