@@ -15,6 +15,8 @@ import {Home} from "@/constants/paths";
 import {FormattedMessage} from 'react-intl';
 import {STATUS} from "@/constants/ingameConstants";
 
+const APP_ROOT = DEPLOYED_URL;
+
 class Index extends Component {
 
     //TODO: update advertise
@@ -30,7 +32,7 @@ class Index extends Component {
             gamesTotal: 0,
             status: STATUS[0],
             logoutWarning: false,
-            newsUrl: "http://localhost:9191/assets/no-add_1.jpg"
+            newsUrl: APP_ROOT + "ad/no-add_1.jpg"
         };
         this.handleChange = this.handleChange.bind(this);
         this.handlePwChange = this.handlePwChange.bind(this);

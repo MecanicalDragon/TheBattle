@@ -1,12 +1,12 @@
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlWebpackTemplate = require('html-webpack-template');
-const CleanWebpackPlugin = require('clean-webpack-plugin');
 const webpack = require('webpack');
 const publicPath = '/';
 const path = require('path');
 
 module.exports = {
+    mode: 'development',
     devServer: {
         contentBase: `${publicPath}`,
         historyApiFallback: {
@@ -75,7 +75,6 @@ module.exports = {
         }
     },
     plugins: [
-        // new CleanWebpackPlugin(),
         new webpack.DefinePlugin({
             'process.env': {ASSET_PATH: JSON.stringify(publicPath)},
             //BTW: changing port will break cookie communication with port other than 8080 in war-container

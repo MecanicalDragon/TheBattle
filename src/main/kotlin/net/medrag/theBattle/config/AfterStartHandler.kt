@@ -27,7 +27,7 @@ class AfterStartHandler {
             for (name in beanDefinitionNames) {
                 val beanDefinition = factory.getBeanDefinition(name)
                 beanDefinition.beanClassName?.let {
-                    val beanClass = ClassUtils.resolveClassName(it, ClassLoader.getSystemClassLoader())
+                    val beanClass = ClassUtils.resolveClassName(it, ClassUtils.getDefaultClassLoader())
                     val methods = beanClass.methods
                     for (m in methods) {
                         if (m.isAnnotationPresent(AfterStart::class.java)) {

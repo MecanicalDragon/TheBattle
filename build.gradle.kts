@@ -41,17 +41,45 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-test")
 }
 
-tasks.register<Exec>("runBuild"){
-    dependsOn("yarnInstall")
-    commandLine( "yarn", "run", "build")
+tasks.build {
+    doFirst {
+        copy {
+            from("src/main/resources/ad")
+            into("src/main/resources/static/ad")
+        }
+    }
+    doLast {
+        delete("build/resources/main/ad")
+    }
 }
 
-tasks.register<Exec>("yarnInstall"){
-    commandLine( "yarn", "install")
+//tasks.build.get().doLast {
+//    delete("build/resources/main/ad")
+//}
+//
+//tasks.build.get().doFirst {
+//    copy {
+//        from("src/main/resources/ad")
+//        into("src/main/resources/static/ad")
+//    }
+//}
+
+tasks.register<Copy>("compileResources") {
+    dependsOn("yarnInstall", "yarnRunBuild")
+    from("src/main/resources/ad")
+    into("src/main/resources/static/ad")
 }
 
-tasks.register<Exec>("startLocal"){
-    commandLine( "yarn", "start-local")
+tasks.register<Exec>("yarnRunBuild") {
+    commandLine("yarn", "run", "build")
+}
+
+tasks.register<Exec>("yarnInstall") {
+    commandLine("yarn", "install")
+}
+
+tasks.register<Exec>("yarnStartDev") {
+    commandLine("yarn", "start-dev")
 }
 
 tasks.withType<Test> {
