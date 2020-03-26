@@ -41,6 +41,7 @@ data class FoesPair(
         if (turn == limit) calculateTurnOrder(true)
         actionMan = turnOrder[turn]
         sout()
+        lastMove = LocalTime.now()
         return actionMan
     }
 
@@ -71,6 +72,7 @@ data class FoesPair(
             actionMan = turnOrder[turn]
             println("recalculating turn order...")
             sout()
+            lastMove = LocalTime.now()
             return actionMan
         } else return actor
     }

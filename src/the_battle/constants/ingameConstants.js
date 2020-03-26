@@ -20,6 +20,8 @@ export const WAIT = "WAIT";
 export const BLOCK = "BLOCK";
 export const CONCEDE = "CONCEDE";
 
+export const TIME_FOR_TURN = 20000;
+
 export const CLOSE_TARGETS = {
     "ff": {
         "pos1": ["pos1", "pos3"],
