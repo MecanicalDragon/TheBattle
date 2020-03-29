@@ -4,9 +4,9 @@ import net.medrag.theBattle.model.dto.Position
 import net.medrag.theBattle.model.dto.UnitDTO
 import net.medrag.theBattle.model.dto.UnitEffects
 import net.medrag.theBattle.model.squad.SquadType
-import net.medrag.theBattle.model.squad.ValidatedSquad
 import org.springframework.stereotype.Service
 import kotlin.math.roundToInt
+import net.medrag.theBattle.model.dto.Position.*
 
 @Service
 class AttackService {
@@ -44,44 +44,19 @@ class AttackService {
         }
     }
 
-    fun calculateAccuracy(accuracy: Int, atkPosition: Position, targetPosition: String,
-                          attackerSquad: ValidatedSquad, sufferingSquad: ValidatedSquad): Int {
-        val atkP = atkPosition.toString().substring(3).toInt()
-        var reduced = false;
-        if (attackerSquad.type === SquadType.FORCED_FRONT && atkP % 2 == 1) {
-//            if (sufferingSquad.type === SquadType.FORCED_FRONT) {
-//                if (sufferingSquad.pos3.hp != 0) {
-//                    reduced = true;
-//                } else if ((atkPosition === Position.POS1 && sufferingSquad.pos1.hp != 0)
-//                        || (atkPosition === Position.POS5 && sufferingSquad.pos5.hp != 0)) {
-//                    reduced = true;
-//                }
-//            } else {    //  FF vs FB
-//                if ((sufferingSquad.pos2.hp != 0 && atkP != 5) || (sufferingSquad.pos4.hp != 0 && atkP != 1)) reduced = true;
-//            }
-            reduced = true
-        } else if (attackerSquad.type === SquadType.FORCED_BACK && atkP % 2 == 0) {    //  FORCED_BACK
-//            if (sufferingSquad.type === SquadType.FORCED_BACK) {
-//                if (sufferingSquad.pos2.hp != 0 || sufferingSquad.pos4.hp != 0) reduced = true;
-//            } else {    //  FB vs FF
-//                if (sufferingSquad.pos3.hp != 0) {
-//                    reduced = true
-//                } else {
-//                    if ((atkP == 2 && sufferingSquad.pos1.hp != 0) || (atkP == 4 && sufferingSquad.pos5.hp != 0)) reduced = true
-//                }
-//            }
-            reduced = true
-        }
-        if (reduced) {
-            //TODO: for Debug. Remove.
-            println("Ranged attack performed with disadvantage from pos$atkP")
-            println("Ranged attack performed with disadvantage from pos$atkP")
-            println("Ranged attack performed with disadvantage from pos$atkP")
-            println("Ranged attack performed with disadvantage from pos$atkP")
-            println("Ranged attack performed with disadvantage from pos$atkP")
-            return accuracy / 2
-        } else return accuracy
-    }
+    /**
+     * Validates if range unit attacks from a front line and reduces it's accuracy in this case
+     *
+     * @param accuracy Int unit's accuracy
+     * @param pos Position - unit's position
+     * @param squadType SquadType - attacker's squad type
+     * @return Int - current accuracy
+     */
+    fun calculateAccuracy(accuracy: Int, pos: Position, squadType: SquadType): Int =
+            if ((squadType === SquadType.FORCED_FRONT && (pos === POS1 || pos === POS2 || pos === POS3))
+                    || (squadType === SquadType.FORCED_BACK && (pos === POS2 || pos === POS4))) {
+                accuracy / 2
+            } else accuracy
 
     private fun randomizeDamage(damage: Int): Int {
         val minDmg: Int = damage * 100 - damage * 20

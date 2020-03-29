@@ -98,20 +98,21 @@ class Index extends Component {
                         <Button id={"logoutButton"} onClick={() => this.toggleLogoutWarning()}>Logout</Button>
                         <Popover placement="bottom" isOpen={this.state.logoutWarning} target="logoutButton"
                                  toggle={this.toggleLogoutWarning}>
-                            <PopoverHeader>Warning!!!</PopoverHeader>
-                            {/*//TODO: do formatted message*/}
+                            <PopoverHeader><FormattedMessage id={'app.index.logout.warning'}/></PopoverHeader>
                             <PopoverBody>
-                                If you're searching the game, we'll try to cancel it.
+                                <FormattedMessage id={'app.index.logout.span1'}/>
                                 <br/>
-                                If you're fighting in the battle, that battle will be conceded!
+                                <FormattedMessage id={'app.index.logout.span2'}/>
                                 <br/>
                                 <Row style={{paddingTop: 7}}>
                                     <Col style={{textAlign: "center"}}>
                                         <Button color={"secondary"}
-                                                onClick={() => this.toggleLogoutWarning()}>Cancel</Button>
+                                                onClick={() => this.toggleLogoutWarning()}><FormattedMessage
+                                            id={'app.index.logout.btn.cancel'}/></Button>
                                     </Col>
                                     <Col style={{textAlign: "center"}}>
-                                        <Button color={"danger"} onClick={() => this.logout()}>Logout</Button>
+                                        <Button color={"danger"} onClick={() => this.logout()}><FormattedMessage
+                                            id={'app.index.logout.btn.logout'}/></Button>
                                     </Col>
                                 </Row>
                             </PopoverBody>

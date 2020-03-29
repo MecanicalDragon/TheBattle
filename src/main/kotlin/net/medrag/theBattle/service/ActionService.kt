@@ -5,6 +5,8 @@ import kotlinx.coroutines.*
 import net.medrag.theBattle.model.*
 import net.medrag.theBattle.model.classes.Unitt
 import net.medrag.theBattle.model.dto.*
+import net.medrag.theBattle.model.squad.FoesPair
+import net.medrag.theBattle.model.squad.SquadType
 import net.medrag.theBattle.model.squad.ValidatedSquad
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -52,78 +54,52 @@ class ActionService(@Autowired private val battleService: BattleService,
                     var battleWon = false
                     val nextUnit = when (simpleAction.action) {
                         ActionType.WAIT -> {
-                            if (actor.initiative > INITIATIVE_BOTTOM_THRESHOLD) {
-                                comments.append("${actor.name} waits for a moment...")
-                                pair.recalculateOrder()
-                            } else {
-                                comments.append("${actor.name} can not wait anymore! It's high time for action!")
-                                pair.actionMan
-                            }
+                            actionWait(actor, comments, pair)
                         }
                         ActionType.BLOCK -> {
-                            actor.effects.add(UnitEffects.IN_BLOCK)
-                            comments.append("${actor.name} goes into defence.")
-                            pair.makeMove()
+                            actionBlock(actor, comments, pair)
                         }
                         ActionType.CONCEDE -> {
                             comments.append("$playerName concedes! ${foesSquad.playerName} wins the battle!")
-                            GlobalScope.launch {
-                                var finished = false
-                                while (!finished) {
-                                    try {
-                                        battleService.finishTheBattle(bud, foesSquad, player, actor, true)
-                                        finished = true
-                                    } catch (e: Exception) {
-                                        logger.error("Database transaction has failed.")
-                                        logger.error(e.message)
-                                        delay(300)
-                                    }
-                                }
-                            }
+                            finishTheBattle(bud, foesSquad, player, actor, true)
                             battleWon = true
                             pair.actionMan
                         }
                         ActionType.ATTACK -> {
 
-                            //TODO: validate attack
+                            val targets = simpleAction.additionalData["targets"] as List<*>
+                            val targetsPositions = targets.map {
+                                try {
+                                    Position.valueOf(it.toString().toUpperCase())
+                                } catch (e: Exception) {
+                                    val error = "Unit position $it has been passed incorrectly for player ${playerName}!"
+                                    logger.error(error)
+                                    throw ValidationException(error)
+                                }
+                            }
+
+                            //  Validate attack
+                            if (actor.type.distance === Unitt.Unit.Distance.CLOSED) {
+                                if (!validateAttack(simpleAction.actor, targetsPositions, player, foesSquad))
+                                    throw ValidationException("Attack of ${simpleAction.actor} to $targetsPositions is not valid in current conditions!")
+                            }
 
                             comments.append("${actor.name} attacks! ")
                             var accuracy = actor.type.accuracy + ACCURACY_MODIFIER
                             var targetDied = false;
                             val attackPower = actor.type.attack
-                            val targets = simpleAction.additionalData["targets"] as List<*>
                             if (targets.size > 1) comments.append("\n")
-                            targets.forEach {
-                                val pos = it.toString().toUpperCase();
-                                if (!pos.matches(Regex("^POS[1-5]\$"))) {
-                                    val error = "Unit position $pos has been passed incorrectly for player ${playerName}!"
-                                    logger.error(error)
-                                    throw ValidationException(error)
-                                } else {
-                                    val position = Position.valueOf(pos)
-                                    val unit = foesSquad.map[position] as UnitDTO
-                                    if (actor.type.distance === Unitt.Unit.Distance.RANGED)
-                                        accuracy = attackService.calculateAccuracy(accuracy, simpleAction.actor, pos, player, foesSquad)
-                                    val result = attackService.sufferDamage(unit, accuracy, attackPower)
-                                    comments.append(result.first)
-                                    if (result.second) targetDied = true
-                                }
+                            targetsPositions.forEach {
+                                val unit = foesSquad.map[it] as UnitDTO
+                                if (actor.type.distance === Unitt.Unit.Distance.RANGED)
+                                    accuracy = attackService.calculateAccuracy(accuracy, simpleAction.actor, player.type)
+                                val result = attackService.sufferDamage(unit, accuracy, attackPower)
+                                comments.append(result.first)
+                                if (result.second) targetDied = true
                             }
                             additionalData[DAMAGED_SQUAD] = foesSquad;
                             if (targetDied && foesSquad.map.values.none { it.hp > 0 }) {
-                                GlobalScope.launch {
-                                    var finished = false
-                                    while (!finished) {
-                                        try {
-                                            battleService.finishTheBattle(bud, player, foesSquad, actor)
-                                            finished = true
-                                        } catch (e: Exception) {
-                                            logger.error("Database transaction has failed.")
-                                            logger.error(e.message)
-                                            delay(300)
-                                        }
-                                    }
-                                }
+                                finishTheBattle(bud, player, foesSquad, actor, false)
                                 battleWon = true
                                 comments.append("\n$playerName wins the battle!")
                                 pair.actionMan
@@ -164,6 +140,204 @@ class ActionService(@Autowired private val battleService: BattleService,
                     }
                 } finally {
                     pair.actionInProcess.set(false)
+                }
+            }
+        }
+    }
+
+    private fun validateAttack(realActor: Position, targets: List<Position>, playerSquad: ValidatedSquad, foesSquad: ValidatedSquad): Boolean {
+
+        //TODO: now we just mock validation
+        if (Math.random() < 1) return true;
+
+        class Targets {
+            var pos1 = false
+            var pos2 = false
+            var pos3 = false
+            var pos4 = false
+            var pos5 = false
+        }
+
+//        val t = Array(5) { false }
+
+        var actor: Position = realActor
+
+        val t = Targets()
+        if (playerSquad.type === SquadType.FORCED_FRONT) {
+
+            // If attacker is in the rear line
+            if (actor == Position.POS2 || actor == Position.POS4) {
+                if (playerSquad.pos3.hp == 0) {
+                    if (actor === Position.POS2 && playerSquad.pos1.hp == 0) {
+                        actor = Position.POS3
+                    } else if (actor === Position.POS4 && playerSquad.pos5.hp == 0) {
+                        actor = Position.POS3
+                    } else return false
+                } else return false
+            }
+
+            if (foesSquad.type === SquadType.FORCED_FRONT) {
+
+                // Basic validation
+                if (playerSquad.pos3.hp == 0) {
+                    t.pos1 = true
+                    t.pos3 = true
+                    t.pos5 = true
+                } else {
+                    when (actor) {
+                        Position.POS1 -> {
+                            t.pos1 = true
+                            t.pos3 = true
+                        }
+                        Position.POS3 -> {
+                            t.pos1 = true
+                            t.pos3 = true
+                            t.pos5 = true
+                        }
+                        Position.POS5 -> {
+                            t.pos3 = true
+                            t.pos5 = true
+                        }
+                    }
+                }
+
+                //  If enemy's front line is dead
+                if (foesSquad.pos3.hp == 0) {
+                    if (foesSquad.pos1.hp == 0 && (foesSquad.pos5.hp == 0 || actor !== Position.POS5)) t.pos2 = true
+                    if (foesSquad.pos5.hp == 0 && (foesSquad.pos1.hp == 0 || actor !== Position.POS1)) t.pos4 = true
+                }
+
+            }
+            //  foesSquad.type === SquadType.FORCED_BACK
+            else {
+
+                if (playerSquad.pos3.hp == 0) {
+                    actor = Position.POS3
+                }
+
+                when (actor) {
+                    Position.POS1 -> {
+                        t.pos2 = true
+                    }
+                    Position.POS3 -> {
+                        t.pos2 = true
+                        t.pos4 = true
+                    }
+                    Position.POS5 -> {
+                        t.pos4 = true
+                    }
+                }
+
+                //  If enemy's front line is dead
+                val pos4dead = foesSquad.pos4.hp == 0
+                val pos2dead = foesSquad.pos2.hp == 0
+                if (pos4dead && pos2dead) {
+                    t.pos3 = true
+                    t.pos1 = true
+                    t.pos5 = true
+                } else {
+                    if (pos2dead && realActor != Position.POS5) t.pos1 = true
+                    if (pos4dead && realActor != Position.POS1) t.pos5 = true
+                }
+
+            }
+        } else {    //  playerSquad.type === SquadType.FORCED_BACK
+
+            var posX = false
+
+            // If attacker is in the rear line
+            when (actor) {
+                Position.POS1, Position.POS3, Position.POS5 -> {
+                    if (actor === Position.POS1 && playerSquad.pos2.hp == 0) actor = Position.POS2
+                    else if (actor === Position.POS5 && playerSquad.pos4.hp == 0) actor = Position.POS4
+                    else if (actor === Position.POS3 && playerSquad.pos2.hp == 0 && playerSquad.pos4.hp == 0) actor = Position.POS2 //TODO: variants
+                    else return false
+                }
+            }
+
+            if (foesSquad.type === SquadType.FORCED_FRONT) {
+                when (actor) {
+                    Position.POS2 -> {
+                        t.pos1 = true
+                        t.pos3 = true
+                        if (playerSquad.pos4.hp == 0) t.pos5 = true
+                    }
+                    Position.POS4 -> {
+                        t.pos3 = true
+                        t.pos5 = true
+                        if (playerSquad.pos2.hp == 0) t.pos1 = true
+                    }
+                }
+
+                // If target is in the rear line
+                if (foesSquad.pos3.hp == 0) {
+                    if (foesSquad.pos1.hp == 0) {
+                        if (posX || actor == Position.POS2 || playerSquad.pos2.hp == 0)
+                            t.pos2 = true
+                    }
+                    if (foesSquad.pos5.hp == 0) {
+                        if (posX || actor == Position.POS4 || playerSquad.pos4.hp == 0)
+                            t.pos4 = true
+                    }
+                }
+            } else {    //  foesSquad.type === SquadType.FORCED_BACKt.pos2 = true
+                t.pos2 = true
+                t.pos4 = true
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Includes action BLOCK instructions
+     * @param actor UnitDTO
+     * @param comments StringBuilder
+     * @param pair FoesPair
+     * @return UnitDTO
+     */
+    private fun actionBlock(actor: UnitDTO, comments: StringBuilder, pair: FoesPair): UnitDTO {
+        actor.effects.add(UnitEffects.IN_BLOCK)
+        comments.append("${actor.name} goes into defence.")
+        return pair.makeMove()
+    }
+
+    /**
+     * Includes action WAIT instructions
+     * @param actor UnitDTO
+     * @param comments StringBuilder
+     * @param pair FoesPair
+     * @return UnitDTO
+     */
+    private fun actionWait(actor: UnitDTO, comments: StringBuilder, pair: FoesPair): UnitDTO {
+        return if (actor.initiative > INITIATIVE_BOTTOM_THRESHOLD) {
+            comments.append("${actor.name} waits for a moment...")
+            pair.recalculateOrder()
+        } else {
+            comments.append("${actor.name} can not wait anymore! It's high time for action!")
+            pair.actionMan
+        }
+    }
+
+    /**
+     * Just launch coroutine job to finish the battle
+     * @param bud UUID - battle UUID
+     * @param winner ValidatedSquad
+     * @param looser ValidatedSquad
+     * @param actor UnitDTO
+     * @param conceded Boolean
+     */
+    private fun finishTheBattle(bud: UUID, winner: ValidatedSquad, looser: ValidatedSquad, actor: UnitDTO, conceded: Boolean) {
+        GlobalScope.launch {
+            var finished = false
+            while (!finished) {
+                try {
+                    battleService.finishTheBattle(bud, winner, looser, actor, conceded)
+                    finished = true
+                } catch (e: Exception) {
+                    logger.error("Database transaction has failed.")
+                    logger.error(e.message)
+                    delay(300)
                 }
             }
         }

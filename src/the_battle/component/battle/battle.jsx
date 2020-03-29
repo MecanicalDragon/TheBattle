@@ -53,24 +53,23 @@ class BattleComp extends Component {
                 let foesName = foesSquad.playerName;
                 let actionMan = this.defineActionMan(resp.actionMan, mySquad, foesSquad);
 
-
-                let time = resp.lastMove.split(":");
-                let lastMove = new Date();
-                lastMove.setHours(time[0]);
-                lastMove.setMinutes(time[1]);
-                lastMove.setSeconds(time[2]);
-                time = lastMove.getTime();
-                let now = new Date().getTime();
-                if (time + 20000 < now) {
-                    console.log("ping")
-                } else {
-                    setTimeout(function () {
-                        console.log("delayed ping")
-                    }, time + 20000 - now)
-                }
+                // let time = resp.lastMove.split(":");
+                // let lastMove = new Date();
+                // lastMove.setHours(time[0]);
+                // lastMove.setMinutes(time[1]);
+                // lastMove.setSeconds(time[2]);
+                // time = lastMove.getTime();
+                // let now = new Date().getTime();
+                // if (time + 20000 < now) {
+                //     console.log("ping")
+                // } else {
+                //     setTimeout(function () {
+                //         console.log("delayed ping")
+                //     }, time + 20000 - now)
+                // }
 
                 this.setState({
-                    lastMove: time,
+                    // lastMove: time,
                     foesSquad: foesSquad,
                     mySquad: mySquad,
                     foesName: foesName,
