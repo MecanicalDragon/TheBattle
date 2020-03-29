@@ -148,7 +148,11 @@ class ActionService(@Autowired private val battleService: BattleService,
     private fun validateAttack(realActor: Position, targets: List<Position>, playerSquad: ValidatedSquad, foesSquad: ValidatedSquad): Boolean {
 
         //TODO: now we just mock validation
-        if (Math.random() < 1) return true;
+        if (Math.random() < 1) return true
+
+        else {
+            println(targets)
+        }
 
         class Targets {
             var pos1 = false
@@ -198,6 +202,7 @@ class ActionService(@Autowired private val battleService: BattleService,
                             t.pos3 = true
                             t.pos5 = true
                         }
+                         else -> {}
                     }
                 }
 
@@ -226,6 +231,7 @@ class ActionService(@Autowired private val battleService: BattleService,
                     Position.POS5 -> {
                         t.pos4 = true
                     }
+                    else -> {}
                 }
 
                 //  If enemy's front line is dead
@@ -253,6 +259,7 @@ class ActionService(@Autowired private val battleService: BattleService,
                     else if (actor === Position.POS3 && playerSquad.pos2.hp == 0 && playerSquad.pos4.hp == 0) actor = Position.POS2 //TODO: variants
                     else return false
                 }
+                else -> {}
             }
 
             if (foesSquad.type === SquadType.FORCED_FRONT) {
@@ -267,6 +274,7 @@ class ActionService(@Autowired private val battleService: BattleService,
                         t.pos5 = true
                         if (playerSquad.pos2.hp == 0) t.pos1 = true
                     }
+                    else -> {}
                 }
 
                 // If target is in the rear line

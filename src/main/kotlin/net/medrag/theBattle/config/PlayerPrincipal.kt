@@ -8,7 +8,6 @@ import org.springframework.security.core.userdetails.UserDetails
  * {@author} Stanislav Tretyakov
  * 25.12.2019
  */
-@Deprecated(message="currently I don't need it")
 data class PlayerPrincipal(
         val playerName: String,
         val pWord: String,

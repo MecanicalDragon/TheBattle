@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "net.medrag"
-version = "0.95"
+version = "0.97"
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
 repositories {
@@ -41,45 +41,42 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-test")
 }
 
-tasks.build {
-    doFirst {
-        copy {
-            from("src/main/resources/ad")
-            into("src/main/resources/static/ad")
-        }
-    }
-    doLast {
-        delete("build/resources/main/ad")
-    }
-}
-
-//tasks.build.get().doLast {
-//    delete("build/resources/main/ad")
-//}
-//
-//tasks.build.get().doFirst {
-//    copy {
-//        from("src/main/resources/ad")
-//        into("src/main/resources/static/ad")
-//    }
-//}
-
-tasks.register<Copy>("compileResources") {
+tasks.register("buildResources") {
+    group = "build"
     dependsOn("yarnInstall", "yarnRunBuild")
-    from("src/main/resources/ad")
-    into("src/main/resources/static/ad")
 }
 
 tasks.register<Exec>("yarnRunBuild") {
-    commandLine("yarn", "run", "build")
+    group = "yarn"
+    if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+        commandLine("cmd", "/c", "yarn", "run", "build")
+    } else {
+        commandLine("yarn", "run", "build")
+    }
+    doLast {
+        copy {
+            from("src/ad")
+            into("src/main/resources/static/ad")
+        }
+    }
 }
 
 tasks.register<Exec>("yarnInstall") {
-    commandLine("yarn", "install")
+    group = "yarn"
+    if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+        commandLine("cmd", "/c", "yarn", "install")
+    } else {
+        commandLine("yarn", "install")
+    }
 }
 
 tasks.register<Exec>("yarnStartDev") {
-    commandLine("yarn", "start-dev")
+    group = "yarn"
+    if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+        commandLine("cmd", "/c", "yarn", "start-dev")
+    } else {
+        commandLine("yarn", "start-dev")
+    }
 }
 
 tasks.withType<Test> {
@@ -88,7 +85,7 @@ tasks.withType<Test> {
 
 tasks.withType<KotlinCompile> {
     kotlinOptions {
-        freeCompilerArgs = listOf("-Xjsr305=strict", "-Xcoroutines=enable")
+        freeCompilerArgs = listOf("-Xjsr305=strict")
         jvmTarget = "1.8"
     }
 }

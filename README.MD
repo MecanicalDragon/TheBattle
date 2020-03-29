@@ -5,10 +5,12 @@ Here I develop online game on enterprise technologies, following 2 purposes:
     - To do something, I like)
     
 ### If you want to try it
-You need java, maven, node.js and yarn. Follow these steps:
+You need java, gradle, node.js and yarn. Input into console following commands:
 
-    - mvn clean install
-    - java -jar "./target/TheBattle.jar"
+    - gradle buildResources build
+    - java -jar build/libs/TheBattle-0.97.jar
+    
+Or just download compiled jar [here](https://yadi.sk/d/ZJd7bJ8YumgpGQ)
     
 The game will start on http://localhost:9191 in your browser. 
 Btw, you need another browser and another player if you want to try it, cause there is no AI for a while)
