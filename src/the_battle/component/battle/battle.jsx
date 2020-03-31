@@ -11,8 +11,8 @@ import {Battle} from "@/constants/paths";
 import * as BattleService from '@/service/BattleService'
 import {getPlayerName} from "@/service/PlayerService";
 import BattleSquad from "@/component/battle/BattleSquad";
-import {performAction} from "@/service/ActionService";
-import {ATTACK} from "@/constants/ingameConstants";
+import {performAction, ping} from "@/service/ActionService";
+import {ATTACK, TIME_FOR_TURN} from "@/constants/ingameConstants";
 import SockJsClient from 'react-stomp';
 import Console from "@/component/battle/Console";
 import * as routes from "@/router/routes";
@@ -32,7 +32,8 @@ class BattleComp extends Component {
             mySquad: undefined,
             foesSquad: undefined,
             foesName: null,
-            lastMove: 0,
+            lastMoveTimestamp: 0,
+            timeLeft: "",
             actionMan: {
                 id: -1,
                 pos: "",
@@ -52,29 +53,21 @@ class BattleComp extends Component {
                 let foesSquad = resp.foe1.playerName === playerName ? resp.foe2 : resp.foe1;
                 let foesName = foesSquad.playerName;
                 let actionMan = this.defineActionMan(resp.actionMan, mySquad, foesSquad);
-
-                // let time = resp.lastMove.split(":");
-                // let lastMove = new Date();
-                // lastMove.setHours(time[0]);
-                // lastMove.setMinutes(time[1]);
-                // lastMove.setSeconds(time[2]);
-                // time = lastMove.getTime();
-                // let now = new Date().getTime();
-                // if (time + 20000 < now) {
-                //     console.log("ping")
-                // } else {
-                //     setTimeout(function () {
-                //         console.log("delayed ping")
-                //     }, time + 20000 - now)
-                // }
+                let lastMoveTimestamp = resp.lastMove;
 
                 this.setState({
-                    // lastMove: time,
+                    lastMoveTimestamp: lastMoveTimestamp,
                     foesSquad: foesSquad,
                     mySquad: mySquad,
                     foesName: foesName,
                     actionMan: actionMan
                 });
+
+                if (lastMoveTimestamp + TIME_FOR_TURN <= Date.now()) {
+                    ping()
+                } else {
+                    this.startTimeCounter();
+                }
             } else {
                 this.setState({battleWon: true, badReq: true})
             }
@@ -82,10 +75,15 @@ class BattleComp extends Component {
     }
 
     render() {
-        let {mySquad, foesSquad, playerName, foesName, actionMan, battleWon} = this.state;
+        let {mySquad, foesSquad, playerName, foesName, actionMan, battleWon, timeLeft} = this.state;
         return (
             <Container>
                 <Jumbotron style={{paddingLeft: 10, paddingRight: 10}}>
+                    <Row style={{height: 10, textAlign: "center"}}>
+                        <Col>
+                            <h1 style={timeLeft < 6 ? {color: "red"} : {color: "black"}}>{timeLeft}</h1>
+                        </Col>
+                    </Row>
                     <Row>
                         <Col>
                             {mySquad ?
@@ -99,7 +97,7 @@ class BattleComp extends Component {
                             {foesSquad ?
                                 <BattleSquad foe={true} squad={foesSquad} clearTargets={this.clearTargets}
                                              calculateTargets={this.calculateTargets} actionMan={actionMan}
-                                             selectTargets={this.selectTargets} playerName={foesName}
+                                             selectTargets={this.performAttack} playerName={foesName}
                                              won={battleWon}/>
                                 : null}
                         </Col>
@@ -132,6 +130,27 @@ class BattleComp extends Component {
     }
 
     /**
+     * Function refreshes turn time counter every second and pings server for forcing turn shifting if time is up.
+     */
+    startTimeCounter = async function () {
+        function sleep1sec() {
+            return new Promise(resolve => setTimeout(resolve, 1000));
+        }
+
+        let last = this.state.lastMoveTimestamp;
+        let now = (Date.now() / 1000).toFixed();
+        let limit = ((last + TIME_FOR_TURN) / 1000).toFixed();
+        while (now <= limit) {
+            if (last === this.state.lastMoveTimestamp) {
+                this.setState({timeLeft: limit - now});
+                await sleep1sec();
+                now++;
+            } else return;
+        }
+        if (!this.state.battleWon) ping();
+    };
+
+    /**
      * Receiving info by websocket about opponent's turn results
      * @param msg - ws message
      */
@@ -142,15 +161,18 @@ class BattleComp extends Component {
                 mySquad: msg.additionalData.DAMAGED_SQUAD,
                 battleLogs: msg.comments,
                 actionMan: actionMan,
+                lastMoveTimestamp: msg.lastMoveTimestamp,
                 battleWon: msg.finished
             });
         } else {
             this.setState({
                 actionMan: actionMan,
+                lastMoveTimestamp: msg.lastMoveTimestamp,
                 battleLogs: msg.comments,
                 battleWon: msg.finished
             });
         }
+        this.startTimeCounter();
     };
 
     /**
@@ -196,7 +218,9 @@ class BattleComp extends Component {
      * @param action - action itself
      */
     simpleAction = (action) => {
+        if (this.state.battleWon) return;
         if (action === ATTACK) {
+            //TODO: implement
             alert("This button is just for fancy view here, but others work, we assure)")
         } else {
             let {actionMan} = this.state;
@@ -205,9 +229,11 @@ class BattleComp extends Component {
                     let newActionMan = this.defineActionMan(resp.nextUnit);
                     this.setState({
                         actionMan: newActionMan,
+                        lastMoveTimestamp: resp.lastMoveTimestamp,
                         battleLogs: resp.comments,
                         battleWon: resp.finished
                     });
+                    this.startTimeCounter();
                 }
             })
         }
@@ -217,7 +243,8 @@ class BattleComp extends Component {
      * Pick attack targets and perform attack action on them
      * @param targets - targets positions
      */
-    selectTargets = (targets) => {
+    performAttack = (targets) => {
+        if (this.state.battleWon) return;
         let {actionMan} = this.state;
         let data = {targets: targets};
         performAction(actionMan.pos, ATTACK, data).then(resp => {
@@ -227,9 +254,11 @@ class BattleComp extends Component {
                 this.setState({
                     foesSquad: foe,
                     actionMan: newActionMan,
+                    lastMoveTimestamp: resp.lastMoveTimestamp,
                     battleLogs: resp.comments,
                     battleWon: resp.finished
                 });
+                this.startTimeCounter();
             }
         })
     };

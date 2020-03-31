@@ -5,7 +5,6 @@ import {FormattedMessage} from "react-intl";
 
 //TODO: messaging
 //TODO: avatars
-//TODO: timer
 const ControlPanel = (props) => {
 
     let {simpleAction, foe, yourTurn, won} = props;

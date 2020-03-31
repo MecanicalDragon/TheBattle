@@ -100,13 +100,19 @@ class BattleController(@Autowired private val battleService: BattleService,
                 }
             }
 
-            // 2 cases, if player does not know his bud:
+            // 3 cases, if player does not know his bud:
             // 1. The battle just started, and it's a first request.
+            // 2. The battle has finished.
             battleService.getBud(playerName)?.let {
                 val bud = UUID.fromString(it)
-                session.bud = bud
-                session.playerStatus = PlayerStatus.IN_BATTLE
-                return ResponseEntity.ok(battleService.getDislocations(playerName, bud))
+                try {
+                    val dislocations = battleService.getDislocations(playerName, bud)
+                    session.bud = bud
+                    session.playerStatus = PlayerStatus.IN_BATTLE
+                    return ResponseEntity.ok(dislocations)
+                } catch (e: ValidationException) {
+                    return ResponseEntity.badRequest().build()
+                }
             }
             return ResponseEntity.badRequest().build()
         }

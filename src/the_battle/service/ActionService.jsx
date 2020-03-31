@@ -5,6 +5,16 @@ const appApi = DEPLOYED_URL;
 const sendCred = SEND_CREDENTIALS;
 
 /**
+ * Send ping request to the server if turn time exceeds limit
+ */
+export async function ping() {
+    let url = new URL(appApi + 'action/pingTurn');
+    fetch(url, {method: 'POST', credentials: sendCred}).then(function (response) {
+        console.log("Time is up! Ping request has sent!")
+    })
+}
+
+/**
  * Sending request to perform an action
  * @param actor - acting unit position (pos5)
  * @param action - action itself (ATTACK, BLOCK, WAIT)

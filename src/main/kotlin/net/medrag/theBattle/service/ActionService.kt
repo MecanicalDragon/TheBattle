@@ -14,7 +14,6 @@ import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Service
 import java.lang.Exception
 import java.lang.StringBuilder
-import java.time.LocalTime
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -108,7 +107,8 @@ class ActionService(@Autowired private val battleService: BattleService,
                             }
                         }
                     }
-                    val actionResult = ActionResult(simpleAction.action, additionalData, nextUnit, comments.toString(), battleWon)
+                    val actionResult = ActionResult(simpleAction.action, additionalData, nextUnit, pair.lastMove,
+                            comments.toString(), battleWon)
                     wSocket.convertAndSend("/battle/${foesSquad.playerName}",
                             ObjectMapper().writeValueAsString(actionResult))
                     return actionResult
@@ -123,16 +123,30 @@ class ActionService(@Autowired private val battleService: BattleService,
         } else throw ProcessingException("Another player already acts.")
     }
 
+    /**
+     * Shifts turn to next unit if turn time exceeded.
+     * If it's possible, applies to current unit {@link ActionType.WAIT}. If not - just passes.
+     * Result is passed by websocket.
+     * @param playerName String
+     * @param bud UUID
+     */
     fun pingTurn(playerName: String, bud: UUID) {
         val pair = battleService.getDislocations(playerName, bud)
-        if (pair.lastMove.isBefore(LocalTime.now().minusSeconds(TURN_TIME))) {
+        if (pair.lastMove < System.currentTimeMillis() - TURN_TIME) {
             if (pair.actionInProcess.compareAndSet(false, true)) {
                 try {
-                    if (pair.lastMove.isBefore(LocalTime.now().minusSeconds(TURN_TIME))) {
-                        var comments = "${pair.actionMan.name} waits for something, but time is not! "
-                        val next = pair.makeMove()
-                        comments = comments.plus("Now it's ${next.name}'s turn!")
-                        val actionResult = ActionResult(ActionType.WAIT, null, next, comments)
+                    if (pair.lastMove < System.currentTimeMillis() - TURN_TIME) {
+                        val comments = StringBuilder()
+                        var actionMan = pair.actionMan
+                        if (actionMan.initiative > INITIATIVE_BOTTOM_THRESHOLD) {
+                            actionMan = actionWait(actionMan, comments, pair)
+                        } else {
+                            comments.append("${pair.actionMan.name} waits for something, but time is not!\n")
+                            actionMan = pair.makeMove()
+                            comments.append("Now it's ${actionMan.name}'s turn!")
+                        }
+                        val actionResult = ActionResult(ActionType.WAIT, null, actionMan, pair.lastMove,
+                                comments.toString())
                         wSocket.convertAndSend("/battle/${pair.foe1.playerName}",
                                 ObjectMapper().writeValueAsString(actionResult))
                         wSocket.convertAndSend("/battle/${pair.foe2.playerName}",
@@ -145,11 +159,18 @@ class ActionService(@Autowired private val battleService: BattleService,
         }
     }
 
+    /**
+     * Validate attack for closed-range unit.
+     * @param realActor Position
+     * @param targets List<Position>
+     * @param playerSquad ValidatedSquad
+     * @param foesSquad ValidatedSquad
+     * @return Boolean
+     */
     private fun validateAttack(realActor: Position, targets: List<Position>, playerSquad: ValidatedSquad, foesSquad: ValidatedSquad): Boolean {
 
         //TODO: now we just mock validation
         if (Math.random() < 1) return true
-
         else {
             println(targets)
         }
@@ -202,7 +223,8 @@ class ActionService(@Autowired private val battleService: BattleService,
                             t.pos3 = true
                             t.pos5 = true
                         }
-                         else -> {}
+                        else -> {
+                        }
                     }
                 }
 
@@ -231,7 +253,8 @@ class ActionService(@Autowired private val battleService: BattleService,
                     Position.POS5 -> {
                         t.pos4 = true
                     }
-                    else -> {}
+                    else -> {
+                    }
                 }
 
                 //  If enemy's front line is dead
@@ -259,7 +282,8 @@ class ActionService(@Autowired private val battleService: BattleService,
                     else if (actor === Position.POS3 && playerSquad.pos2.hp == 0 && playerSquad.pos4.hp == 0) actor = Position.POS2 //TODO: variants
                     else return false
                 }
-                else -> {}
+                else -> {
+                }
             }
 
             if (foesSquad.type === SquadType.FORCED_FRONT) {
@@ -274,7 +298,8 @@ class ActionService(@Autowired private val battleService: BattleService,
                         t.pos5 = true
                         if (playerSquad.pos2.hp == 0) t.pos1 = true
                     }
-                    else -> {}
+                    else -> {
+                    }
                 }
 
                 // If target is in the rear line

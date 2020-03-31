@@ -38,10 +38,7 @@ class ActionController(@Autowired private val actionService: ActionService,
         session.playerName?.let { name ->
             session.bud?.let {
                 return try {
-                    val actionResult = actionService.performSimpleAction(name, it, action)
-                    if (actionResult.finished)
-                        session.bud = null
-                    ResponseEntity.ok(actionResult)
+                    ResponseEntity.ok(actionService.performSimpleAction(name, it, action))
                 } catch (e: ValidationException) {
                     ResponseEntity.badRequest().body(e.message)
                 } catch (e: ProcessingException) {
@@ -52,6 +49,9 @@ class ActionController(@Autowired private val actionService: ActionService,
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
     }
 
+    /**
+     * Endpoint is triggered by client if turn time exceeds limit.
+     */
     @PostMapping("/pingTurn")
     fun pingTurn() {
         session.playerName?.let {

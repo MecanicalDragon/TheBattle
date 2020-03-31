@@ -176,10 +176,6 @@ class BattleService(
         unitRepo.changeStatus(UnitStatus.IN_POOL, UnitStatus.IN_SEARCH, Player(playerId, playerName))
         playerRepo.setStatusAndUUID(PlayerStatus.FREE, null, listOf(playerName))
         if (!searching.remove(ValidatedSquad(playerName))) throw ProcessingException("The battle has already started!")
-
-        //TODO: for debug. Remove
-        logger.info("Searching queue now:")
-        logger.info("$searching")
     }
 
     /**

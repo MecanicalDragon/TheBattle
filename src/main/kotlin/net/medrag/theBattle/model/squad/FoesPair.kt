@@ -2,7 +2,6 @@ package net.medrag.theBattle.model.squad
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import net.medrag.theBattle.model.dto.UnitDTO
-import java.time.LocalTime
 import java.util.concurrent.atomic.AtomicBoolean
 
 
@@ -13,7 +12,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 data class FoesPair(
         val foe1: ValidatedSquad,
         val foe2: ValidatedSquad,
-        var lastMove: LocalTime = LocalTime.now()) {
+        var lastMove: Long = System.currentTimeMillis()) {
 
     @JsonIgnore
     var actionInProcess: AtomicBoolean = AtomicBoolean(false)
@@ -35,13 +34,17 @@ data class FoesPair(
 
     var actionMan = turnOrder[turn]
 
+    /**
+     * Move actionUnit marker forward
+     * @return UnitDTO - unit, who's turn now
+     */
     fun makeMove(): UnitDTO {
         while (++turn < limit && turnOrder[turn].hp == 0) {
         }
         if (turn == limit) calculateTurnOrder(true)
         actionMan = turnOrder[turn]
         sout()
-        lastMove = LocalTime.now()
+        lastMove = System.currentTimeMillis()
         return actionMan
     }
 
@@ -72,7 +75,7 @@ data class FoesPair(
             actionMan = turnOrder[turn]
             println("recalculating turn order...")
             sout()
-            lastMove = LocalTime.now()
+            lastMove = System.currentTimeMillis()
             return actionMan
         } else return actor
     }
