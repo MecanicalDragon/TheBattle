@@ -1,19 +1,18 @@
 package net.medrag.theBattle.service
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import kotlinx.coroutines.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import net.medrag.theBattle.model.*
 import net.medrag.theBattle.model.classes.Unitt
 import net.medrag.theBattle.model.dto.*
 import net.medrag.theBattle.model.squad.FoesPair
-import net.medrag.theBattle.model.squad.SquadType
 import net.medrag.theBattle.model.squad.ValidatedSquad
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.messaging.simp.SimpMessagingTemplate
 import org.springframework.stereotype.Service
-import java.lang.Exception
-import java.lang.StringBuilder
 import java.util.*
 import kotlin.collections.HashMap
 
@@ -34,7 +33,12 @@ class ActionService(@Autowired private val battleService: BattleService,
      * @param bud UUID - battle UUID
      * @param simpleAction SimpleAction - action itself
      * @return ActionResult - result data object
-     * @throws ValidationException if action unit is invalid or position is passed incorrectly
+     * @throws ValidationException if:
+     *          - action unit is dead
+     *          - other unit's turn
+     *          - attack is invalid
+     *          - position is passed incorrectly
+     *          - position data is invalid
      * @throws ProcessingException if another player already acts.
      */
     @Throws(ValidationException::class, ProcessingException::class)
@@ -43,6 +47,7 @@ class ActionService(@Autowired private val battleService: BattleService,
         val player: ValidatedSquad = if (pair.foe1.playerName == playerName) pair.foe1 else pair.foe2
         val foesSquad: ValidatedSquad = if (pair.foe1.playerName == playerName) pair.foe2 else pair.foe1
         val actor = player.map[simpleAction.actor] as UnitDTO
+        if (actor.isDead()) throw ValidationException("${simpleAction.actor} is dead. He can not perform any actions.")
 
         if (pair.actionInProcess.compareAndSet(false, true)) {
             try {
@@ -66,21 +71,22 @@ class ActionService(@Autowired private val battleService: BattleService,
                         }
                         ActionType.ATTACK -> {
 
-                            val targets = simpleAction.additionalData["targets"] as List<*>
-                            val targetsPositions = targets.map {
-                                try {
-                                    Position.valueOf(it.toString().toUpperCase())
-                                } catch (e: Exception) {
-                                    val error = "Unit position $it has been passed incorrectly for player ${playerName}!"
-                                    logger.error(error)
-                                    throw ValidationException(error)
-                                }
-                            }
+                            val targets: List<Position> = simpleAction.additionalData["targets"]?.let {
+                                if (it is List<*>) {
+                                    it.map { pos ->
+                                        try {
+                                            Position.valueOf(pos.toString().toUpperCase())
+                                        } catch (e: IllegalArgumentException) {
+                                            throw ValidationException(TARGET_DATA_INVALID)
+                                        }
+                                    }
+                                } else throw ValidationException(TARGET_DATA_INVALID)
+                            } ?: throw ValidationException(TARGET_DATA_INVALID)
+                            if (targets.isEmpty()) throw ValidationException(TARGET_DATA_INVALID)
 
                             //  Validate attack
                             if (actor.type.distance === Unitt.Unit.Distance.CLOSED) {
-                                if (!validateAttack(simpleAction.actor, targetsPositions, player, foesSquad))
-                                    throw ValidationException("Attack of ${simpleAction.actor} to $targetsPositions is not valid in current conditions!")
+                                attackService.validateMeleeAttack(simpleAction.actor, targets, player, foesSquad)
                             }
 
                             comments.append("${actor.name} attacks! ")
@@ -88,16 +94,17 @@ class ActionService(@Autowired private val battleService: BattleService,
                             var targetDied = false;
                             val attackPower = actor.type.attack
                             if (targets.size > 1) comments.append("\n")
-                            targetsPositions.forEach {
+                            targets.forEach {
                                 val unit = foesSquad.map[it] as UnitDTO
-                                if (actor.type.distance === Unitt.Unit.Distance.RANGED)
-                                    accuracy = attackService.calculateAccuracy(accuracy, simpleAction.actor, player.type)
-                                val result = attackService.sufferDamage(unit, accuracy, attackPower)
-                                comments.append(result.first)
-                                if (result.second) targetDied = true
+                                if (unit.isAlive()) {
+                                    if (actor.type.distance === Unitt.Unit.Distance.RANGED)
+                                        accuracy = attackService.calculateAccuracy(accuracy, simpleAction.actor, player.type)
+                                    comments.append(attackService.sufferDamage(unit, accuracy, attackPower))
+                                    if (unit.isDead()) targetDied = true
+                                }
                             }
                             additionalData[DAMAGED_SQUAD] = foesSquad;
-                            if (targetDied && foesSquad.map.values.none { it.hp > 0 }) {
+                            if (targetDied && foesSquad.map.values.none { it.isAlive() }) {
                                 finishTheBattle(bud, player, foesSquad, actor, false)
                                 battleWon = true
                                 comments.append("\n$playerName wins the battle!")
@@ -157,169 +164,6 @@ class ActionService(@Autowired private val battleService: BattleService,
                 }
             }
         }
-    }
-
-    /**
-     * Validate attack for closed-range unit.
-     * @param realActor Position
-     * @param targets List<Position>
-     * @param playerSquad ValidatedSquad
-     * @param foesSquad ValidatedSquad
-     * @return Boolean
-     */
-    private fun validateAttack(realActor: Position, targets: List<Position>, playerSquad: ValidatedSquad, foesSquad: ValidatedSquad): Boolean {
-
-        //TODO: now we just mock validation
-        if (Math.random() < 1) return true
-        else {
-            println(targets)
-        }
-
-        class Targets {
-            var pos1 = false
-            var pos2 = false
-            var pos3 = false
-            var pos4 = false
-            var pos5 = false
-        }
-
-//        val t = Array(5) { false }
-
-        var actor: Position = realActor
-
-        val t = Targets()
-        if (playerSquad.type === SquadType.FORCED_FRONT) {
-
-            // If attacker is in the rear line
-            if (actor == Position.POS2 || actor == Position.POS4) {
-                if (playerSquad.pos3.hp == 0) {
-                    if (actor === Position.POS2 && playerSquad.pos1.hp == 0) {
-                        actor = Position.POS3
-                    } else if (actor === Position.POS4 && playerSquad.pos5.hp == 0) {
-                        actor = Position.POS3
-                    } else return false
-                } else return false
-            }
-
-            if (foesSquad.type === SquadType.FORCED_FRONT) {
-
-                // Basic validation
-                if (playerSquad.pos3.hp == 0) {
-                    t.pos1 = true
-                    t.pos3 = true
-                    t.pos5 = true
-                } else {
-                    when (actor) {
-                        Position.POS1 -> {
-                            t.pos1 = true
-                            t.pos3 = true
-                        }
-                        Position.POS3 -> {
-                            t.pos1 = true
-                            t.pos3 = true
-                            t.pos5 = true
-                        }
-                        Position.POS5 -> {
-                            t.pos3 = true
-                            t.pos5 = true
-                        }
-                        else -> {
-                        }
-                    }
-                }
-
-                //  If enemy's front line is dead
-                if (foesSquad.pos3.hp == 0) {
-                    if (foesSquad.pos1.hp == 0 && (foesSquad.pos5.hp == 0 || actor !== Position.POS5)) t.pos2 = true
-                    if (foesSquad.pos5.hp == 0 && (foesSquad.pos1.hp == 0 || actor !== Position.POS1)) t.pos4 = true
-                }
-
-            }
-            //  foesSquad.type === SquadType.FORCED_BACK
-            else {
-
-                if (playerSquad.pos3.hp == 0) {
-                    actor = Position.POS3
-                }
-
-                when (actor) {
-                    Position.POS1 -> {
-                        t.pos2 = true
-                    }
-                    Position.POS3 -> {
-                        t.pos2 = true
-                        t.pos4 = true
-                    }
-                    Position.POS5 -> {
-                        t.pos4 = true
-                    }
-                    else -> {
-                    }
-                }
-
-                //  If enemy's front line is dead
-                val pos4dead = foesSquad.pos4.hp == 0
-                val pos2dead = foesSquad.pos2.hp == 0
-                if (pos4dead && pos2dead) {
-                    t.pos3 = true
-                    t.pos1 = true
-                    t.pos5 = true
-                } else {
-                    if (pos2dead && realActor != Position.POS5) t.pos1 = true
-                    if (pos4dead && realActor != Position.POS1) t.pos5 = true
-                }
-
-            }
-        } else {    //  playerSquad.type === SquadType.FORCED_BACK
-
-            var posX = false
-
-            // If attacker is in the rear line
-            when (actor) {
-                Position.POS1, Position.POS3, Position.POS5 -> {
-                    if (actor === Position.POS1 && playerSquad.pos2.hp == 0) actor = Position.POS2
-                    else if (actor === Position.POS5 && playerSquad.pos4.hp == 0) actor = Position.POS4
-                    else if (actor === Position.POS3 && playerSquad.pos2.hp == 0 && playerSquad.pos4.hp == 0) actor = Position.POS2 //TODO: variants
-                    else return false
-                }
-                else -> {
-                }
-            }
-
-            if (foesSquad.type === SquadType.FORCED_FRONT) {
-                when (actor) {
-                    Position.POS2 -> {
-                        t.pos1 = true
-                        t.pos3 = true
-                        if (playerSquad.pos4.hp == 0) t.pos5 = true
-                    }
-                    Position.POS4 -> {
-                        t.pos3 = true
-                        t.pos5 = true
-                        if (playerSquad.pos2.hp == 0) t.pos1 = true
-                    }
-                    else -> {
-                    }
-                }
-
-                // If target is in the rear line
-                if (foesSquad.pos3.hp == 0) {
-                    if (foesSquad.pos1.hp == 0) {
-                        if (posX || actor == Position.POS2 || playerSquad.pos2.hp == 0)
-                            t.pos2 = true
-                    }
-                    if (foesSquad.pos5.hp == 0) {
-                        if (posX || actor == Position.POS4 || playerSquad.pos4.hp == 0)
-                            t.pos4 = true
-                    }
-                }
-            } else {    //  foesSquad.type === SquadType.FORCED_BACKt.pos2 = true
-                t.pos2 = true
-                t.pos4 = true
-            }
-        }
-
-        return true;
     }
 
     /**

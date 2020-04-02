@@ -39,7 +39,7 @@ data class FoesPair(
      * @return UnitDTO - unit, who's turn now
      */
     fun makeMove(): UnitDTO {
-        while (++turn < limit && turnOrder[turn].hp == 0) {
+        while (++turn < limit && turnOrder[turn].isDead()) {
         }
         if (turn == limit) calculateTurnOrder(true)
         actionMan = turnOrder[turn]
@@ -49,7 +49,7 @@ data class FoesPair(
     }
 
     private fun calculateTurnOrder(filter: Boolean = false) {
-        if (filter) turnOrder = turnOrder.filter { it.hp > 0 } as ArrayList<UnitDTO>
+        if (filter) turnOrder = turnOrder.filter { it.isAlive() } as ArrayList<UnitDTO>
         for (unitDTO in turnOrder) {
             unitDTO.initiative = unitDTO.type.initiative + Math.random() * (unitDTO.type.initiative.toDouble() / 2)
         }
@@ -69,7 +69,7 @@ data class FoesPair(
             if (turnOrder[turn + 1].initiative > turnOrder[turn].initiative) {
                 turnOrder.sortByDescending { it.initiative }
             }
-            while (turn < limit && turnOrder[turn].hp == 0) {
+            while (turn < limit && turnOrder[turn].isDead()) {
                 turn++
             }
             actionMan = turnOrder[turn]

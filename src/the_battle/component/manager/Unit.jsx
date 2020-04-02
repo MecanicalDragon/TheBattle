@@ -15,7 +15,7 @@ export function Unit(props) {
     return characteristics ?
         <Draggable draggableId={props.characteristics.id} index={props.index}>
             {(provided, snapshot) => (
-                <UnitPlace className={"unitLogo" + getBorderColor(characteristics.type.type)}
+                <UnitPlace className={"unselectable unitLogo" + getBorderColor(characteristics.type.type)}
                            onMouseOver={() => descrFunc(characteristics)}
                            {...provided.draggableProps}
                            {...provided.dragHandleProps}

@@ -18,4 +18,7 @@ data class UnitDTO(
         var initiative: Double = 0.0,
         val effects: ArrayList<UnitEffects> = ArrayList(),
         val type: Unitt
-)
+) {
+    fun isDead() = this.hp == 0
+    fun isAlive() = this.hp > 0
+}

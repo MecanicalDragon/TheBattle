@@ -143,12 +143,12 @@ class BattleService(
         val wonUnits = winner.map.values
         val loosedUnits = looser.map.values
 
-        val expForWinner = loosedUnits.asSequence().filter { it.hp == 0 }.fold(0) { i, u -> i + (u.type.basicReward * u.level / 2) }
-        val expForLooser = if (conceded) 0 else wonUnits.asSequence().filter { it.hp == 0 }.fold(0) { i, u -> i + (u.type.basicReward * u.level / 2) }
+        val expForWinner = loosedUnits.asSequence().filter { it.isDead() }.fold(0) { i, u -> i + (u.type.basicReward * u.level / 2) }
+        val expForLooser = if (conceded) 0 else wonUnits.asSequence().filter { it.isDead() }.fold(0) { i, u -> i + (u.type.basicReward * u.level / 2) }
 
         val xps = HashMap<Long, Int>()
         wonUnits.forEach {
-            if (it.hp == 0) xps[it.id] = expForWinner / 3 * 2
+            if (it.isDead()) xps[it.id] = expForWinner / 3 * 2
             else xps[it.id] = expForWinner
         }
         loosedUnits.forEach {

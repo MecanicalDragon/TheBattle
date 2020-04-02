@@ -2,6 +2,7 @@ package net.medrag.theBattle.config
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory
+import org.springframework.context.annotation.Profile
 import org.springframework.context.event.ContextRefreshedEvent
 import org.springframework.context.event.EventListener
 import org.springframework.stereotype.Component
@@ -13,6 +14,7 @@ import org.springframework.util.ClassUtils
  * 18.02.2020
  */
 @Component
+@Profile("!test")
 class AfterStartHandler {
 
     @Autowired
