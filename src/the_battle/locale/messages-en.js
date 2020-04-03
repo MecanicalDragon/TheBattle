@@ -14,8 +14,13 @@ export default {
     'app.breadcrump.manage': 'Manage',
 
     // Index page
-    'app.index.header': 'The App',
+    'app.index.header': 'The Battle',
     'app.index.start': 'Start it!',
+    'app.index.logout.warning': 'Warning!!!',
+    'app.index.logout.span1': 'If you\'re searching the game, we\'ll try to cancel it.',
+    'app.index.logout.span2': 'If you\'re fighting in the battle, that battle will be conceded!',
+    'app.index.logout.btn.cancel': 'Cancel',
+    'app.index.logout.btn.logout': 'Logout',
 
     'app.input.regex': 'Player name and password should be 4-16 characters of digits and letters.',
     'app.input.create.trim': 'Remove whitespaces in the beginning and the end of input fields.',

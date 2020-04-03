@@ -16,6 +16,11 @@ export default {
     // Index page
     'app.index.header': 'The Битъва',
     'app.index.start': 'Начать',
+    'app.index.logout.warning': 'Ахътунгъ!!!',
+    'app.index.logout.span1': 'Если вы в поиске игры, мы попытвемся отменить его.',
+    'app.index.logout.span2': 'Если вы уже в бою, вам будет засчитано поражение.',
+    'app.index.logout.btn.cancel': 'Отмена',
+    'app.index.logout.btn.logout': 'Выйти',
 
     'app.input.regex': 'Имя и пароль должны содержать 4-16 символов букв и цифр.',
     'app.input.create.trim': 'Уберите пробелы в начале и конце вводимых полей.',

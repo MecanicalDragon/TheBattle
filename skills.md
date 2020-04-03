@@ -12,6 +12,7 @@
 
 - full defence
 - two weapons
+- spearman (attack backline from sides)
 
 - messaging
 - avatars
