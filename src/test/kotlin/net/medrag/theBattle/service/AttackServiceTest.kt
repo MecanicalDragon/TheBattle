@@ -38,6 +38,67 @@ internal class AttackServiceTest {
     fun tearDown() {
     }
 
+
+    /**
+     *
+     *
+     *                      FORCED_BACK to FORCED_BACK attack validation
+     *
+     *
+     */
+
+    /**
+     * B.POS1 -> B.POS4, !condition 3
+     */
+    @Test
+    fun validateMeleeAttackFromForcedBackToForcedBackCase04() {
+        val player = createMockSquad(FORCED_BACK, pos1 = true)
+        val foe = createMockSquad(FORCED_BACK, pos4 = true)
+        assertDoesNotThrow { attackService.validateMeleeAttack(POS1, listOf(POS4), player, foe) }
+    }
+
+    /**
+     * B.POS5 [POS4] -> B.POS4, condition 3
+     */
+    @Test
+    fun validateMeleeAttackFromForcedBackToForcedBackCase03() {
+        val player = createMockSquad(FORCED_BACK, pos5 = true, pos4 = true)
+        val foe = createMockSquad(FORCED_BACK, pos4 = true)
+        val e = assertThrows<ValidationException> { attackService.validateMeleeAttack(POS5, listOf(POS4), player, foe) }
+        assertEquals("e011", e.message?.substring(7, 11))
+    }
+
+    /**
+     * B.POS3 [POS4] -> B.POS4, condition 2
+     */
+    @Test
+    fun validateMeleeAttackFromForcedBackToForcedBackCase02() {
+        val player = createMockSquad(FORCED_BACK, pos3 = true, pos4 = true)
+        val foe = createMockSquad(FORCED_BACK, pos4 = true)
+        val e = assertThrows<ValidationException> { attackService.validateMeleeAttack(POS3, listOf(POS4), player, foe) }
+        assertEquals("e010", e.message?.substring(7, 11))
+    }
+
+    /**
+     * B.POS3 -> B.POS4, !condition 1
+     */
+    @Test
+    fun validateMeleeAttackFromForcedBackToForcedBackCase01() {
+        val player = createMockSquad(FORCED_BACK, pos3 = true)
+        val foe = createMockSquad(FORCED_BACK, pos4 = true)
+        assertDoesNotThrow { attackService.validateMeleeAttack(POS3, listOf(POS4), player, foe) }
+    }
+
+
+    /**
+     *
+     *
+     *                      FORCED_FRONT to FORCED_BACK attack validation
+     *
+     *
+     */
+
+
     /**
      * F.POS2 -> B.POS4, !condition 1
      */

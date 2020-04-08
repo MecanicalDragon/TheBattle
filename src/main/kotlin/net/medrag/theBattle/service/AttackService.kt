@@ -115,17 +115,21 @@ class AttackService {
                     SquadType.FORCED_BACK -> {
 
                         // If attacker is in the back line
-                        //TODO: check intently!
                         if (attacker % 2 == 0) {
-                            if (player[1] || player[3]) {
-                                if (attacker == 2 || player[abs(attacker - 1)])
+                            if (player[1] || player[3]) {   //  condition 1
+                                if (attacker == 2)  //  condition 2
                                     logAndThrow("e010", actor, targetPosition, playerSquad, foesSquad)
+                                if (player[abs(attacker - 1)]) {    //  condition 3
+                                    logAndThrow("e011", actor, targetPosition, playerSquad, foesSquad)
+                                } else {
+                                    attacker = abs(attacker - 1)
+                                }
                             }
                         }
 
                         if (target % 2 == 1 || (foe[1].not() && foe[3].not())) continue@loop
-                        if (foe[abs(target - 1)] || target == 2)
-                            logAndThrow("e011", actor, targetPosition, playerSquad, foesSquad)
+                        if (foe[abs(target - 1)] || target == 2 || attacker == abs(target - 1))
+                            logAndThrow("e012", actor, targetPosition, playerSquad, foesSquad)
                     }
                 }
             }
