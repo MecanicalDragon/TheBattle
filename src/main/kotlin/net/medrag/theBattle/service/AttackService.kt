@@ -46,23 +46,23 @@ class AttackService {
 
                         //  If attacker is in the rear line, both of front units should be dead.
                         if (attacker % 2 == 1) {
-                            if (player[attacker - 1] || player[attacker + 1])
+                            if (player[attacker - 1] || player[attacker + 1])   //  condition 1
                                 logAndThrow("e001", actor, targetPosition, playerSquad, foesSquad)
                             else attacker = 2
                         } else {
 
                             //  if attacker and target are on different sides, one of central units should be dead.
                             if (abs(attacker - target) == 4) {
-                                if (player[2].not() || foe[2].not()) continue@loop
+                                if (player[2].not() || foe[2].not()) continue@loop  //  condition 2
                                 else logAndThrow("e002", actor, targetPosition, playerSquad, foesSquad)
                             }
                         }
 
                         //  If target is adjacent unit, validate attack
-                        if (attacker == target || abs(attacker - target) == 2) continue@loop
+                        if (attacker == target || abs(attacker - target) == 2) continue@loop    //  condition 3
 
                         //  Target is in the back line. Both of front units should be dead
-                        if (foe[target - 1] || foe[target + 1])
+                        if (foe[target - 1] || foe[target + 1]) //  condition 4
                             logAndThrow("e003", actor, targetPosition, playerSquad, foesSquad)
                     }
                     SquadType.FORCED_BACK -> {
@@ -74,17 +74,25 @@ class AttackService {
                             else attacker = 2
                         }
 
-                        //  If target is in the first line
+                        //  Success conditions if target is in the first line:
+                        //  1. player.pos3 is dead
+                        //  2. attacker is pos3
+                        //  3. attacker is directly opposite to target
+                        //  4. adjacent to target unit is dead
                         if (target % 2 == 1) {
                             if (player[2].not() || attacker == 2 || abs(attacker - target) == 1
-                                    || foe[abs(attacker - 1)].not()) continue@loop  //  condition 2
+                                    || foe[4 - target].not()) continue@loop  //  condition 2
                             else logAndThrow("e005", actor, targetPosition, playerSquad, foesSquad)
                         } else {
-
                             //  Target is in the back line
+
+                            // if all units in the front line are dead, VALIDATION IS PASSED
                             if (foe[1].not() && foe[3].not()) continue@loop //  condition 3
+
+                            // If unit in front of the target is alive, ATTACK IS INVALID
                             if (foe[abs(target - 1)] || target == 2)    //  condition 4
                                 logAndThrow("e006", actor, targetPosition, playerSquad, foesSquad)
+                            //  Otherwise, VALIDATION IS PASSED
 
                         }
                     }
@@ -94,21 +102,28 @@ class AttackService {
 
                         // If attacker is in the back line
                         if (attacker % 2 == 0) {
-                            if (player[1].not() && player[3].not()) attacker = 1
-                            else if (attacker == 2 || player[abs(attacker - 1)])
-                                logAndThrow("e007", actor, targetPosition, playerSquad, foesSquad)
-                            else attacker = 1
-                        }
+                            //  if front line contains live units
+                            if (player[1] || player[3]) {   //  condition 1
+                                //  if attacker is POS3 or unit in front of attacker is alive, ATTACK IS INVALID
+                                if (attacker == 2 || player[abs(attacker - 1)])    //  condition 2
+                                    logAndThrow("e007", actor, targetPosition, playerSquad, foesSquad)
+                            }
+                            attacker = abs(--attacker) //  there are no attacking squad constraints
+                        }   //  else attacking unit is in the first line
 
-                        //  Target is in the rear line
+                        //  If target is in the rear line, both of units in front of it should be dead for valid attack
                         if (target % 2 == 1) {
-                            if (foe[target + 1].not() && foe[target - 1].not()) target = 2
-                            else logAndThrow("e008", actor, targetPosition, playerSquad, foesSquad)
-                        }
+                            if (foe[target + 1] || foe[target - 1]) //  condition 3
+                                logAndThrow("e008", actor, targetPosition, playerSquad, foesSquad)
+                            else target = 2
+                        }   //  else we can consider target as a first-line target
 
                         //  Target is in the first line
-                        if (abs(target - attacker) == 1) continue@loop
-                        else if (player[abs(target - 1)])
+
+                        //  If POS3 in enemy's squad is dead or attacker is directly in opposite of it's target, VALIDATION IS PASSED
+                        if (foe[2].not() || abs(target - attacker) == 1) continue@loop  //  condition 4
+                        //  else adjacent to attacker unit in a front line should be dead, otherwise ATTACK IS INVALID
+                        else if (player[4 - attacker])  //  condition 5
                             logAndThrow("e009", actor, targetPosition, playerSquad, foesSquad)
 
                     }
@@ -116,20 +131,25 @@ class AttackService {
 
                         // If attacker is in the back line
                         if (attacker % 2 == 0) {
+                            //  if front line contains alive units
                             if (player[1] || player[3]) {   //  condition 1
-                                if (attacker == 2)  //  condition 2
+                                //  if attacker is POS3 or unit in front of attacker is alive, ATTACK IS INVALID
+                                if (attacker == 2 || player[abs(attacker - 1)])  //  condition 2
                                     logAndThrow("e010", actor, targetPosition, playerSquad, foesSquad)
-                                if (player[abs(attacker - 1)]) {    //  condition 3
-                                    logAndThrow("e011", actor, targetPosition, playerSquad, foesSquad)
-                                } else {
-                                    attacker = abs(attacker - 1)
-                                }
                             }
-                        }
+                            attacker = abs(--attacker)   //  there are no attacker squad constraints in this confrontation type
+                        }   //  else attacker is in the front line, hence he can pick targets without attacker squad constraints in this confrontation type
 
-                        if (target % 2 == 1 || (foe[1].not() && foe[3].not())) continue@loop
-                        if (foe[abs(target - 1)] || target == 2 || attacker == abs(target - 1))
+                        //  if target is in the front line or whole front line is dead, VALIDATION IS PASSED
+                        if (target % 2 == 1 || (foe[1].not() && foe[3].not())) continue@loop    //  condition 4
+
+                        //  Front line has alive units, but target is in the back
+
+                        //  if target is POS3, unit in front of target is alive or cross-lined frontline units hinder the attack, ATTACK IS INVALID
+                        if (foe[abs(target - 1)] || target == 2 || (player[4 - attacker] && foe[attacker])) //  condition 5
                             logAndThrow("e012", actor, targetPosition, playerSquad, foesSquad)
+                        //  else VALIDATION IS PASSED
+
                     }
                 }
             }
