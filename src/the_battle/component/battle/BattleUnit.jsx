@@ -88,6 +88,9 @@ export function BattleUnit(props) {
         }
     }, [yourTurn]);
 
+    /**
+     * Remark targets when cursor leaves other unit if now this unit's turn
+     */
     useEffect(() => {
         if (yourTurn) {
             if (foe) {

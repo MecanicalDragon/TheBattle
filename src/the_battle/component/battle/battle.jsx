@@ -41,7 +41,8 @@ class BattleComp extends Component {
             },
             battleLogs: "",
             battleWon: false,
-            badReq: false
+            badReq: false,
+            twoTurnsInARowCounter: 0
         };
     }
 
@@ -156,22 +157,13 @@ class BattleComp extends Component {
      */
     actionPerformed = (msg) => {
         let actionMan = this.defineActionMan(msg.nextUnit);
-        if (msg.action === ATTACK) {
-            this.setState({
-                mySquad: msg.additionalData.DAMAGED_SQUAD,
-                battleLogs: msg.comments,
-                actionMan: actionMan,
-                lastMoveTimestamp: msg.lastMoveTimestamp,
-                battleWon: msg.finished
-            });
-        } else {
-            this.setState({
-                actionMan: actionMan,
-                lastMoveTimestamp: msg.lastMoveTimestamp,
-                battleLogs: msg.comments,
-                battleWon: msg.finished
-            });
-        }
+        this.setState({
+            mySquad: msg.action === ATTACK ? msg.additionalData.DAMAGED_SQUAD : this.state.mySquad,
+            actionMan: actionMan,
+            lastMoveTimestamp: msg.lastMoveTimestamp,
+            battleLogs: msg.comments,
+            battleWon: msg.finished
+        });
         this.startTimeCounter();
     };
 
@@ -214,49 +206,51 @@ class BattleComp extends Component {
     };
 
     /**
-     * Perform simple action like WAIT or BLOCK
+     * Perform simple action by button clicking like WAIT or BLOCK
      * @param action - action itself
      */
     simpleAction = (action) => {
-        if (this.state.battleWon) return;
         if (action === ATTACK) {
+            let {foesSquad} = this.state;
+            console.log(foesSquad);
             //TODO: implement
             alert("This button is just for fancy view here, but others work, we assure)")
         } else {
-            let {actionMan} = this.state;
-            performAction(actionMan.pos, action).then(resp => {
-                if (resp) {
-                    let newActionMan = this.defineActionMan(resp.nextUnit);
-                    this.setState({
-                        actionMan: newActionMan,
-                        lastMoveTimestamp: resp.lastMoveTimestamp,
-                        battleLogs: resp.comments,
-                        battleWon: resp.finished
-                    });
-                    this.startTimeCounter();
-                }
-            })
+            this.doSimpleAction(action);
         }
     };
 
     /**
-     * Pick attack targets and perform attack action on them
+     * Perform attack action on targets
      * @param targets - targets positions
      */
     performAttack = (targets) => {
+        this.doSimpleAction(ATTACK, {targets: targets});
+    };
+
+    /**
+     * Aggregate action logic
+     * @param action - action constant
+     * @param adData - additionalData like targets for ATTACK-action
+     */
+    doSimpleAction = (action, adData) => {
         if (this.state.battleWon) return;
-        let {actionMan} = this.state;
-        let data = {targets: targets};
-        performAction(actionMan.pos, ATTACK, data).then(resp => {
+        let {actionMan, twoTurnsInARowCounter} = this.state;
+        performAction(actionMan.pos, action, adData).then(resp => {
             if (resp) {
                 let foe = resp.additionalData.DAMAGED_SQUAD;
                 let newActionMan = this.defineActionMan(resp.nextUnit);
+                if (newActionMan.id === actionMan.id){
+                    console.log("increment");
+                    twoTurnsInARowCounter++;
+                }
                 this.setState({
-                    foesSquad: foe,
+                    foesSquad: foe || this.state.foesSquad,
                     actionMan: newActionMan,
                     lastMoveTimestamp: resp.lastMoveTimestamp,
                     battleLogs: resp.comments,
-                    battleWon: resp.finished
+                    battleWon: resp.finished,
+                    twoTurnsInARowCounter: twoTurnsInARowCounter
                 });
                 this.startTimeCounter();
             }

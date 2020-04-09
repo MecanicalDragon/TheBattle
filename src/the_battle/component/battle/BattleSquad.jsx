@@ -30,7 +30,8 @@ const BattleSquad = (props) => {
     const getLine = (...units) => {
         let positions = units.length < 3 ? ["pos2", "pos4"] : ["pos1", "pos3", "pos5"];
         return (
-            <Column style={units.length < 3 ? {position: "relative", top: 50} : {}}>{
+            <Column style={units.length < 3 ? {position: "relative", top: 50, height: 200} : {}}
+                    onMouseLeave={() => increaseTrigger(remarkTrigger + 1)}>{
                 units.map((unit, index) => {
                         return (
                             <BattleUnit key={index} characteristics={unit} descrFunc={setDescription} foe={foe}
@@ -53,8 +54,7 @@ const BattleSquad = (props) => {
                 <DescriptionArea description={description}/>
                 {squad ?
                     <Squad className={"unselectable"}
-                        straight={(squad.type === "FORCED_BACK" && !foe) || (squad.type !== "FORCED_BACK" && foe)}
-                        onMouseLeave={() => increaseTrigger(remarkTrigger + 1)}>
+                           straight={(squad.type === "FORCED_BACK" && !foe) || (squad.type !== "FORCED_BACK" && foe)}>
                         {getLine(squad.pos1, squad.pos3, squad.pos5)}
                         {getLine(squad.pos2, squad.pos4)}
                     </Squad>

@@ -114,8 +114,8 @@ class ActionService(@Autowired private val battleService: BattleService,
                             }
                         }
                     }
-                    val actionResult = ActionResult(simpleAction.action, additionalData, nextUnit, pair.lastMove,
-                            comments.toString(), battleWon)
+                    val actionResult = ActionResult(simpleAction.action, nextUnit, pair.lastMove,
+                            comments.toString(), additionalData, battleWon)
                     wSocket.convertAndSend("/battle/${foesSquad.playerName}",
                             ObjectMapper().writeValueAsString(actionResult))
                     return actionResult
@@ -152,8 +152,7 @@ class ActionService(@Autowired private val battleService: BattleService,
                             actionMan = pair.makeMove()
                             comments.append("Now it's ${actionMan.name}'s turn!")
                         }
-                        val actionResult = ActionResult(ActionType.WAIT, null, actionMan, pair.lastMove,
-                                comments.toString())
+                        val actionResult = ActionResult(ActionType.WAIT, actionMan, pair.lastMove, comments.toString())
                         wSocket.convertAndSend("/battle/${pair.foe1.playerName}",
                                 ObjectMapper().writeValueAsString(actionResult))
                         wSocket.convertAndSend("/battle/${pair.foe2.playerName}",

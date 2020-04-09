@@ -12,10 +12,10 @@ function markTargets(position, attacker, target) {
 
     function addBacklineIfTargetIsForcedFront(position) {
         if (target.pos3.hp === 0) {
-            if (target.pos1.hp === 0 && position !== "pos5" && position !== "pos4") {
+            if (target.pos1.hp === 0) {
                 targets.push("pos2")
             }
-            if (target.pos5.hp === 0 && position !== "pos1" && position !== "pos2") {
+            if (target.pos5.hp === 0) {
                 targets.push("pos4")
             }
         }
