@@ -423,8 +423,9 @@ internal class AttackServiceTest {
     fun validateMeleeAttackFromForcedBackToForcedBackCase04() {
         val player = createMockSquad(FORCED_BACK, pos1 = true, pos4 = true)
         val foe = createMockSquad(FORCED_BACK, pos5 = true, pos2 = true)
-        val e = assertThrows<ValidationException> { attackService.validateMeleeAttack(POS1, listOf(POS5), player, foe) }
-        assertEquals("e012", e.message?.substring(7, 11))
+        assertDoesNotThrow{ attackService.validateMeleeAttack(POS1, listOf(POS5), player, foe) }
+//        val e = assertThrows<ValidationException> { attackService.validateMeleeAttack(POS1, listOf(POS5), player, foe) }
+//        assertEquals("e012", e.message?.substring(7, 11)) //  deprecated condition 5.3
     }
 
     /**
@@ -476,8 +477,9 @@ internal class AttackServiceTest {
     fun validateMeleeAttackFromForcedBackToForcedBackCase09() {
         val player = createMockSquad(FORCED_BACK, pos2 = true, pos5 = true)
         val foe = createMockSquad(FORCED_BACK, pos4 = true, pos1 = true)
-        val e = assertThrows<ValidationException> { attackService.validateMeleeAttack(POS5, listOf(POS1), player, foe) }
-        assertEquals("e012", e.message?.substring(7, 11))
+        assertDoesNotThrow { attackService.validateMeleeAttack(POS5, listOf(POS1), player, foe) }
+//        val e = assertThrows<ValidationException> { attackService.validateMeleeAttack(POS5, listOf(POS1), player, foe) }
+//        assertEquals("e012", e.message?.substring(7, 11)) //  deprecated condition 5.3
     }
 
     /**
@@ -497,8 +499,9 @@ internal class AttackServiceTest {
     fun validateMeleeAttackFromForcedBackToForcedBackCase11() {
         val player = createMockSquad(FORCED_BACK, pos2 = true, pos4 = true)
         val foe = createMockSquad(FORCED_BACK, pos5 = true, pos2 = true)
-        val e = assertThrows<ValidationException> { attackService.validateMeleeAttack(POS2, listOf(POS5), player, foe) }
-        assertEquals("e012", e.message?.substring(7, 11))
+        assertDoesNotThrow { attackService.validateMeleeAttack(POS2, listOf(POS5), player, foe) }
+//        val e = assertThrows<ValidationException> { attackService.validateMeleeAttack(POS2, listOf(POS5), player, foe) }
+//        assertEquals("e012", e.message?.substring(7, 11)) //  deprecated condition 5.3
     }
 
     private fun createMockSquad(type: SquadType = FORCED_FRONT, pos1: Boolean = false, pos2: Boolean = false,

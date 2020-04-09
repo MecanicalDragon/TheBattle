@@ -338,8 +338,8 @@ class ManageComp extends Component {
                                             ? "app.manage.battle.cancel" : playerData.status === STATUS[0] ?
                                                 "app.manage.to.battle" : "app.manage.battle.goes"}/></Button>
                                     {playerData.status === STATUS[1] ? <span>Searching...</span> : null}
-                                    {/*<Button onClick={() => this.test()} color={"info"}*/}
-                                    {/*        style={{marginBottom: 17, marginRight: 15}}>Test</Button>*/}
+                                    <Button onClick={() => this.test()} color={"info"}
+                                            style={{marginBottom: 17, marginRight: 15}}>Test</Button>
                                     <br/>
                                     <DescriptionArea description={this.state.descr} height={274}/>
                                     <Remove show={this.state.removeWindow}/>
@@ -370,23 +370,23 @@ class ManageComp extends Component {
                     },
                     'short1': {
                         id: 'short1',
-                        heroes: [1]
+                        heroes: [14]
                     },
                     'short2': {
                         id: 'short2',
-                        heroes: [4]
+                        heroes: [15]
                     },
                     'long1': {
                         id: 'long1',
-                        heroes: [66]
+                        heroes: [16]
                     },
                     'long2': {
                         id: 'long2',
-                        heroes: [67]
+                        heroes: [17]
                     },
                     'long3': {
                         id: 'long3',
-                        heroes: [68]
+                        heroes: [18]
                     },
                     'remove': {
                         id: 'remove',
@@ -403,23 +403,23 @@ class ManageComp extends Component {
                     },
                     'short1': {
                         id: 'short1',
-                        heroes: [33]
+                        heroes: [19]
                     },
                     'short2': {
                         id: 'short2',
-                        heroes: [34]
+                        heroes: [20]
                     },
                     'long1': {
                         id: 'long1',
-                        heroes: [35]
+                        heroes: [21]
                     },
                     'long2': {
                         id: 'long2',
-                        heroes: [69]
+                        heroes: [22]
                     },
                     'long3': {
                         id: 'long3',
-                        heroes: [70]
+                        heroes: [23]
                     },
                     'remove': {
                         id: 'remove',

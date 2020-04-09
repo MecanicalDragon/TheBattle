@@ -1,14 +1,9 @@
 import React, {useState, useEffect} from 'react';
 import {Progress} from 'reactstrap';
 import styled from "styled-components";
-import * as fighter from "./unit/fighter"
-import * as ranger from "./unit/ranger"
-import * as sage from "./unit/sage"
+import {UNIT_TYPES} from "./unit/unitTypes"
 
 import Img from 'react-image'
-import img_fgt from '@/img/fighter.png';
-import img_rng from '@/img/ranger.png';
-import img_sag from '@/img/sage.png';
 import img_skull from '@/img/skull.png';
 import {
     UNIT_FOES_TURN, UNIT_FOES_TARGET,
@@ -83,10 +78,10 @@ export function BattleUnit(props) {
     useEffect(() => {
         if (yourTurn && foe) {
             setBorders(UNIT_FOES_TURN);
-            calculateTargets(pos, foe, unitProps.mark)
+            calculateTargets(pos, foe, unitProps.markTargets)
         } else if (yourTurn && !foe) {
             setBgc(UNIT_BG_PICKED);
-            calculateTargets(pos, foe, unitProps.mark)
+            calculateTargets(pos, foe, unitProps.markTargets)
         } else {
             setBorders(UNIT_NOT_FOES_TARGET);
             setBgc(UNIT_BG_DEFAULT);
@@ -100,7 +95,7 @@ export function BattleUnit(props) {
             } else {
                 setBgc(UNIT_BG_PICKED);
             }
-            calculateTargets(pos, foe, unitProps.mark)
+            calculateTargets(pos, foe, unitProps.markTargets)
         }
     }, [rt]);
 
@@ -140,7 +135,7 @@ export function BattleUnit(props) {
         }
         descrFunc(characteristics);
         if (characteristics.hp !== 0)
-            calculateTargets(pos, foe, unitProps.mark)
+            calculateTargets(pos, foe, unitProps.markTargets)
     };
 
     const onMouseLeave = () => {
@@ -164,7 +159,7 @@ export function BattleUnit(props) {
                    onClick={foe ? () => validateAttack() : null}>
             {/*<div style={{height: 90, width: 80}}/>*/}
             <Img style={{maxHeight: 100, maxWidth: 80, marginLeft: 10, transform: foe ? "scaleX(-1)" : "scaleX(1)"}}
-                 src={characteristics.hp === 0 ? img_skull : unitProps.image}/>
+                 src={characteristics.hp === 0 ? img_skull : unitProps.image} draggable={false}/>
             <Progress animated color={"success"} value={currentHP}
                       style={{height: 5, marginRight: 4, marginLeft: 4, backgroundColor: "red"}}/>
         </UnitPlace>
@@ -172,14 +167,5 @@ export function BattleUnit(props) {
 }
 
 function getUnitProps(type) {
-    switch (type) {
-        case "FIGHTER":
-            return {image: img_fgt, mark: fighter.markTargets};
-        case "SAGE":
-            return {image: img_sag, mark: sage.markTargets};
-        case "RANGER":
-            return {image: img_rng, mark: ranger.markTargets};
-        default:
-            return null
-    }
+    return UNIT_TYPES[type]()
 }

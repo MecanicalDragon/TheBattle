@@ -1,10 +1,11 @@
 import React from 'react';
-import Img from 'react-image'
-import img_fgt from '@/img/fighter.png';
+import image from '@/img/fighter.png';
 import {FORCED_BACK, FORCED_FRONT, SHORT_LINE, CLOSE_TARGETS} from "@/constants/ingameConstants";
 
 //TODO: recalculate! Especially ff.pos5 -> fb.pos2 if ff.pos3.isAlive && fb.pos4.isDead
-export function markTargets(position, attacker, target) {
+function markTargets(position, attacker, target) {
+
+    // return ['pos1', 'pos2', 'pos3', 'pos4', 'pos5'];
 
     let posN = +position.substring(3);
     let targets = [];
@@ -107,4 +108,11 @@ export function markTargets(position, attacker, target) {
         }
     }
     return targets;
+}
+
+export default function properties(){
+    return {
+        image: image,
+        markTargets: markTargets
+    }
 }

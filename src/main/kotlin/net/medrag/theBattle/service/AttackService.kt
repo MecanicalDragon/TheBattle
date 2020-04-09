@@ -137,16 +137,17 @@ class AttackService {
                                 if (attacker == 2 || player[abs(attacker - 1)])  //  condition 2
                                     logAndThrow("e010", actor, targetPosition, playerSquad, foesSquad)
                             }
-                            attacker = abs(--attacker)   //  there are no attacker squad constraints in this confrontation type
+//                            attacker = abs(--attacker)   //  there are no attacker squad constraints in this confrontation type () - required only for deprecated condition 5.3
                         }   //  else attacker is in the front line, hence he can pick targets without attacker squad constraints in this confrontation type
 
                         //  if target is in the front line or whole front line is dead, VALIDATION IS PASSED
                         if (target % 2 == 1 || (foe[1].not() && foe[3].not())) continue@loop    //  condition 4
 
-                        //  Front line has alive units, but target is in the back
+                        //  Enemy's front line has alive units, but target is in the back
 
-                        //  if target is POS3, unit in front of target is alive or cross-lined frontline units hinder the attack, ATTACK IS INVALID
-                        if (foe[abs(target - 1)] || target == 2 || (player[4 - attacker] && foe[attacker])) //  condition 5
+                        //  if target is POS3 or unit in front of target is alive, ATTACK IS INVALID
+//                           '|| (player[4 - attacker] && foe[attacker])' - deprecated condition 'cross-lined frontline units hinder the attack'
+                        if (foe[abs(target - 1)] || target == 2) //  condition 5
                             logAndThrow("e012", actor, targetPosition, playerSquad, foesSquad)
                         //  else VALIDATION IS PASSED
 

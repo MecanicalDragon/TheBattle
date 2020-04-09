@@ -52,7 +52,7 @@ const BattleSquad = (props) => {
                 <ControlPanel simpleAction={simpleAction} foe={foe} yourTurn={actionMan.player} won={won}/>
                 <DescriptionArea description={description}/>
                 {squad ?
-                    <Squad
+                    <Squad className={"unselectable"}
                         straight={(squad.type === "FORCED_BACK" && !foe) || (squad.type !== "FORCED_BACK" && foe)}
                         onMouseLeave={() => increaseTrigger(remarkTrigger + 1)}>
                         {getLine(squad.pos1, squad.pos3, squad.pos5)}
