@@ -31,7 +31,7 @@ const UnitPlace = styled.div`
 export function BattleUnit(props) {
 
     const {
-        characteristics, descrFunc, foe, calculateTargets, pos, clearTargets, selectTargets, yourTurn, rt
+        characteristics, descrFunc, foe, calculateTargets, pos, clearTargets, selectTargets, yourTurn, remarkTrigger
     } = props;
 
     const initDefaultBg = () => {
@@ -78,7 +78,6 @@ export function BattleUnit(props) {
     /**
      * If unit's turn, sets it's and it's targets' borders or backgrounds
      */
-    //TODO: does not work if two turns in a row 
     useEffect(() => {
         if (yourTurn) {
             if (foe) {
@@ -97,7 +96,7 @@ export function BattleUnit(props) {
     }, [yourTurn]);
 
     /**
-     * Remark targets when cursor leaves other unit if now this unit's turn
+     * Remark targets when cursor leaves squad area or if this is unit's second move in a row
      */
     useEffect(() => {
         if (yourTurn) {
@@ -108,7 +107,7 @@ export function BattleUnit(props) {
             }
             calculateTargets(pos, foe, unitProps.markTargets)
         }
-    }, [rt]);
+    }, [remarkTrigger]);
 
     /**
      * If unit can be a target of player's attack, colors bg

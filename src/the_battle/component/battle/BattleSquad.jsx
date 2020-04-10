@@ -1,4 +1,4 @@
-import React, {Fragment, useState} from "react";
+import React, {Fragment, useState, useEffect} from "react";
 import styled from "styled-components";
 import DescriptionArea from "@/component/common/DescriptionArea";
 import {BattleUnit} from "@/component/battle/BattleUnit";
@@ -22,10 +22,17 @@ const Column = styled.div`
 
 const BattleSquad = (props) => {
 
-    let {foe, squad, calculateTargets, clearTargets, selectTargets, actionMan, simpleAction, playerName, won} = props;
+    let {foe, squad, calculateTargets, clearTargets, selectTargets, actionMan, simpleAction, playerName, won, twoTurns} = props;
 
     const [description, setDescription] = useState("");
     const [remarkTrigger, increaseTrigger] = useState(0);
+
+    /**
+     * If unit makes second turn in a row, triggers target marking again.
+     */
+    useEffect(() => {
+        increaseTrigger(remarkTrigger + 1)
+    },[twoTurns]);
 
     const getLine = (...units) => {
         let positions = units.length < 3 ? ["pos2", "pos4"] : ["pos1", "pos3", "pos5"];
@@ -37,7 +44,7 @@ const BattleSquad = (props) => {
                             <BattleUnit key={index} characteristics={unit} descrFunc={setDescription} foe={foe}
                                         calculateTargets={calculateTargets} pos={positions[index]}
                                         clearTargets={clearTargets} selectTargets={foe ? selectTargets : null}
-                                        yourTurn={actionMan.id === unit.id} rt={remarkTrigger}/>
+                                        yourTurn={actionMan.id === unit.id} remarkTrigger={remarkTrigger}/>
                         )
                     }
                 )

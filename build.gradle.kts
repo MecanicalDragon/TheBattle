@@ -11,7 +11,7 @@ plugins {
 }
 
 group = "net.medrag"
-version = "0.98"
+version = "0.98.5"
 java.sourceCompatibility = JavaVersion.VERSION_1_8
 
 repositories {

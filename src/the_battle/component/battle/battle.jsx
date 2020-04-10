@@ -42,7 +42,7 @@ class BattleComp extends Component {
             battleLogs: "",
             battleWon: false,
             badReq: false,
-            twoTurnsInARowCounter: 0    //TODO: figure out and implement
+            twoTurnsInARowCounter: 0
         };
     }
 
@@ -76,7 +76,7 @@ class BattleComp extends Component {
     }
 
     render() {
-        let {mySquad, foesSquad, playerName, foesName, actionMan, battleWon, timeLeft} = this.state;
+        let {mySquad, foesSquad, playerName, foesName, actionMan, battleWon, timeLeft, twoTurnsInARowCounter} = this.state;
         return (
             <Container>
                 <Jumbotron style={{paddingLeft: 10, paddingRight: 10}}>
@@ -91,7 +91,7 @@ class BattleComp extends Component {
                                 <BattleSquad foe={false} squad={mySquad} clearTargets={this.clearTargets}
                                              calculateTargets={this.calculateTargets} actionMan={actionMan}
                                              simpleAction={this.simpleAction} playerName={playerName}
-                                             won={battleWon}/>
+                                             won={battleWon} twoTurns={twoTurnsInARowCounter}/>
                                 : null}
                         </Col>
                         <Col>
@@ -99,7 +99,7 @@ class BattleComp extends Component {
                                 <BattleSquad foe={true} squad={foesSquad} clearTargets={this.clearTargets}
                                              calculateTargets={this.calculateTargets} actionMan={actionMan}
                                              selectTargets={this.performAttack} playerName={foesName}
-                                             won={battleWon}/>
+                                             won={battleWon} twoTurns={twoTurnsInARowCounter}/>
                                 : null}
                         </Col>
                     </Row>

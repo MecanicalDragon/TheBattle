@@ -8,9 +8,9 @@ Here I develop online game on enterprise technologies, following 2 purposes:
 You need java, gradle, node.js and yarn. Input into console following commands:
 
     - gradle buildResources build
-    - java -jar build/libs/TheBattle-0.98.jar
+    - java -jar build/libs/TheBattle-0.98.5.jar
     
-Or just download compiled jar [here](https://yadi.sk/d/NZX6PzFP6gzhgA)
+Or just download compiled jar [here](https://yadi.sk/d/3pf7UOSspUF7QA)
     
 The game will start on http://localhost:9191 in your browser. 
 Btw, you need another browser and another player if you want to try it, cause there is no AI for a while)
