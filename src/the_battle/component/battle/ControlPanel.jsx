@@ -3,8 +3,6 @@ import {Button, Popover, PopoverHeader, PopoverBody} from "reactstrap";
 import {ATTACK, BLOCK, CONCEDE, WAIT} from "@/constants/ingameConstants";
 import {FormattedMessage} from "react-intl";
 
-//TODO: messaging
-//TODO: avatars
 const ControlPanel = (props) => {
 
     let {simpleAction, foe, yourTurn, won} = props;

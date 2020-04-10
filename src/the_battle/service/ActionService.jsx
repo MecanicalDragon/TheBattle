@@ -10,7 +10,7 @@ const sendCred = SEND_CREDENTIALS;
 export async function ping() {
     let url = new URL(appApi + 'action/pingTurn');
     fetch(url, {method: 'POST', credentials: sendCred}).then(function (response) {
-        console.log("Time is up! Ping request has sent!")
+        console.log("Time is up! Ping request has been sent!")
     })
 }
 

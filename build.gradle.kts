@@ -74,8 +74,21 @@ tasks.register<Exec>("yarnStartDev") {
     group = "yarn"
     if (System.getProperty("os.name").toLowerCase().contains("windows")) {
         commandLine("cmd", "/c", "yarn", "start-dev")
+    } else if (System.getProperty("os.name").toLowerCase().contains("linux")) {
+        //  that is useless while yarn has no sudo privileges, cause it can not refresh the view, but anyway...
+        commandLine("yarn", "start-dev")
+//        commandLine("bash", "-c", "echo 'password' | sudo -kS yarn start-dev")
     } else {
         commandLine("yarn", "start-dev")
+    }
+}
+
+tasks.register<Exec>("yarnKillDev") {
+    group = "yarn"
+    if (System.getProperty("os.name").toLowerCase().contains("linux")) {
+        commandLine("bash", "-c", "kill $(lsof -i -P -n | grep 9095 | grep node)")
+    } else {
+        logger.error("This feature for your OS is not maintained yet.")
     }
 }
 

@@ -19,7 +19,6 @@ const APP_ROOT = DEPLOYED_URL;
 
 class Index extends Component {
 
-    //TODO: update advertise
     constructor(props) {
         super(props);
         this.props.dispatch(setNavPosition(Home));

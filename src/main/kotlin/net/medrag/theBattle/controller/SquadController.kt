@@ -27,6 +27,7 @@ class SquadController(@Autowired private val squadService: SquadService,
      *      - 401 Error string
      *      - 555 if db fails
      */
+    @Deprecated("currently 'getPoolAndData' used")
     @GetMapping("/getPool")
     fun getPool(): ResponseEntity<Any> {
 
@@ -37,7 +38,7 @@ class SquadController(@Autowired private val squadService: SquadService,
     }
 
     /**
-     * Returns free heroes pool
+     * Returns free heroes pool and player data
      * @return ResponseEntity<Any>:
      *      - 200 List of UnitDTO
      *      - 401 Error string

@@ -42,7 +42,7 @@ class BattleComp extends Component {
             battleLogs: "",
             battleWon: false,
             badReq: false,
-            twoTurnsInARowCounter: 0
+            twoTurnsInARowCounter: 0    //TODO: figure out and implement
         };
     }
 
@@ -211,14 +211,35 @@ class BattleComp extends Component {
      */
     simpleAction = (action) => {
         if (action === ATTACK) {
-            let {foesSquad} = this.state;
-            console.log(foesSquad);
-            //TODO: implement
-            alert("This button is just for fancy view here, but others work, we assure)")
+            this.performAttackAsSimpleAction()
         } else {
             this.doSimpleAction(action);
         }
     };
+
+    /**
+     * Attack with red button on the control panel. Picks possible target with the lowest hp
+     * and performs an attack action or logs in console impossibility of this action.
+     */
+    performAttackAsSimpleAction = () => {
+        let {foesSquad} = this.state;
+        let target = null
+        let targetHP = 999999999
+        for (let i = 1; i < 6; i++) {
+            let pos = "pos" + i;
+            if (foesSquad[pos].marktByPlayer && foesSquad[pos].hp < targetHP) {
+                target = pos
+                targetHP = foesSquad[pos].hp
+            }
+        }
+        if (target) this.performAttack([target])
+        else {
+            this.setState({
+                battleLogs: this.state.mySquad[this.state.actionMan.pos].name
+                    + " can not see any target to attack!"
+            })
+        }
+    }
 
     /**
      * Perform attack action on targets
@@ -240,10 +261,8 @@ class BattleComp extends Component {
             if (resp) {
                 let foe = resp.additionalData.DAMAGED_SQUAD;
                 let newActionMan = this.defineActionMan(resp.nextUnit);
-                if (newActionMan.id === actionMan.id){
-                    console.log("increment");
+                if (newActionMan.id === actionMan.id)
                     twoTurnsInARowCounter++;
-                }
                 this.setState({
                     foesSquad: foe || this.state.foesSquad,
                     actionMan: newActionMan,
@@ -266,24 +285,17 @@ class BattleComp extends Component {
     calculateTargets = (pos, foe, mark) => {
         let attacker = foe === true ? this.state.foesSquad : this.state.mySquad;
         let target = foe === true ? this.state.mySquad : this.state.foesSquad;
-
-        target.pos1.marked = false;
-        target.pos2.marked = false;
-        target.pos3.marked = false;
-        target.pos4.marked = false;
-        target.pos5.marked = false;
-
+        this.clearMarking(target, foe);
         let targets = mark(pos, attacker, target);
         targets.forEach(function (pos) {
-            if (target[pos].hp > 0)
-                target[pos].marked = true;
+            if (target[pos].hp > 0) {
+                if (foe) target[pos].marktByFoe = true;
+                else target[pos].marktByPlayer = true;
+            }
         });
 
-        if (!foe) {
-            this.setState({foesSquad: target});
-        } else {
-            this.setState({mySquad: target});
-        }
+        if (foe) this.setState({mySquad: target});
+        else this.setState({foesSquad: target});
     };
 
     /**
@@ -292,23 +304,25 @@ class BattleComp extends Component {
      * @param foe - define player's or opponent's squad
      */
     clearTargets = (foe) => {
-        let clearMark = function (squad) {
-            squad.pos1.marked = false;
-            squad.pos2.marked = false;
-            squad.pos3.marked = false;
-            squad.pos4.marked = false;
-            squad.pos5.marked = false;
-        };
-        if (foe) {
-            let squad = this.state.mySquad;
-            clearMark(squad);
-            this.setState({mySquad: squad});
-        } else {
-            let squad = this.state.foesSquad;
-            clearMark(squad);
-            this.setState({foesSquad: squad});
-        }
+        let squad = foe ? this.state.mySquad : this.state.foesSquad;
+        this.clearMarking(squad, foe);
+        if (foe) this.setState({mySquad: squad});
+        else this.setState({foesSquad: squad});
     };
+
+    /**
+     * Clear old mark
+     * @param squad - squad for clearing
+     * @param foe - true if opponent, false if player
+     */
+    clearMarking = (squad, foe) => {
+        let markType = foe ? "marktByFoe" : "marktByPlayer";
+        squad.pos1[markType] = false;
+        squad.pos2[markType] = false;
+        squad.pos3[markType] = false;
+        squad.pos4[markType] = false;
+        squad.pos5[markType] = false;
+    }
 }
 
 export default connect()(BattleComp);

@@ -69,6 +69,10 @@ export function BattleUnit(props) {
      */
     useEffect(() => {
         setCurrentHP(characteristics.hp * 100 / characteristics.type.health);
+        if (characteristics.hp < 1){
+            setBgc(UNIT_BG_DEFAULT);
+            setBorders(UNIT_NOT_FOES_TARGET)
+        }
     }, [characteristics.hp]);
 
     /**
@@ -85,6 +89,7 @@ export function BattleUnit(props) {
         } else {
             setBorders(UNIT_NOT_FOES_TARGET);
             setBgc(UNIT_BG_DEFAULT);
+            clearTargets(foe)
         }
     }, [yourTurn]);
 
@@ -103,55 +108,55 @@ export function BattleUnit(props) {
     }, [rt]);
 
     /**
-     * If unit can be a target of attack, colors bg or borders
+     * If unit can be a target of player's attack, colors bg
      */
     useEffect(() => {
-        if (characteristics.hp !== 0) {
-            if (characteristics.marked) {
-                if (foe) {
-                    setBgc(UNIT_BG_MARKED)
-                } else {
-                    setBorders(UNIT_FOES_TARGET)
-                }
+        if (foe && characteristics.hp > 0) {
+            if (characteristics.marktByPlayer) {
+                setBgc(UNIT_BG_MARKED)
             } else {
-                if (foe) {
-                    setBgc(UNIT_BG_DEFAULT)
-                } else {
-                    setBorders(UNIT_NOT_FOES_TARGET)
-                }
+                setBgc(UNIT_BG_DEFAULT)
             }
-        } else {
-            setBgc(UNIT_BG_DEFAULT);
-            setBorders(UNIT_NOT_FOES_TARGET)
         }
-    }, [characteristics.marked]);
+    }, [characteristics.marktByPlayer]);
+
+    /**
+     * If unit can be a target of foe's attack, colors borders
+     */
+    useEffect(() => {
+        if (!foe && characteristics.hp > 0) {
+            if (characteristics.marktByFoe) {
+                setBorders(UNIT_FOES_TARGET)
+            } else {
+                setBorders(UNIT_NOT_FOES_TARGET)
+            }
+        }
+    }, [characteristics.marktByFoe]);
 
     const onMouseOver = () => {
-        if (!yourTurn) {
-            if (foe && characteristics.marked) {
+        if (!(yourTurn && !foe)){
+            if (characteristics.marktByPlayer) {
                 setBgc(UNIT_BG_ATTACK)
             } else {
                 setBgc(UNIT_BG_OVER);
             }
-        } else if (yourTurn && foe) {
-            setBgc(UNIT_BG_OVER);
         }
         descrFunc(characteristics);
-        if (characteristics.hp !== 0)
+        if (characteristics.hp > 0)
             calculateTargets(pos, foe, unitProps.markTargets)
     };
 
     const onMouseLeave = () => {
         if (!yourTurn) {
-            clearTargets(foe);
-            setBgc(characteristics.marked && foe ? UNIT_BG_MARKED : UNIT_BG_DEFAULT);
+            if (characteristics.hp > 0) clearTargets(foe);
+            setBgc(characteristics.marktByPlayer ? UNIT_BG_MARKED : UNIT_BG_DEFAULT);
         } else if (foe) {
             setBgc(UNIT_BG_DEFAULT);
         }
     };
 
     const validateAttack = () => {
-        if (characteristics.marked)
+        if (characteristics.marktByPlayer)
             selectTargets([pos]);
     };
 

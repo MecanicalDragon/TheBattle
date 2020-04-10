@@ -1,4 +1,3 @@
-import React from 'react';
 import image from '@/img/ranger.png';
 
 function markTargets(position, attacker, target) {

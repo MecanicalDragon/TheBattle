@@ -47,7 +47,8 @@ class ActionService(@Autowired private val battleService: BattleService,
         val player: ValidatedSquad = if (pair.foe1.playerName == playerName) pair.foe1 else pair.foe2
         val foesSquad: ValidatedSquad = if (pair.foe1.playerName == playerName) pair.foe2 else pair.foe1
         val actor = player.map[simpleAction.actor] as UnitDTO
-        if (actor.isDead()) throw ValidationException("${simpleAction.actor} is dead. He can not perform any actions.")
+        if (actor.isDead() && simpleAction.action !== ActionType.CONCEDE)
+            throw ValidationException("${simpleAction.actor} is dead. He can not perform any actions.")
 
         if (pair.actionInProcess.compareAndSet(false, true)) {
             try {

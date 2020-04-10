@@ -338,8 +338,9 @@ class ManageComp extends Component {
                                             ? "app.manage.battle.cancel" : playerData.status === STATUS[0] ?
                                                 "app.manage.to.battle" : "app.manage.battle.goes"}/></Button>
                                     {playerData.status === STATUS[1] ? <span>Searching...</span> : null}
-                                    <Button onClick={() => this.test()} color={"info"}
-                                            style={{marginBottom: 17, marginRight: 15}}>Test</Button>
+                                    {/*//TODO: comment out*/}
+                                    {/*<Button onClick={() => this.fillWithFighters()} color={"info"}*/}
+                                    {/*        style={{marginBottom: 17, marginRight: 15}}>Test</Button>*/}
                                     <br/>
                                     <DescriptionArea description={this.state.descr} height={274}/>
                                     <Remove show={this.state.removeWindow}/>
@@ -359,8 +360,10 @@ class ManageComp extends Component {
         )
     }
 
-    //TODO: should be removed in release
-    test() {
+    /**
+     * Function for testing, fills squad with fighters
+     */
+    fillWithFighters() {
         if (this.state.playerName === "asdd")
             this.setState({
                 columns: {

@@ -48,7 +48,9 @@ class AuthController(@Autowired private val playerService: PlayerService,
     fun isAuthenticatedWithData(): ResponseEntity<Any> {
         session.playerName?.let {
             try {
-                return ResponseEntity.ok(playerService.getPlayerData(it))
+                val playerDto = playerService.getPlayerData(it)
+                session.playerStatus = playerDto.status
+                return ResponseEntity.ok(playerDto)
             } catch (e: ValidationException) {
                 session.invalidate()
             }

@@ -30,7 +30,7 @@ class AttackService {
                 playerSquad.pos3.isAlive(), playerSquad.pos4.isAlive(), playerSquad.pos5.isAlive())
         val foe: ArrayList<Boolean> = arrayListOf(foesSquad.pos1.isAlive(), foesSquad.pos2.isAlive(),
                 foesSquad.pos3.isAlive(), foesSquad.pos4.isAlive(), foesSquad.pos5.isAlive())
-        val realAttacker = Position.values().indexOf(actor)
+        var attacker = Position.values().indexOf(actor)
 
         var deadCounter = 0
         loop@ for (targetPosition in targets) {
@@ -38,7 +38,6 @@ class AttackService {
                 deadCounter++
                 continue
             }
-            var attacker = realAttacker
             var target = Position.values().indexOf(targetPosition)
             when (playerSquad.type) {
                 SquadType.FORCED_FRONT -> when (foesSquad.type) {
@@ -89,8 +88,13 @@ class AttackService {
                             // if all units in the front line are dead, VALIDATION IS PASSED
                             if (foe[1].not() && foe[3].not()) continue@loop //  condition 3
 
-                            // If unit in front of the target is alive, ATTACK IS INVALID
-                            if (foe[abs(target - 1)] || target == 2)    //  condition 4
+                            //  Invalid attack conditions:
+                            //  1. Unit in front of the target is alive
+                            //  2. Target is POS3
+                            //  3. Attacker's POS3 is alive, also target is on the opposite side
+                            //  (Condition 3 excludes clear first line, condition 4.1 excludes unit in front of target,
+                            //  hence enemy unit in front of attacker is alive
+                            if (foe[abs(target - 1)] || target == 2 || (player[2] && attacker == abs(4 - target)))    //  condition 4
                                 logAndThrow("e006", actor, targetPosition, playerSquad, foesSquad)
                             //  Otherwise, VALIDATION IS PASSED
 

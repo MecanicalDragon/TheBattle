@@ -1,16 +1,11 @@
-import React from 'react';
 import image from '@/img/fighter.png';
-import {FORCED_BACK, FORCED_FRONT, SHORT_LINE, CLOSE_TARGETS} from "@/constants/ingameConstants";
+import {FORCED_FRONT, SHORT_LINE, CLOSE_TARGETS} from "@/constants/ingameConstants";
 
-//TODO: recalculate! Especially ff.pos5 -> fb.pos2 if ff.pos3.isAlive && fb.pos4.isDead
 function markTargets(position, attacker, target) {
 
-    // return ['pos1', 'pos2', 'pos3', 'pos4', 'pos5'];
-
-    let posN = +position.substring(3);
     let targets = [];
 
-    function addBacklineIfTargetIsForcedFront(position) {
+    function addBacklineIfTargetIsForcedFront() {
         if (target.pos3.hp === 0) {
             if (target.pos1.hp === 0) {
                 targets.push("pos2")
@@ -25,10 +20,11 @@ function markTargets(position, attacker, target) {
         if (target.pos2.hp === 0 && target.pos4.hp === 0) {
             targets.push("pos1", "pos3", "pos5")
         } else {
-            if (target.pos2.hp === 0 && position !== "pos4" && position !== "pos5") {
+            let fbCondition = position ? (position !== "pos5" || attacker.pos3.hp === 0) : true;
+            if (target.pos2.hp === 0 && fbCondition) {
                 targets.push("pos1")
             }
-            if (target.pos4.hp === 0 && position !== "pos1" && position !== "pos2") {
+            if (target.pos4.hp === 0 && fbCondition) {
                 targets.push("pos5")
             }
         }
@@ -39,13 +35,14 @@ function markTargets(position, attacker, target) {
         // Target squad is FF-type
         if (target.type === FORCED_FRONT) { //  target has FORCED_FRONT
             targets = targets.concat(CLOSE_TARGETS.ff[position]);
-            if (target.pos3.hp === 0) {
+            if (target.pos3.hp === 0 || attacker.pos3.hp === 0) {
                 targets.push("pos5", "pos1")
             }
-            addBacklineIfTargetIsForcedFront(position);
+            addBacklineIfTargetIsForcedFront();
         } else {    //  Target squad is FORCED_BACK
             targets = targets.concat(CLOSE_TARGETS.fb[position]);
-            if (attacker.pos3.hp === 0) {
+            if (attacker.pos3.hp === 0 ||
+                ((position === "pos5" && target.pos4.hp === 0) || (position === "pos1" && target.pos2.hp === 0))) {
                 targets.push("pos2", "pos4")
             }
             addBacklineIfTargetIsForcedBack(position);
@@ -57,13 +54,14 @@ function markTargets(position, attacker, target) {
         // Target squad is FF-type
         if (target.type === FORCED_FRONT) {
             targets = targets.concat(CLOSE_TARGETS.bf[position]);
-            if (target.pos3.hp === 0) {
+            let aPos = position === "pos2" ? "pos4" : "pos2";
+            if (target.pos3.hp === 0 || (attacker[aPos].hp === 0)) {
                 targets.push("pos5", "pos1")
             }
-            addBacklineIfTargetIsForcedFront(position);
+            addBacklineIfTargetIsForcedFront();
         } else {    //  Target squad is //  FORCED_BACK
             targets = targets.concat(CLOSE_TARGETS.bb[position]);
-            addBacklineIfTargetIsForcedBack(position);
+            addBacklineIfTargetIsForcedBack();
         }
     }
 
@@ -71,46 +69,39 @@ function markTargets(position, attacker, target) {
 
         // Attacking unit is in the back line
         if (SHORT_LINE[0] === position || SHORT_LINE[1] === position) {
-            let posInc = "pos" + (posN + 1);
-            let posDec = "pos" + (posN - 1);
-            if (attacker[posInc].hp === 0 && attacker[posDec].hp === 0) {
-                addToFF("pos3");
+            if (attacker.pos3.hp === 0) {
+                if ((position === "pos2" && attacker.pos1.hp === 0)
+                    || (position === "pos4" && attacker.pos5.hp === 0)) {
+                    addToFF("pos3");
+                }
             }
         } else {
             addToFF(position);
         }
 
-
     } else {    // FORCED_BACK here
 
         // Attacking unit is in the back line
         if (SHORT_LINE[0] !== position && SHORT_LINE[1] !== position) {
-            if (target.pos3.hp === 0 && target.pos1.hp === 0 && target.pos5.hp === 0) {
-                targets.push("pos2", "pos4")
+            if (attacker.pos2.hp === 0 && attacker.pos4.hp === 0) {
+                addToFB("pos2")
             } else {
-                if (position === "pos3") {
-                    let posInc = "pos" + (posN + 1);
-                    let posDec = "pos" + (posN - 1);
-                    if (attacker[posInc].hp === 0 && attacker[posDec].hp === 0) {
-                        addToFB(posInc);
-                        addToFB(posDec);
-                    }
-                } else {
-                    if (position === "pos1" && attacker.pos2.hp === 0) {
-                        addToFB("pos2")
-                    } else if (position === "pos5" && attacker.pos4.hp === 0) {
-                        addToFB("pos4")
-                    }
+                if (position === "pos1" && attacker.pos2.hp === 0) {
+                    addToFB("pos2")
+                } else if (position === "pos5" && attacker.pos4.hp === 0) {
+                    addToFB("pos4")
                 }
             }
         } else {
             addToFB(position)
         }
     }
-    return targets;
+    return targets.filter((value, index, self) => {
+        return self.indexOf(value) === index && target[value].hp > 0;
+    });
 }
 
-export default function properties(){
+export default function properties() {
     return {
         image: image,
         markTargets: markTargets

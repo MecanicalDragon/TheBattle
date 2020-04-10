@@ -16,3 +16,4 @@
 
 - messaging
 - avatars
+- update advertise
