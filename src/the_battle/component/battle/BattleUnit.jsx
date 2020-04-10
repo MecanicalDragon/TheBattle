@@ -6,8 +6,8 @@ import {UNIT_TYPES} from "./unit/unitTypes"
 import Img from 'react-image'
 import img_skull from '@/img/skull.png';
 import {
-    UNIT_FOES_TURN, UNIT_FOES_TARGET,
-    UNIT_NOT_FOES_TARGET,
+    UNIT_BORDERS_PICKED, UNIT_BORDERS_MARKED,
+    UNIT_BORDERS_DEFAULT,
     UNIT_BG_ATTACK,
     UNIT_BG_DEFAULT,
     UNIT_BG_MARKED,
@@ -19,7 +19,7 @@ const UnitPlace = styled.div`
     width: 100px;
     height: 100px;
     border-radius: 15px;
-    border-style: ${props => props.brd === UNIT_NOT_FOES_TARGET ? "none" : "dashed"}
+    border-style: ${props => props.brd === UNIT_BORDERS_DEFAULT ? "none" : "dashed"}
     border-color: ${props => props.brd}
     border-width: 1px;
     background-color: ${props => props.bgc}
@@ -49,12 +49,12 @@ export function BattleUnit(props) {
     const initDefaultBorders = () => {
         if (foe) {
             if (yourTurn) {
-                return UNIT_FOES_TURN
+                return UNIT_BORDERS_PICKED
             } else {
-                return UNIT_NOT_FOES_TARGET
+                return UNIT_BORDERS_DEFAULT
             }
         } else {
-            return UNIT_NOT_FOES_TARGET
+            return UNIT_BORDERS_DEFAULT
         }
     };
 
@@ -69,9 +69,9 @@ export function BattleUnit(props) {
      */
     useEffect(() => {
         setCurrentHP(characteristics.hp * 100 / characteristics.type.health);
-        if (characteristics.hp < 1){
+        if (characteristics.hp < 1) {
             setBgc(UNIT_BG_DEFAULT);
-            setBorders(UNIT_NOT_FOES_TARGET)
+            setBorders(UNIT_BORDERS_DEFAULT)
         }
     }, [characteristics.hp]);
 
@@ -80,16 +80,19 @@ export function BattleUnit(props) {
      */
     //TODO: does not work if two turns in a row 
     useEffect(() => {
-        if (yourTurn && foe) {
-            setBorders(UNIT_FOES_TURN);
-            calculateTargets(pos, foe, unitProps.markTargets)
-        } else if (yourTurn && !foe) {
-            setBgc(UNIT_BG_PICKED);
-            calculateTargets(pos, foe, unitProps.markTargets)
+        if (yourTurn) {
+            if (foe) {
+                setBorders(UNIT_BORDERS_PICKED);
+            } else {
+                setBgc(UNIT_BG_PICKED);
+            }
+            calculateTargets(pos, foe, unitProps.markTargets, true)
         } else {
-            setBorders(UNIT_NOT_FOES_TARGET);
-            setBgc(UNIT_BG_DEFAULT);
-            clearTargets(foe)
+            if (foe) {
+                setBorders(UNIT_BORDERS_DEFAULT);
+            } else {
+                setBgc(UNIT_BG_DEFAULT);
+            }
         }
     }, [yourTurn]);
 
@@ -99,7 +102,7 @@ export function BattleUnit(props) {
     useEffect(() => {
         if (yourTurn) {
             if (foe) {
-                setBorders(UNIT_FOES_TURN);
+                setBorders(UNIT_BORDERS_PICKED);
             } else {
                 setBgc(UNIT_BG_PICKED);
             }
@@ -126,15 +129,15 @@ export function BattleUnit(props) {
     useEffect(() => {
         if (!foe && characteristics.hp > 0) {
             if (characteristics.marktByFoe) {
-                setBorders(UNIT_FOES_TARGET)
+                setBorders(UNIT_BORDERS_MARKED)
             } else {
-                setBorders(UNIT_NOT_FOES_TARGET)
+                setBorders(UNIT_BORDERS_DEFAULT)
             }
         }
     }, [characteristics.marktByFoe]);
 
     const onMouseOver = () => {
-        if (!(yourTurn && !foe)){
+        if (!(yourTurn && !foe)) {
             if (characteristics.marktByPlayer) {
                 setBgc(UNIT_BG_ATTACK)
             } else {

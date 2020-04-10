@@ -281,11 +281,13 @@ class BattleComp extends Component {
      * @param pos - position in a squad
      * @param foe - boolean of player's/foe's squad
      * @param mark - mark function of unit type
+     * @param clear - clear own squad from targeting
      */
-    calculateTargets = (pos, foe, mark) => {
+    calculateTargets = (pos, foe, mark, clear) => {
         let attacker = foe === true ? this.state.foesSquad : this.state.mySquad;
         let target = foe === true ? this.state.mySquad : this.state.foesSquad;
         this.clearMarking(target, foe);
+        if (clear) this.clearMarking(attacker, !foe)
         let targets = mark(pos, attacker, target);
         targets.forEach(function (pos) {
             if (target[pos].hp > 0) {
@@ -294,8 +296,8 @@ class BattleComp extends Component {
             }
         });
 
-        if (foe) this.setState({mySquad: target});
-        else this.setState({foesSquad: target});
+        if (foe) this.setState(clear ? {mySquad: target, foesSquad: attacker} : {mySquad: target});
+        else this.setState(clear ? {foesSquad: target, mySquad: attacker} : {foesSquad: target});
     };
 
     /**

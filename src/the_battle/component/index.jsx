@@ -208,6 +208,7 @@ class Index extends Component {
     }
 
     logout() {
+        this.toggleLogoutWarning()
         player.logout().then(logout => {
             if (logout) {
                 this.setState({playerName: "", authenticated: false})

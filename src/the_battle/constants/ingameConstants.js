@@ -9,9 +9,9 @@ export const UNIT_BG_MARKED = "var(--marked-unit)";
 export const UNIT_BG_PICKED = "var(--picked-unit)";
 export const UNIT_BG_ATTACK = "var(--attack-unit)";
 
-export const UNIT_FOES_TARGET = "red";
-export const UNIT_FOES_TURN = "green";
-export const UNIT_NOT_FOES_TARGET = "grey";
+export const UNIT_BORDERS_MARKED = "red";
+export const UNIT_BORDERS_PICKED = "green";
+export const UNIT_BORDERS_DEFAULT = "grey";
 
 export const STATUS = ["FREE", "IN_SEARCH", "IN_BATTLE"];
 
