@@ -7,8 +7,8 @@ html, body  {
     min-height: calc(100vh - 76px - 59px);
 }
 
-.magenta-bg {
-    background-color: var(--magenta-color);
+.primary-bg {
+    background-color: var(--app-primary-color);
 }
 
 .breadcrumb {
@@ -16,5 +16,5 @@ html, body  {
 }
 
 .active {
-    color: var(--magenta-color)
+    color: var(--app-primary-color)
 }

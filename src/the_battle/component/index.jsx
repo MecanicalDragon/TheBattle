@@ -58,7 +58,7 @@ class Index extends Component {
         return (
             <Container>
                 <Jumbotron style={{textAlign: "center"}}>
-                    <h1 id={"theBattle"} style={{color: "var(--magenta-color)"}}><FormattedMessage
+                    <h1 id={"theBattle"} style={{color: "var(--app-primary-color)"}}><FormattedMessage
                         id={'app.index.header'}/></h1>
                     <br/>
                     {this.state.authenticated === true ? this.getPlayerForm() :
@@ -122,7 +122,7 @@ class Index extends Component {
                             borderStyle: "solid",
                             borderWidth: 5,
                             borderRadius: 15,
-                            borderColor: "var(--magenta-color)"
+                            borderColor: "var(--app-primary-color)"
                         }}/>
                     </Col>
                 </Row>

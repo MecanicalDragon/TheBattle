@@ -57,6 +57,7 @@ export default {
     'app.battle.your.turn.header': 'Your turn',
     'app.battle.foes.turn.header': 'Foe\'s turn',
     'app.battle.over': 'Looks like your battle has finished...',
+    'app.battle.over.exit': 'EXIT',
     'app.battle.concede.header': 'WARNING!!!',
     'app.battle.concede.body': 'This action end the battle immediately revoking for you all gained in this battle experience!',
 

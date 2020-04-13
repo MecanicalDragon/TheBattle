@@ -29,7 +29,7 @@ class Layout extends React.Component {
         return (
             <Fragment>
                 {/*Header*/}
-                <Navbar className="magenta-bg">
+                <Navbar className="primary-bg">
                     <Container>
                         <NavbarBrand style={{cursor: "pointer"}}
                                      onClick={() => this.props.history.push(routes.index())}>
@@ -74,7 +74,7 @@ class Layout extends React.Component {
             <Loader
                 style={{position: "absolute", top: "50%", left: "50%", margin: "-150px 0 0 -150px"}}
                 type="Rings"
-                color="#e20074"
+                color="var(--app-primary-color)"
                 height={get300()}
                 width={get300()}
             />

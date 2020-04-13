@@ -57,6 +57,7 @@ export default {
     'app.battle.your.turn.header': 'Ваш ход',
     'app.battle.foes.turn.header': 'Ход соперника',
     'app.battle.over': 'Похоже, ваш бой уже закончился...',
+    'app.battle.over.exit': 'ВЫХОД',
     'app.battle.concede.header': 'ВНИМАНИЕ!!!',
     'app.battle.concede.body': 'Это действие немедленно заканчивает бой, аннулируя весь заработанный вами в этом бою опыт!',
 

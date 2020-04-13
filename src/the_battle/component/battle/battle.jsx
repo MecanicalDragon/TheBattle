@@ -110,12 +110,12 @@ class BattleComp extends Component {
                     }
                     {battleWon ?
                         <Row>
-                            <Col style={{textAlign: "center", cursor: "pointer", color: "var(--magenta-color)"}}
+                            <Col style={{textAlign: "center", cursor: "pointer", color: "var(--app-primary-color)"}}
                                  onClick={() => this.props.history.push(routes.manage())}>
                                 {
                                     this.state.badReq ? <FormattedMessage id={'app.battle.over'}/> : null
                                 }
-                                <h1>EXIT</h1>
+                                <h1><FormattedMessage id={'app.battle.over.exit'}/></h1>
                             </Col>
                         </Row>
                         : null
