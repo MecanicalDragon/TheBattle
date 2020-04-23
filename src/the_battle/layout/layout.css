@@ -1,4 +1,4 @@
-html, body  {
+html, body {
     height: 100%;
     width: 100%;
 }
@@ -7,14 +7,38 @@ html, body  {
     min-height: calc(100vh - 76px - 59px);
 }
 
-.primary-bg {
+.app-header {
     background-color: var(--app-primary-color);
+    width: 100%;
+}
+
+.app-header .navbar-brand {
+    cursor: pointer;
+}
+
+.app-header img {
+    height: 50px;
+    width: 50px;
+}
+
+.app-footer {
+    background-color: gray;
+    width: 100%;
+}
+
+.app-footer .navbar-brand {
+    cursor: pointer;
+}
+
+.app-footer img {
+    height: 30px;
+    width: 30px;
 }
 
 .breadcrumb {
     background-color: transparent;
 }
 
-.active {
-    color: var(--app-primary-color)
+.active-page {
+    color: var(--app-secondary-color)
 }

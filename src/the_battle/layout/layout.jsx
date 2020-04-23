@@ -29,11 +29,10 @@ class Layout extends React.Component {
         return (
             <Fragment>
                 {/*Header*/}
-                <Navbar className="primary-bg">
+                <Navbar className="app-header">
                     <Container>
-                        <NavbarBrand style={{cursor: "pointer"}}
-                                     onClick={() => this.props.history.push(routes.index())}>
-                            <img style={{height: 50, width: 50}} src={logo} alt="Medrag logo"/>
+                        <NavbarBrand onClick={() => this.props.history.push(routes.index())}>
+                            <img src={logo} alt="Medrag logo"/>
                         </NavbarBrand>
                         <Nav className='ml-auto'>
                             <Locale history={this.props.history}/>
@@ -50,11 +49,10 @@ class Layout extends React.Component {
                 </div>
 
                 {/*Footer*/}
-                <Navbar style={{backgroundColor: "grey"}}>
+                <Navbar className="app-footer">
                     <Container>
-                        <NavbarBrand style={{cursor: "pointer"}}
-                                     onClick={() => this.props.history.push(routes.index())}>
-                            <img style={{height: 30, width: 30}} src={logo} alt="Medrag logo"/>
+                        <NavbarBrand onClick={() => this.props.history.push(routes.index())}>
+                            <img src={logo} alt="Medrag logo"/>
                         </NavbarBrand>
                         <Nav className='ml-auto'>
                             <b><FormattedMessage id={'app.index.header'}/></b>
@@ -67,7 +65,7 @@ class Layout extends React.Component {
     }
 
     static getLoader() {
-        const get300 = function(){
+        const get300 = function () {
             return 300
         };
         return (

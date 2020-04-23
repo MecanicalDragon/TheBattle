@@ -3,13 +3,11 @@ package net.medrag.theBattle.controller
 import net.medrag.theBattle.config.PPPair
 import net.medrag.theBattle.model.*
 import net.medrag.theBattle.model.dto.ActionType
+import net.medrag.theBattle.model.dto.ManagePageResponse
 import net.medrag.theBattle.model.dto.Position
 import net.medrag.theBattle.model.dto.SimpleAction
 import net.medrag.theBattle.model.entities.PlayerStatus
-import net.medrag.theBattle.service.ActionService
-import net.medrag.theBattle.service.BattleService
-import net.medrag.theBattle.service.PlayerService
-import net.medrag.theBattle.service.PlayerSession
+import net.medrag.theBattle.service.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -28,14 +26,8 @@ import javax.servlet.http.HttpSession
 class AuthController(@Autowired private val playerService: PlayerService,
                      @Autowired private val session: PlayerSession,
                      @Autowired private val battleService: BattleService,
-                     @Autowired private val actionService: ActionService) {
-
-    /**
-     * Checks if user authenticated
-     * @return ResponseEntity - 'authenticated' boolean
-     */
-    @GetMapping("/isAuthenticated")
-    fun isAuthenticated() = ResponseEntity.ok(session.playerName != null)
+                     @Autowired private val actionService: ActionService,
+                     @Autowired private val adService: AdService) {
 
     /**
      * Checks if user authenticated
@@ -50,7 +42,7 @@ class AuthController(@Autowired private val playerService: PlayerService,
             try {
                 val playerDto = playerService.getPlayerData(it)
                 session.playerStatus = playerDto.status
-                return ResponseEntity.ok(playerDto)
+                return ResponseEntity.ok(ManagePageResponse(playerDto, newsUrl = adService.getRandomLink()))
             } catch (e: ValidationException) {
                 session.invalidate()
             }
@@ -74,7 +66,7 @@ class AuthController(@Autowired private val playerService: PlayerService,
         session.playerId = player.id.also { player.id = session.playerId }
         session.playerName = player.name
         session.playerStatus = player.status
-        ResponseEntity.ok(player)
+        ResponseEntity.ok(ManagePageResponse(player, newsUrl = adService.getRandomLink()))
     } catch (e: ValidationException) {
         ResponseEntity.badRequest().body(e.message)
     }
@@ -96,7 +88,7 @@ class AuthController(@Autowired private val playerService: PlayerService,
         session.playerId = player.id.also { player.id = session.playerId }
         session.playerName = player.name
         session.playerStatus = player.status
-        ResponseEntity.ok(player)
+        ResponseEntity.ok(ManagePageResponse(player, newsUrl = adService.getRandomLink()))
     } catch (e: ValidationException) {
         ResponseEntity.badRequest().body(e.message)
     } catch (e: IncompatibleDataException) {

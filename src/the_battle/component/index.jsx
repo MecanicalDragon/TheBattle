@@ -39,14 +39,16 @@ class Index extends Component {
     }
 
     componentDidMount() {
-        player.isPlayerLoggedInWithData().then(player => {
-            if (player) {
+        player.isPlayerLoggedInWithData().then(resp => {
+            if (resp) {
+                let player = resp.player;
                 this.setState({
                     playerName: player.name,
                     gamesTotal: player.games,
                     wins: player.wins,
                     status: player.status,
-                    authenticated: true
+                    authenticated: true,
+                    newsUrl: APP_ROOT + resp.newsUrl
                 });
             } else {
                 this.setState({authenticated: false});
@@ -197,12 +199,13 @@ class Index extends Component {
     successfulLogin(resp) {
         if (resp !== null) {
             this.setState({
-                playerName: resp.name,
-                wins: resp.wins,
-                gamesTotal: resp.games,
+                playerName: resp.player.name,
+                wins: resp.player.wins,
+                gamesTotal: resp.player.games,
                 enterName: "",
                 enterPw: "",
-                authenticated: true
+                authenticated: true,
+                newsUrl: APP_ROOT + resp.newsUrl
             })
         }
     }

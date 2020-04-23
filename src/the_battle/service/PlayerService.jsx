@@ -1,11 +1,12 @@
-const appApi = DEPLOYED_URL;
-const sendCred = SEND_CREDENTIALS;
 import {createStore} from 'redux';
 import {reducers} from '@/reducer/reducers'
 import {setAuth} from "@/constants/actions";
 import {NotificationManager} from 'react-notifications';
 import {FormattedMessage} from "react-intl";
 import React from "react";
+
+const appApi = DEPLOYED_URL;
+const sendCred = SEND_CREDENTIALS;
 
 // Redux
 export const loadState = () => {
@@ -59,19 +60,6 @@ export function isPlayerLoggedInWithData() {
     }).catch(e => {
         store.dispatch(setAuth(null));
         return null;
-    })
-}
-
-export function isPlayerLoggedIn() {
-    let url = new URL(appApi + 'auth/isAuthenticated');
-    return fetch(url, {
-        credentials: sendCred
-    }).then(function (response) {
-        if (response.status === 200)
-            return response.text();
-        else return response
-    }).then(r => {
-        return r === 'true'
     })
 }
 
@@ -136,7 +124,7 @@ export async function login(name, pw) {
     ).then(function (response) {
         if (response.status === 200)
             return response.json().then(resp => {
-                store.dispatch(setAuth(resp.name));
+                store.dispatch(setAuth(name));
                 NotificationManager.success(name, <FormattedMessage id={"app.input.login.success"}/>, 3000);
                 return resp;
             });

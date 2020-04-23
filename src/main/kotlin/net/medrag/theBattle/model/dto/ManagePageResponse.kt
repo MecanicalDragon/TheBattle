@@ -1,5 +1,7 @@
 package net.medrag.theBattle.model.dto
 
+import net.medrag.theBattle.model.DEFAULT_AD_URL
+
 
 /**
  * {@author} Stanislav Tretyakov
@@ -7,4 +9,5 @@ package net.medrag.theBattle.model.dto
  */
 class ManagePageResponse(
         val player: PlayerDTO,
-        val pool: List<UnitDTO>)
+        val pool: List<UnitDTO> = emptyList(),
+        val newsUrl: String = DEFAULT_AD_URL)

@@ -21,7 +21,7 @@ class BreadCrump extends React.Component {
 
         return (
             <Container style={{paddingTop: "6px", paddingBottom: 0}}>
-                <ol className="breadcrumb" style={{marginBottom : 0}}>
+                <ol className="breadcrumb" style={{marginBottom: 0}}>
                     {
                         pathElements.map((e, index) => {
                             const prevElement = paths[e];
@@ -35,13 +35,13 @@ class BreadCrump extends React.Component {
                                         }
                                     }><FormattedMessage id={prevElement.formattedId}/></a></li>
                                     {
-                                        index === pathElements.length ? null : ">"
+                                        index === pathElements.length ? null : <span>&nbsp;&gt;&nbsp;</span>
                                     }
                                 </Fragment>
                             )
                         })
                     }
-                    <li className="active"><FormattedMessage id={currentPageProperty.formattedId}/></li>
+                    <li className="active-page"><FormattedMessage id={currentPageProperty.formattedId}/></li>
                 </ol>
             </Container>
         );

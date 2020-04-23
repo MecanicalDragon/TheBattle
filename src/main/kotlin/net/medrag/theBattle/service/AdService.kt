@@ -1,5 +1,6 @@
 package net.medrag.theBattle.service
 
+import net.medrag.theBattle.model.DEFAULT_AD_URL
 import net.medrag.theBattle.repo.AdvertisementRepo
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
@@ -19,6 +20,6 @@ class AdService(@Autowired private val adRepo: AdvertisementRepo) {
 
     @PostConstruct
     private fun init() {
-        links = adRepo.findAll().map { it.link }.ifEmpty { listOf("ad/no-add_1.jpg") }
+        links = adRepo.findAll().map { it.link }.ifEmpty { listOf(DEFAULT_AD_URL) }
     }
 }
