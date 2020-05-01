@@ -6,6 +6,7 @@
   "author": "MechanicalDragon",
   "dependencies": {
     "@babel/plugin-proposal-class-properties": "^7.5.5",
+    "@jaames/iro": "^5.1.8",
     "axios": "^0.18.0",
     "bootstrap": "^4.1.1",
     "path": "^0.12.7",

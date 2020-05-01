@@ -55,8 +55,8 @@ tasks.register<Exec>("yarnRunBuild") {
     }
     doLast {
         copy {
-            from("src/ad")
-            into("src/main/resources/static/ad")
+            from("src/res")
+            into("src/main/resources/static/res")
         }
     }
 }

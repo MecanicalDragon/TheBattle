@@ -4,6 +4,7 @@ import {setAuth} from "@/constants/actions";
 import {NotificationManager} from 'react-notifications';
 import {FormattedMessage} from "react-intl";
 import React from "react";
+import defaultHandling from "./ErrorService";
 
 const appApi = DEPLOYED_URL;
 const sendCred = SEND_CREDENTIALS;
@@ -46,6 +47,58 @@ store.subscribe(() => {
 });
 
 /// Redux
+
+/**
+ * Get the avatars list
+ *
+ * @returns list of images
+ */
+export function getAvatarsPage(page) {
+    let url = new URL(appApi + 'profile/avatars');
+    url.search = new URLSearchParams({page: page});
+    return fetch(url, {
+        method: 'GET',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        credentials: sendCred
+    }).then(function (response) {
+        if (response.status === 200) {
+            return response.json().then(r => {
+                return r
+            });
+        } else {
+            defaultHandling(response)
+            return null;
+        }
+    });
+}
+
+/**
+ * Change the profile image
+ *
+ * @returns true if successful
+ */
+export function saveProfileImage(avatar) {
+    let url = new URL(appApi + 'profile/save');
+    return fetch(url, {
+        method: 'POST',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(avatar),
+        credentials: sendCred
+    }).then(function (response) {
+        if (response.status === 200) {
+            return true;
+        } else {
+            defaultHandling(response)
+            return false;
+        }
+    });
+}
 
 export function isPlayerLoggedInWithData() {
     let url = new URL(appApi + 'auth/isAuthenticatedWithData');

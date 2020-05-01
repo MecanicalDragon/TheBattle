@@ -17,4 +17,4 @@ const val DAMAGED_SQUAD = "DAMAGED_SQUAD"
 const val TURN_TIME = 20_000L
 const val ATTACK_VALIDATION_ERROR = "[CODE: %s] Attack from %s to %s is not valid!"
 const val TARGET_DATA_INVALID = "Data of targets positions have been passed incorrectly."
-const val DEFAULT_AD_URL = "ad/no-add_1.jpg"
+const val DEFAULT_AD_URL = "res/ad/no-add_1.jpg"

@@ -3,7 +3,7 @@ package net.medrag.theBattle.controller
 import net.medrag.theBattle.config.PPPair
 import net.medrag.theBattle.model.*
 import net.medrag.theBattle.model.dto.ActionType
-import net.medrag.theBattle.model.dto.ManagePageResponse
+import net.medrag.theBattle.model.dto.IndexPageResponse
 import net.medrag.theBattle.model.dto.Position
 import net.medrag.theBattle.model.dto.SimpleAction
 import net.medrag.theBattle.model.entities.PlayerStatus
@@ -42,7 +42,7 @@ class AuthController(@Autowired private val playerService: PlayerService,
             try {
                 val playerDto = playerService.getPlayerData(it)
                 session.playerStatus = playerDto.status
-                return ResponseEntity.ok(ManagePageResponse(playerDto, newsUrl = adService.getRandomLink()))
+                return ResponseEntity.ok(IndexPageResponse(playerDto, newsUrl = adService.getRandomLink()))
             } catch (e: ValidationException) {
                 session.invalidate()
             }
@@ -66,7 +66,7 @@ class AuthController(@Autowired private val playerService: PlayerService,
         session.playerId = player.id.also { player.id = session.playerId }
         session.playerName = player.name
         session.playerStatus = player.status
-        ResponseEntity.ok(ManagePageResponse(player, newsUrl = adService.getRandomLink()))
+        ResponseEntity.ok(IndexPageResponse(player, newsUrl = adService.getRandomLink()))
     } catch (e: ValidationException) {
         ResponseEntity.badRequest().body(e.message)
     }
@@ -88,7 +88,7 @@ class AuthController(@Autowired private val playerService: PlayerService,
         session.playerId = player.id.also { player.id = session.playerId }
         session.playerName = player.name
         session.playerStatus = player.status
-        ResponseEntity.ok(ManagePageResponse(player, newsUrl = adService.getRandomLink()))
+        ResponseEntity.ok(IndexPageResponse(player, newsUrl = adService.getRandomLink()))
     } catch (e: ValidationException) {
         ResponseEntity.badRequest().body(e.message)
     } catch (e: IncompatibleDataException) {

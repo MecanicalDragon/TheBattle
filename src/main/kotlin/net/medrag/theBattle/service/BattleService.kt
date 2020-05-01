@@ -2,11 +2,8 @@ package net.medrag.theBattle.service
 
 import net.medrag.theBattle.config.AfterStart
 import net.medrag.theBattle.model.*
+import net.medrag.theBattle.model.dto.*
 import net.medrag.theBattle.model.squad.ValidatedSquad
-import net.medrag.theBattle.model.dto.BattleBidResponse
-import net.medrag.theBattle.model.dto.SquadDTO
-import net.medrag.theBattle.model.dto.UnitDTO
-import net.medrag.theBattle.model.dto.buildUnit
 import net.medrag.theBattle.model.entities.Player
 import net.medrag.theBattle.model.entities.PlayerStatus
 import net.medrag.theBattle.model.entities.UnitStatus
@@ -86,7 +83,7 @@ class BattleService(
         }
         for (unit in listOf(unit1, unit2, unit3, unit4, unit5)) {
             if (unit.status != UnitStatus.IN_POOL) {
-                val msg = "Someone cheats: $unit is not free fo pick!"
+                val msg = "Someone cheats: $unit is not able to be picked!"
                 logger.error(msg)
                 throw ValidationException(msg)
             }
@@ -184,13 +181,28 @@ class BattleService(
      */
     fun getBud(playerName: String) = playerRepo.getBud(playerName)
 
+    /**
+     * Returns foesPair and players' profile images to render on battle page. Meant to be invoked on battle page landing.
+     * @param playerName String
+     * @param bud UUID
+     * @return BattlePageResponse
+     * @throws ValidationException if {@link #getDislocations()} throws
+     */
+    @Throws(ValidationException::class)
+    fun getDislocationsOnBattleStart(playerName: String, bud: UUID): BattlePageResponse {
+        val dislocations = getDislocations(playerName, bud)
+        val player = playerRepo.findByName(playerName)!!.profileImage
+        val foesName = if (playerName == dislocations.foe1.playerName) dislocations.foe2.playerName else dislocations.foe1.playerName
+        val foe = playerRepo.findByName(foesName)!!.profileImage
+        return BattlePageResponse(dislocations, player, foe)
+    }
 
     /**
      * Returns foesPair, based on Battle UUID
      * @param playerName String
      * @param bud UUID
      * @return FoesPair
-     * @throws ValidationException if byd is invalid or if there is no playerName in FoesPair
+     * @throws ValidationException if bud is invalid or if there is no playerName in FoesPair
      */
     @Throws(ValidationException::class)
     fun getDislocations(playerName: String, bud: UUID): FoesPair {

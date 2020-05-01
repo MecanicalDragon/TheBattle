@@ -2,7 +2,6 @@ import React, {useState, useEffect} from 'react';
 import {Progress} from 'reactstrap';
 import styled from "styled-components";
 import {UNIT_TYPES} from "./unit/unitTypes"
-
 import Img from 'react-image'
 import img_skull from '@/img/skull.png';
 import {

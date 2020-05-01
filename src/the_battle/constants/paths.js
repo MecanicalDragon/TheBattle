@@ -3,6 +3,7 @@ import * as routes from '@/router/routes'
 export const Home = "Home";
 export const Battle = "Battle";
 export const Manage = "Manage";
+export const Profile = "Profile";
 
 const paths = {};
 paths[Home] = {
@@ -19,5 +20,10 @@ paths[Manage] =  {
     formattedId: "app.breadcrump.manage",
     pathElements: [Home],
     link: routes.manage()
+};
+paths[Profile] =  {
+    formattedId: "app.breadcrump.profile",
+    pathElements: [Home],
+    link: routes.profile()
 };
 export {paths};

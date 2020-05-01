@@ -19,4 +19,7 @@ class IndexController{
 
     @GetMapping("/manage")
     fun manage() = "index.html"
+
+    @GetMapping("/profile")
+    fun profile() = "index.html"
 }

@@ -27,6 +27,8 @@ class BattleComp extends Component {
         this.props.dispatch(setNavPosition(Battle));
         this.state = {
             playerName: getPlayerName(),
+            playersAvatar: null,
+            foesAvatar : null,
             myDescr: "",
             foesDescr: "",
             mySquad: undefined,
@@ -49,14 +51,17 @@ class BattleComp extends Component {
     componentDidMount() {
         BattleService.getBattle().then(resp => {
             if (resp) {
+                let {dislocations} = resp;
                 let {playerName} = this.state;
-                let mySquad = resp.foe1.playerName === playerName ? resp.foe1 : resp.foe2;
-                let foesSquad = resp.foe1.playerName === playerName ? resp.foe2 : resp.foe1;
+                let mySquad = dislocations.foe1.playerName === playerName ? dislocations.foe1 : dislocations.foe2;
+                let foesSquad = dislocations.foe1.playerName === playerName ? dislocations.foe2 : dislocations.foe1;
                 let foesName = foesSquad.playerName;
-                let actionMan = this.defineActionMan(resp.actionMan, mySquad, foesSquad);
-                let lastMoveTimestamp = resp.lastMove;
+                let actionMan = this.defineActionMan(dislocations.actionMan, mySquad, foesSquad);
+                let lastMoveTimestamp = dislocations.lastMove;
 
                 this.setState({
+                    playersAvatar: resp.playersAvatar,
+                    foesAvatar: resp.foesAvatar,
                     lastMoveTimestamp: lastMoveTimestamp,
                     foesSquad: foesSquad,
                     mySquad: mySquad,
@@ -76,7 +81,8 @@ class BattleComp extends Component {
     }
 
     render() {
-        let {mySquad, foesSquad, playerName, foesName, actionMan, battleWon, timeLeft, twoTurnsInARowCounter} = this.state;
+        let {mySquad, foesSquad, playerName, foesName, actionMan, battleWon, timeLeft
+            , twoTurnsInARowCounter, playersAvatar, foesAvatar} = this.state;
         return (
             <Container>
                 <Jumbotron style={{paddingLeft: 10, paddingRight: 10}}>
@@ -91,7 +97,7 @@ class BattleComp extends Component {
                                 <BattleSquad foe={false} squad={mySquad} clearTargets={this.clearTargets}
                                              calculateTargets={this.calculateTargets} actionMan={actionMan}
                                              simpleAction={this.simpleAction} playerName={playerName}
-                                             won={battleWon} twoTurns={twoTurnsInARowCounter}/>
+                                             won={battleWon} twoTurns={twoTurnsInARowCounter} ava={playersAvatar}/>
                                 : null}
                         </Col>
                         <Col>
@@ -99,7 +105,7 @@ class BattleComp extends Component {
                                 <BattleSquad foe={true} squad={foesSquad} clearTargets={this.clearTargets}
                                              calculateTargets={this.calculateTargets} actionMan={actionMan}
                                              selectTargets={this.performAttack} playerName={foesName}
-                                             won={battleWon} twoTurns={twoTurnsInARowCounter}/>
+                                             won={battleWon} twoTurns={twoTurnsInARowCounter} ava={foesAvatar}/>
                                 : null}
                         </Col>
                     </Row>

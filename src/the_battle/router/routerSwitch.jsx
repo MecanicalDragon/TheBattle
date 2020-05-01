@@ -6,11 +6,13 @@ import AuthRouter from "@/router/authRouter";
 const LazyIndex = React.lazy(() => import( '@/component/index'));
 const LazyBattle = React.lazy(() => import( '@/component/battle/battle'));
 const LazyManage = React.lazy(() => import( '@/component/manager/manage'));
+const LazyProfile = React.lazy(() => import( '@/component/profile/profile'));
 
 export default () => (
     <Switch>
         <Route exact path={routes.index()} component={LazyIndex}/>
         <AuthRouter exact path={routes.battle()} component={LazyBattle}/>
         <AuthRouter exact path={routes.manage()} component={LazyManage}/>
+        <AuthRouter exact path={routes.profile()} component={LazyProfile}/>
     </Switch>
 );

@@ -18,6 +18,9 @@ data class Player(
         @Column(name = "name", nullable = false, unique = true)
         val name: String,
 
+        @Embedded
+        var profileImage: ProfileImage = ProfileImage(),
+
         @Column(name = "games", nullable = false)
         var games: Int = 0,
 

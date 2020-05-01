@@ -2,10 +2,11 @@ package net.medrag.theBattle.model.dto
 
 
 /**
- * {@author} Stanislav Tretyakov
+ * Instance of this class is returned on any player's action in battle.
+ * @author Stanislav Tretyakov
  * 20.01.2020
  */
-data class ActionResult(val action: ActionType,
+class ActionResult(val action: ActionType,
                         val nextUnit: UnitDTO,
                         val lastMoveTimestamp: Long,
                         val comments: String,

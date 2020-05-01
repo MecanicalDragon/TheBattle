@@ -1,5 +1,6 @@
 import React, {Component, Fragment} from 'react';
 import {connect} from 'react-redux';
+import ProfileImage from "./common/ProfileImage";
 import {
     Container,
     Jumbotron,
@@ -29,9 +30,15 @@ class Index extends Component {
             authenticated: undefined,
             wins: 0,
             gamesTotal: 0,
+            profileImage: {
+                background: "#ffffff",
+                borders: "#000000",
+                color: "#000000",
+                name: "dragon1"
+            },
             status: STATUS[0],
             logoutWarning: false,
-            newsUrl: APP_ROOT + "ad/no-add_1.jpg"
+            newsUrl: APP_ROOT + "res/ad/no-add_1.jpg"
         };
         this.handleChange = this.handleChange.bind(this);
         this.handlePwChange = this.handlePwChange.bind(this);
@@ -48,6 +55,7 @@ class Index extends Component {
                     wins: player.wins,
                     status: player.status,
                     authenticated: true,
+                    profileImage: player.profileImage,
                     newsUrl: APP_ROOT + resp.newsUrl
                 });
             } else {
@@ -80,23 +88,32 @@ class Index extends Component {
                         <br/>
                         <Row>
                             <Col>
-                                <h6 style={{color: "blue"}}>Games: {gamesTotal}</h6>
+                                <h6 style={{color: "blue"}}>
+                                    <FormattedMessage id={"app.index.games.count"}/>{gamesTotal}
+                                </h6>
                             </Col>
                             <Col>
-                                <h6 style={{color: "darkgreen"}}>Wins: {wins}</h6>
+                                <h6 style={{color: "darkgreen"}}>
+                                    <FormattedMessage id={"app.index.wins.count"}/>{wins}
+                                </h6>
                             </Col>
                         </Row>
                         <br/>
+                        <ProfileImage properties={this.state.profileImage} invoke={this.manageProfile}
+                                      titleMsg={"app.avatar.change"}/>
+                        <br/>
                         {
                             gamesTotal === 0 ? null :
-                                <h5 style={{color: "green"}}>Win Rate: {(wins * 100 / gamesTotal).toPrecision(4)}%</h5>
+                                <h5 style={{color: "green"}}><FormattedMessage id={"app.index.win.rate"}/>
+                                    {(wins * 100 / gamesTotal).toPrecision(4)}%</h5>
                         }
                         <br/>
-                        <Button color={"info"} onClick={() => this.props.history.push(routes.manage())}>Manage
-                            squad</Button>
+                        <Button color={"info"} onClick={() => this.props.history.push(routes.manage())}>
+                            <FormattedMessage id={"app.index.prepare.to.battle"}/></Button>
                         <br/>
                         <br/>
-                        <Button id={"logoutButton"} onClick={() => this.toggleLogoutWarning()}>Logout</Button>
+                        <Button id={"logoutButton"} onClick={() => this.toggleLogoutWarning()}>
+                            <FormattedMessage id={"app.index.logout.btn.logout"}/></Button>
                         <Popover placement="bottom" isOpen={this.state.logoutWarning} target="logoutButton"
                                  toggle={this.toggleLogoutWarning}>
                             <PopoverHeader><FormattedMessage id={'app.index.logout.warning'}/></PopoverHeader>
@@ -130,6 +147,11 @@ class Index extends Component {
                 </Row>
             </Fragment>
         )
+    }
+
+    manageProfile = () => {
+        localStorage.setItem("profileImageData", JSON.stringify(this.state.profileImage))
+        this.props.history.push(routes.profile())
     }
 
     getLoginForm() {
@@ -205,13 +227,14 @@ class Index extends Component {
                 enterName: "",
                 enterPw: "",
                 authenticated: true,
+                profileImage: resp.player.profileImage,
                 newsUrl: APP_ROOT + resp.newsUrl
             })
         }
     }
 
     logout() {
-        this.toggleLogoutWarning()
+        this.toggleLogoutWarning();
         player.logout().then(logout => {
             if (logout) {
                 this.setState({playerName: "", authenticated: false})

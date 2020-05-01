@@ -2,9 +2,9 @@ package net.medrag.theBattle.controller
 
 import net.medrag.theBattle.model.*
 import net.medrag.theBattle.model.dto.BattleBidResponse
+import net.medrag.theBattle.model.dto.BattlePageResponse
 import net.medrag.theBattle.model.dto.SquadDTO
 import net.medrag.theBattle.model.entities.PlayerStatus
-import net.medrag.theBattle.model.squad.FoesPair
 import net.medrag.theBattle.service.BattleService
 import net.medrag.theBattle.service.PlayerSession
 import org.springframework.beans.factory.annotation.Autowired
@@ -86,14 +86,14 @@ class BattleController(@Autowired private val battleService: BattleService,
      *      - 555 if database fails
      */
     @GetMapping("/getDislocations")
-    fun getDislocations(): ResponseEntity<FoesPair> {
+    fun getDislocations(): ResponseEntity<BattlePageResponse> {
 
         session.playerName?.let { playerName ->
 
             // Common request.
             session.bud?.let {
                 return try {
-                    ResponseEntity.ok(battleService.getDislocations(playerName, it))
+                    ResponseEntity.ok(battleService.getDislocationsOnBattleStart(playerName, it))
                 } catch (e: ValidationException) {
                     session.bud = null
                     ResponseEntity.badRequest().build()
@@ -105,13 +105,13 @@ class BattleController(@Autowired private val battleService: BattleService,
             // 2. The battle has finished.
             battleService.getBud(playerName)?.let {
                 val bud = UUID.fromString(it)
-                try {
-                    val dislocations = battleService.getDislocations(playerName, bud)
+                return try {
+                    val dislocations = battleService.getDislocationsOnBattleStart(playerName, bud)
                     session.bud = bud
                     session.playerStatus = PlayerStatus.IN_BATTLE
-                    return ResponseEntity.ok(dislocations)
+                    ResponseEntity.ok(dislocations)
                 } catch (e: ValidationException) {
-                    return ResponseEntity.badRequest().build()
+                    ResponseEntity.badRequest().build()
                 }
             }
             return ResponseEntity.badRequest().build()

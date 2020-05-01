@@ -12,21 +12,26 @@ export default {
     'app.breadcrump.home': 'Главная',
     'app.breadcrump.battle': 'Бой',
     'app.breadcrump.manage': 'Построить',
+    'app.breadcrump.profile': 'Профиль',
 
     // Index page
     'app.index.header': 'The Битъва',
     'app.index.start': 'Начать',
+    'app.index.games.count': 'Игр: ',
+    'app.index.wins.count': 'Побед: ',
+    'app.index.win.rate': 'Рейтинг: ',
+    'app.index.prepare.to.battle': 'Подготовить бой',
     'app.index.logout.warning': 'Ахътунгъ!!!',
-    'app.index.logout.span1': 'Если вы в поиске игры, мы попытвемся отменить его.',
+    'app.index.logout.span1': 'Если вы в поиске игры, мы попытаемся отменить его.',
     'app.index.logout.span2': 'Если вы уже в бою, вам будет засчитано поражение.',
     'app.index.logout.btn.cancel': 'Отмена',
     'app.index.logout.btn.logout': 'Выйти',
 
+    //  Login
     'app.input.regex': 'Имя и пароль должны содержать 4-16 символов букв и цифр.',
     'app.input.create.trim': 'Уберите пробелы в начале и конце вводимых полей.',
     'app.input.create.bad.request': 'Невалидный запрос. А не наебать ли ты меня пытаешься?',
     'app.input.create.success': 'Игрок был успешно создан.',
-
     'app.input.name': 'Введите своё имя',
     'app.input.pw': 'Введите пароль',
     'app.input.login.bad': 'Нет такого игрока',
@@ -37,6 +42,14 @@ export default {
     'app.create.bad.input': 'Вы должны использовать 4-16 символов латинского алфавита и цифр для логина и пароля.',
     'app.create.user.exists': 'Сочувствуем вашей неудаче, но пользователь с таким именем уже зарегестрирован. Придумайте другое.',
     'app.logout.failed': 'По неким странным обстоятельствам логаут факапнулся. Старайтесь лучше.',
+
+    // Profile image
+    'app.avatar.change': 'Сменить',
+    'app.avatar.send.message': 'Боевой клич1',
+    'app.avatar.save': 'Сохранить',
+    'app.avatar.save.failed': 'Не удалось сохранить настройки. Попробуйте ещё раз.',
+    'app.avatar.next': 'Далее',
+    'app.avatar.prev': 'Назад',
 
     // Manage page
     'app.manage.pool.header': 'Резерв героев',
@@ -60,5 +73,9 @@ export default {
     'app.battle.over.exit': 'ВЫХОД',
     'app.battle.concede.header': 'ВНИМАНИЕ!!!',
     'app.battle.concede.body': 'Это действие немедленно заканчивает бой, аннулируя весь заработанный вами в этом бою опыт!',
+    'app.battle.btn.attack' : 'Атака!',
+    'app.battle.btn.wait' : 'Выждать',
+    'app.battle.btn.block' : 'Блок',
+    'app.battle.btn.concede' : 'Сдаться',
 
 }

@@ -22,7 +22,7 @@ const Column = styled.div`
 
 const BattleSquad = (props) => {
 
-    let {foe, squad, calculateTargets, clearTargets, selectTargets, actionMan, simpleAction, playerName, won, twoTurns} = props;
+    let {foe, squad, calculateTargets, clearTargets, selectTargets, actionMan, simpleAction, playerName, won, ava, twoTurns} = props;
 
     const [description, setDescription] = useState("");
     const [remarkTrigger, increaseTrigger] = useState(0);
@@ -32,7 +32,7 @@ const BattleSquad = (props) => {
      */
     useEffect(() => {
         increaseTrigger(remarkTrigger + 1)
-    },[twoTurns]);
+    }, [twoTurns]);
 
     const getLine = (...units) => {
         let positions = units.length < 3 ? ["pos2", "pos4"] : ["pos1", "pos3", "pos5"];
@@ -57,10 +57,10 @@ const BattleSquad = (props) => {
         <Fragment>
             <Header foe={foe} playerName={playerName} yourTurn={actionMan.player} won={won}/>
             <Field foe={foe}>
-                <ControlPanel simpleAction={simpleAction} foe={foe} yourTurn={actionMan.player} won={won}/>
+                <ControlPanel simpleAction={simpleAction} foe={foe} yourTurn={actionMan.player} won={won} ava={ava}/>
                 <DescriptionArea description={description}/>
                 {squad ?
-                    <Squad className={"unselectable"}
+                    <Squad className={"unselectable"} style={foe ? {marginRight: 5} : {marginLeft: 5}}
                            straight={(squad.type === "FORCED_BACK" && !foe) || (squad.type !== "FORCED_BACK" && foe)}>
                         {getLine(squad.pos1, squad.pos3, squad.pos5)}
                         {getLine(squad.pos2, squad.pos4)}
