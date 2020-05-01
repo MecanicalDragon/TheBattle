@@ -6,7 +6,7 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 
 /**
- * {@author} Stanislav Tretyakov
+ * @author Stanislav Tretyakov
  * 31.12.2019
  */
 data class FoesPair(

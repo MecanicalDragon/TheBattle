@@ -2,7 +2,7 @@ package net.medrag.theBattle.model
 
 
 /**
- * {@author} Stanislav Tretyakov
+ * @author Stanislav Tretyakov
  * 24.12.2019
  */
 const val GAME_FOUND: String = "GAME_FOUND"

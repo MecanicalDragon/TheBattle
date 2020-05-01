@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*
 
 
 /**
- * {@author} Stanislav Tretyakov
+ * @author Stanislav Tretyakov
  * 15.01.2020
  *
  * Controller for handling battle actions

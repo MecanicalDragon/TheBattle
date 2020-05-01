@@ -2,7 +2,7 @@ package net.medrag.theBattle.model.classes
 
 
 /**
- * {@author} Stanislav Tretyakov
+ * @author Stanislav Tretyakov
  * 18.12.2019
  */
 object Sage : Unitt() {

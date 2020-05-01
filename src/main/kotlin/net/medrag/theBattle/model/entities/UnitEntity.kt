@@ -5,7 +5,7 @@ import javax.persistence.*
 
 
 /**
- * {@author} Stanislav Tretyakov
+ * @author Stanislav Tretyakov
  * 25.12.2019
  */
 @Entity

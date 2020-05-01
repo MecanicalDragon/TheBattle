@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*
 
 
 /**
- * {@author} Stanislav Tretyakov
+ * @author Stanislav Tretyakov
  * 19.12.2019
  * Processes squad manage page requests
  */

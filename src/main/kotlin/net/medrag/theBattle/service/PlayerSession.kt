@@ -8,7 +8,7 @@ import java.util.*
 
 /**
  * Contains all data, related to a player
- * {@author} Stanislav Tretyakov
+ * @author Stanislav Tretyakov
  * 25.02.2020
  */
 @Component

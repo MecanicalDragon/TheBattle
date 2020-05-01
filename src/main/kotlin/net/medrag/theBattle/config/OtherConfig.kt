@@ -6,7 +6,7 @@ import org.springframework.dao.annotation.PersistenceExceptionTranslationPostPro
 
 
 /**
- * {@author} Stanislav Tretyakov
+ * @author Stanislav Tretyakov
  * 13.02.2020
  */
 @Configuration

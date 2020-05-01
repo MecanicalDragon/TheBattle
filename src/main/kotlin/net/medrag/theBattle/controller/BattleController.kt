@@ -15,7 +15,7 @@ import java.util.*
 
 
 /**
- * {@author} Stanislav Tretyakov
+ * @author Stanislav Tretyakov
  * 31.12.2019
  */
 @RestController

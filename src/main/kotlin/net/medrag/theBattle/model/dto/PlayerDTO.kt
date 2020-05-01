@@ -5,7 +5,7 @@ import net.medrag.theBattle.model.entities.ProfileImage
 
 
 /**
- * {@author} Stanislav Tretyakov
+ * @author Stanislav Tretyakov
  * 28.01.2020
  */
 data class PlayerDTO(

@@ -5,7 +5,7 @@ import net.medrag.theBattle.model.classes.Unitt
 
 
 /**
- * {@author} Stanislav Tretyakov
+ * @author Stanislav Tretyakov
  * 25.12.2019
  */
 data class UnitDTO(

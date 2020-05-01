@@ -4,7 +4,7 @@ import net.medrag.theBattle.model.squad.SquadType
 
 
 /**
- * {@author} Stanislav Tretyakov
+ * @author Stanislav Tretyakov
  * 31.12.2019
  */
 data class SquadDTO(val type: SquadType,

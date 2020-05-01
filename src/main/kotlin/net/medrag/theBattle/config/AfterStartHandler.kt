@@ -10,7 +10,7 @@ import org.springframework.util.ClassUtils
 
 
 /**
- * {@author} Stanislav Tretyakov
+ * @author Stanislav Tretyakov
  * 18.02.2020
  */
 @Component

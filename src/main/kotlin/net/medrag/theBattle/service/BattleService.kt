@@ -21,7 +21,7 @@ import java.util.concurrent.ConcurrentLinkedQueue
 
 
 /**
- * {@author} Stanislav Tretyakov
+ * @author Stanislav Tretyakov
  * 31.12.2019
  */
 @Service

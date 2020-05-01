@@ -18,7 +18,7 @@ import kotlin.collections.HashMap
 
 
 /**
- * {@author} Stanislav Tretyakov
+ * @author Stanislav Tretyakov
  * 21.01.2020
  * SimpleAction handler
  */

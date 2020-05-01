@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional
 
 
 /**
- * {@author} Stanislav Tretyakov
+ * @author Stanislav Tretyakov
  * 19.12.2019
  * Squad manage actions processing
  */

@@ -8,7 +8,7 @@ import javax.annotation.PostConstruct
 
 
 /**
- * {@author} Stanislav Tretyakov
+ * @author Stanislav Tretyakov
  * 12.04.2020
  */
 @Service

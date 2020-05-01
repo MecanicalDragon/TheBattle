@@ -7,7 +7,7 @@ import net.medrag.theBattle.model.entities.UnitStatus
 
 
 /**
- * {@author} Stanislav Tretyakov
+ * @author Stanislav Tretyakov
  * 25.12.2019
  */
 fun buildUnit(entity: UnitEntity): UnitDTO = UnitDTO(entity.id as Long, entity.name, entity.level, entity.experience,

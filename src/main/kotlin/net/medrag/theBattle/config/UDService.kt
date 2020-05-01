@@ -8,7 +8,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException
 
 
 /**
- * {@author} Stanislav Tretyakov
+ * @author Stanislav Tretyakov
  * 25.12.2019
  */
 @Deprecated(message="currently I don't need it")

@@ -10,7 +10,7 @@ import org.springframework.stereotype.Repository
 
 
 /**
- * {@author} Stanislav Tretyakov
+ * @author Stanislav Tretyakov
  * 26.12.2019
  */
 @Repository

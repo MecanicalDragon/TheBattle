@@ -5,7 +5,7 @@ import org.springframework.security.core.userdetails.UserDetails
 
 
 /**
- * {@author} Stanislav Tretyakov
+ * @author Stanislav Tretyakov
  * 25.12.2019
  */
 data class PlayerPrincipal(
