@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     id("org.springframework.boot") version "2.2.5.RELEASE"
     id("io.spring.dependency-management") version "1.0.9.RELEASE"
+    id("org.flywaydb.flyway") version "6.3.0"
     kotlin("jvm") version "1.3.70"
     kotlin("plugin.spring") version "1.3.70"
     kotlin("plugin.jpa") version "1.3.70"
@@ -39,6 +40,12 @@ dependencies {
     }
     testImplementation("org.springframework.integration:spring-integration-test")
     testImplementation("org.springframework.security:spring-security-test")
+}
+
+tasks.flywayMigrate{
+    url = "jdbc:h2:file:$rootDir/database/the_battle"
+    user = "the_battle"
+    password = "best_pw_ever"
 }
 
 tasks.register("buildResources") {

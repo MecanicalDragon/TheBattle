@@ -27,7 +27,7 @@ data class Player(
         @Column(name = "wins", nullable = false)
         var wins: Int = 0,
 
-        @Column(name = "password", nullable = true)
+        @Column(name = "password", nullable = false)
         var password: String = "",
 
         @Column(name = "status", nullable = false)

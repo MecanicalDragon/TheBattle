@@ -7,8 +7,8 @@ Here I develop online game on enterprise technologies, following 2 purposes:
 ### If you want to try it
 You need java, gradle, node.js and yarn. Input into console following commands:
 
-    - gradle buildResources build
-    - java -jar build/libs/TheBattle-0.98.5.jar
+    - gradle buildResources build flywayMigrate
+    - java -jar build/libs/TheBattle-0.98.6.jar
     
 Or just download compiled jar [here](https://yadi.sk/d/3pf7UOSspUF7QA)
     

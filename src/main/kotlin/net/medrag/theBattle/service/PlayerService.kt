@@ -70,12 +70,13 @@ class PlayerService(
             if (pw.matches(REGEX.toRegex())) {
                 val encode = pwEncoder.encode(pw)
                 val player = Player(null, name, password = encode)
+                player.profileImage.name = "dragon1"
                 try {
                     playerRepo.save(player)
                 } catch (e: Exception) {
                     throw IncompatibleDataException("Player with name '$name' already exists.")
                 }
-                return PlayerDTO(name, id = player.id)
+                return PlayerDTO(name, id = player.id, profileImage = player.profileImage)
             } else throw ValidationException("Your password does not match regex '$REGEX'")
         } else throw ValidationException("Your name does not match regex '$REGEX'")
     }
