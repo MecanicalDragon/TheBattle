@@ -2,8 +2,8 @@ package net.medrag.theBattle.controller
 
 import net.medrag.theBattle.model.ValidationException
 import net.medrag.theBattle.model.entities.ProfileImage
-import net.medrag.theBattle.service.PlayerService
-import net.medrag.theBattle.service.PlayerSession
+import net.medrag.theBattle.model.PlayerSession
+import net.medrag.theBattle.service.api.PlayerServiceApi
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*
 @RestController
 @RequestMapping("/profile")
 class ProfileController(@Autowired private val session: PlayerSession,
-                        @Autowired private val playerService: PlayerService) {
+                        @Autowired private val playerService: PlayerServiceApi) {
 
     /**
      * Save new profile image for the player
@@ -53,7 +53,7 @@ class ProfileController(@Autowired private val session: PlayerSession,
     @GetMapping("/avatars")
     fun getAvatars(page: Int = 0): ResponseEntity<Any> {
         session.playerName?.let {
-            return ResponseEntity.ok(playerService.getPage(page))
+            return ResponseEntity.ok(playerService.getAvatarsPage(page))
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
     }

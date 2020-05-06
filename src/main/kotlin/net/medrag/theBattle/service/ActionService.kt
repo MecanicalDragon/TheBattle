@@ -9,6 +9,9 @@ import net.medrag.theBattle.model.classes.Unitt
 import net.medrag.theBattle.model.dto.*
 import net.medrag.theBattle.model.squad.FoesPair
 import net.medrag.theBattle.model.squad.ValidatedSquad
+import net.medrag.theBattle.service.api.ActionServiceApi
+import net.medrag.theBattle.service.api.AttackServiceApi
+import net.medrag.theBattle.service.api.BattleServiceApi
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.messaging.simp.SimpMessagingTemplate
@@ -23,9 +26,9 @@ import kotlin.collections.HashMap
  * SimpleAction handler
  */
 @Service
-class ActionService(@Autowired private val battleService: BattleService,
-                    @Autowired private val attackService: AttackService,
-                    @Autowired private val wSocket: SimpMessagingTemplate) {
+class ActionService(@Autowired private val battleService: BattleServiceApi,
+                    @Autowired private val attackService: AttackServiceApi,
+                    @Autowired private val wSocket: SimpMessagingTemplate) : ActionServiceApi {
 
     /**
      * SimpleAction handling
@@ -42,7 +45,7 @@ class ActionService(@Autowired private val battleService: BattleService,
      * @throws ProcessingException if another player already acts.
      */
     @Throws(ValidationException::class, ProcessingException::class)
-    fun performSimpleAction(playerName: String, bud: UUID, simpleAction: SimpleAction): ActionResult {
+    override fun performSimpleAction(playerName: String, bud: UUID, simpleAction: SimpleAction): ActionResult {
         val pair = battleService.getDislocations(playerName, bud)
         val player: ValidatedSquad = if (pair.foe1.playerName == playerName) pair.foe1 else pair.foe2
         val foesSquad: ValidatedSquad = if (pair.foe1.playerName == playerName) pair.foe2 else pair.foe1
@@ -138,7 +141,7 @@ class ActionService(@Autowired private val battleService: BattleService,
      * @param playerName String
      * @param bud UUID
      */
-    fun pingTurn(playerName: String, bud: UUID) {
+    override fun pingTurn(playerName: String, bud: UUID) {
         val pair = battleService.getDislocations(playerName, bud)
         if (pair.lastMove < System.currentTimeMillis() - TURN_TIME) {
             if (pair.actionInProcess.compareAndSet(false, true)) {

@@ -3,13 +3,14 @@ package net.medrag.theBattle.service
 import net.medrag.theBattle.config.AfterStart
 import net.medrag.theBattle.model.*
 import net.medrag.theBattle.model.dto.*
-import net.medrag.theBattle.model.squad.ValidatedSquad
 import net.medrag.theBattle.model.entities.Player
 import net.medrag.theBattle.model.entities.PlayerStatus
 import net.medrag.theBattle.model.entities.UnitStatus
 import net.medrag.theBattle.model.squad.FoesPair
+import net.medrag.theBattle.model.squad.ValidatedSquad
 import net.medrag.theBattle.repo.PlayerRepo
 import net.medrag.theBattle.repo.UnitRepo
+import net.medrag.theBattle.service.api.BattleServiceApi
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.messaging.simp.SimpMessagingTemplate
@@ -28,7 +29,7 @@ import java.util.concurrent.ConcurrentLinkedQueue
 class BattleService(
         @Autowired private val playerRepo: PlayerRepo,
         @Autowired private val unitRepo: UnitRepo,
-        @Autowired private val wSocket: SimpMessagingTemplate) {
+        @Autowired private val wSocket: SimpMessagingTemplate) : BattleServiceApi {
 
     /**
      * Concurrent queue with squads, ready for battle
@@ -53,7 +54,7 @@ class BattleService(
      */
     @Throws(ValidationException::class)
     @Transactional(readOnly = true)
-    fun registerBattleBid(playerName: String, squadDTO: SquadDTO): BattleBidResponse {
+    override fun registerBattleBid(playerName: String, squadDTO: SquadDTO): BattleBidResponse {
 
         val ids = setOf(squadDTO.pos1.id, squadDTO.pos2.id, squadDTO.pos3.id, squadDTO.pos4.id, squadDTO.pos5.id)
         val units = unitRepo.findAllByPlayer_NameAndIdIn(playerName, ids)
@@ -110,7 +111,6 @@ class BattleService(
         return BattleBidResponse(AWAIT)
     }
 
-
     /**
      * Finish the battle
      * @param uuid UUID - battle uuid
@@ -120,7 +120,7 @@ class BattleService(
      * @param conceded Boolean - true if battle conceded
      */
     @Transactional
-    fun finishTheBattle(uuid: UUID, winner: ValidatedSquad, looser: ValidatedSquad, actionUnit: UnitDTO, conceded: Boolean = false) {
+    override fun finishTheBattle(uuid: UUID, winner: ValidatedSquad, looser: ValidatedSquad, actionUnit: UnitDTO, conceded: Boolean) {
         giveExperience(winner, looser, actionUnit, conceded)
         playerRepo.incrementGamesCount(looser.playerName)
         playerRepo.incrementWinsAndGamesCount(winner.playerName)
@@ -135,7 +135,7 @@ class BattleService(
      * @param conceded Boolean - true if battle conceded
      */
     @Transactional
-    fun giveExperience(winner: ValidatedSquad, looser: ValidatedSquad, finalAttack: UnitDTO, conceded: Boolean = false) {
+    override fun giveExperience(winner: ValidatedSquad, looser: ValidatedSquad, finalAttack: UnitDTO, conceded: Boolean) {
 
         val wonUnits = winner.map.values
         val loosedUnits = looser.map.values
@@ -169,7 +169,7 @@ class BattleService(
      */
     @Transactional
     @Throws(ProcessingException::class)
-    fun cancelBid(playerId: Long, playerName: String) {
+    override fun cancelBid(playerId: Long, playerName: String) {
         unitRepo.changeStatus(UnitStatus.IN_POOL, UnitStatus.IN_SEARCH, Player(playerId, playerName))
         playerRepo.setStatusAndUUID(PlayerStatus.FREE, null, listOf(playerName))
         if (!searching.remove(ValidatedSquad(playerName))) throw ProcessingException("The battle has already started!")
@@ -179,7 +179,7 @@ class BattleService(
      * Returns player's battle uuid
      * @param playerName String
      */
-    fun getBud(playerName: String) = playerRepo.getBud(playerName)
+    override fun getBud(playerName: String) = playerRepo.getBud(playerName)
 
     /**
      * Returns foesPair and players' profile images to render on battle page. Meant to be invoked on battle page landing.
@@ -189,7 +189,7 @@ class BattleService(
      * @throws ValidationException if {@link #getDislocations()} throws
      */
     @Throws(ValidationException::class)
-    fun getDislocationsOnBattleStart(playerName: String, bud: UUID): BattlePageResponse {
+    override fun getDislocationsOnBattleStart(playerName: String, bud: UUID): BattlePageResponse {
         val dislocations = getDislocations(playerName, bud)
         val player = playerRepo.findByName(playerName)!!.profileImage
         val foesName = if (playerName == dislocations.foe1.playerName) dislocations.foe2.playerName else dislocations.foe1.playerName
@@ -205,7 +205,7 @@ class BattleService(
      * @throws ValidationException if bud is invalid or if there is no playerName in FoesPair
      */
     @Throws(ValidationException::class)
-    fun getDislocations(playerName: String, bud: UUID): FoesPair {
+    override fun getDislocations(playerName: String, bud: UUID): FoesPair {
         battleFoes[bud]?.let {
             if (it.foe1.playerName == playerName || it.foe2.playerName == playerName) return it
             throw ValidationException("Your name is not in battle data, cheater.")

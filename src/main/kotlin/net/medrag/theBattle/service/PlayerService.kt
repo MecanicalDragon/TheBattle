@@ -7,6 +7,7 @@ import net.medrag.theBattle.model.entities.Player
 import net.medrag.theBattle.model.entities.ProfileImage
 import net.medrag.theBattle.repo.AvatarRepo
 import net.medrag.theBattle.repo.PlayerRepo
+import net.medrag.theBattle.service.api.PlayerServiceApi
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -24,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional
 class PlayerService(
         @Autowired private val playerRepo: PlayerRepo,
         @Autowired private val avatarRepo: AvatarRepo,
-        @Autowired private val pwEncoder: PasswordEncoder) {
+        @Autowired private val pwEncoder: PasswordEncoder) : PlayerServiceApi {
 
     /**
      * Makes an attempt to login user
@@ -34,7 +35,7 @@ class PlayerService(
      * @throws ValidationException if credentials are incorrect
      */
     @Throws(ValidationException::class)
-    fun login(name: String, pw: String): PlayerDTO {
+    override fun login(name: String, pw: String): PlayerDTO {
         val player = playerRepo.findByName(name) ?: throw ValidationException("There is no player with name $name")
         if (pwEncoder.matches(pw, player.password)) {
             return PlayerDTO(player.name, player.games, player.wins, player.profileImage, player.status, player.id)
@@ -48,7 +49,7 @@ class PlayerService(
      * @throws ValidationException if there is no player with such name
      */
     @Throws(ValidationException::class)
-    fun getPlayerData(name: String): PlayerDTO {
+    override fun getPlayerData(name: String): PlayerDTO {
         playerRepo.findByName(name)?.let {
             return PlayerDTO(it.name, it.games, it.wins, it.profileImage, it.status)
         }
@@ -64,7 +65,7 @@ class PlayerService(
      * @throws IncompatibleDataException if player with this name already exists in database
      */
     @Throws(ValidationException::class, IncompatibleDataException::class)
-    fun createPlayer(name: String, pw: String): PlayerDTO {
+    override fun createPlayer(name: String, pw: String): PlayerDTO {
         if (name.matches(REGEX.toRegex())) {
             if (pw.matches(REGEX.toRegex())) {
                 val encode = pwEncoder.encode(pw)
@@ -87,7 +88,7 @@ class PlayerService(
      */
     @Transactional
     @Throws(ValidationException::class)
-    fun saveNewProfileImage(id: Long, ava: ProfileImage) {
+    override fun saveNewProfileImage(id: Long, ava: ProfileImage) {
         if (!ava.background.matches(HEX.toRegex())
                 || !ava.color.matches(HEX.toRegex())
                 || !ava.borders.matches(HEX.toRegex())) {
@@ -99,7 +100,13 @@ class PlayerService(
         playerRepo.save(player)
     }
 
-    fun getPage(page: Int) = avatarRepo.findAll(PageRequest.of(page, 10)).map { it.image }
+    /**
+     * Returns links to available avatars. It's here because in future available avatars will be calculated depending
+     * on player's achievements.
+     * @param page Int
+     * @return Page<String>
+     */
+    override fun getAvatarsPage(page: Int) = avatarRepo.findAll(PageRequest.of(page, 10)).map { it.image }
 
     /**
      * Just regex store

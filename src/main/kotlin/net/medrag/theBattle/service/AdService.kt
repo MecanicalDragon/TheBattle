@@ -2,6 +2,7 @@ package net.medrag.theBattle.service
 
 import net.medrag.theBattle.model.DEFAULT_AD_URL
 import net.medrag.theBattle.repo.AdvertisementRepo
+import net.medrag.theBattle.service.api.AdServiceApi
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import javax.annotation.PostConstruct
@@ -12,11 +13,11 @@ import javax.annotation.PostConstruct
  * 12.04.2020
  */
 @Service
-class AdService(@Autowired private val adRepo: AdvertisementRepo) {
+class AdService(@Autowired private val adRepo: AdvertisementRepo) : AdServiceApi{
 
     private lateinit var links: List<String>
 
-    fun getRandomLink(): String = links[(Math.random() * links.size).toInt()]
+    override fun getRandomLink(): String = links[(Math.random() * links.size).toInt()]
 
     @PostConstruct
     private fun init() {

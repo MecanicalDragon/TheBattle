@@ -9,11 +9,12 @@ import net.medrag.theBattle.model.squad.SquadType
 import org.springframework.stereotype.Service
 import kotlin.math.roundToInt
 import net.medrag.theBattle.model.squad.ValidatedSquad
+import net.medrag.theBattle.service.api.AttackServiceApi
 import org.slf4j.LoggerFactory
 import kotlin.math.abs
 
 @Service
-class AttackService {
+class AttackService : AttackServiceApi {
 
     /**
      * Validate attack for closed-range unit.
@@ -24,7 +25,7 @@ class AttackService {
      * @throws ValidationException if attack is invalid
      */
     @Throws(ValidationException::class)
-    fun validateMeleeAttack(actor: Position, targets: List<Position>, playerSquad: ValidatedSquad, foesSquad: ValidatedSquad) {
+    override fun validateMeleeAttack(actor: Position, targets: List<Position>, playerSquad: ValidatedSquad, foesSquad: ValidatedSquad) {
 
         val player: ArrayList<Boolean> = arrayListOf(playerSquad.pos1.isAlive(), playerSquad.pos2.isAlive(),
                 playerSquad.pos3.isAlive(), playerSquad.pos4.isAlive(), playerSquad.pos5.isAlive())
@@ -174,7 +175,7 @@ class AttackService {
      * @param attackPower Int
      * @return String - battle logs
      */
-    fun sufferDamage(target: UnitDTO, accuracy: Int, attackPower: Int): String {
+    override fun sufferDamage(target: UnitDTO, accuracy: Int, attackPower: Int): String {
         val modifier = Math.random()
         if (modifier * accuracy > target.type.evasion) {
             val inDefence = target.effects.contains(UnitEffects.IN_BLOCK)
@@ -210,7 +211,7 @@ class AttackService {
      * @param squadType SquadType - attacker's squad type
      * @return Int - current accuracy
      */
-    fun calculateAccuracy(accuracy: Int, pos: Position, squadType: SquadType): Int =
+    override fun calculateAccuracy(accuracy: Int, pos: Position, squadType: SquadType): Int =
             if ((squadType === SquadType.FORCED_FRONT && pos.isStrongLine())
                     || (squadType === SquadType.FORCED_BACK && pos.isWeakLine())) {
                 log.debug("Accuracy value $accuracy for unit on position $pos will be reduced by 2 because of " +

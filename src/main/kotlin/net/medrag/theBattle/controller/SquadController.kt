@@ -1,9 +1,11 @@
 package net.medrag.theBattle.controller
 
-import net.medrag.theBattle.model.*
+import net.medrag.theBattle.model.IncompatibleDataException
+import net.medrag.theBattle.model.PlayerSession
+import net.medrag.theBattle.model.RETIRED
+import net.medrag.theBattle.model.ValidationException
 import net.medrag.theBattle.model.classes.Unitt
-import net.medrag.theBattle.service.PlayerSession
-import net.medrag.theBattle.service.SquadService
+import net.medrag.theBattle.service.api.SquadServiceApi
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -17,7 +19,7 @@ import org.springframework.web.bind.annotation.*
  */
 @RestController
 @RequestMapping("/squad")
-class SquadController(@Autowired private val squadService: SquadService,
+class SquadController(@Autowired private val squadService: SquadServiceApi,
                       @Autowired private val session: PlayerSession) {
 
     /**

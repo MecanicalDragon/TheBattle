@@ -1,4 +1,4 @@
-package net.medrag.theBattle.service
+package net.medrag.theBattle.model
 
 import net.medrag.theBattle.model.entities.PlayerStatus
 import org.springframework.stereotype.Component

@@ -8,8 +8,11 @@ import net.medrag.theBattle.model.squad.SquadType
 import net.medrag.theBattle.model.squad.SquadType.FORCED_BACK
 import net.medrag.theBattle.model.squad.SquadType.FORCED_FRONT
 import net.medrag.theBattle.model.squad.ValidatedSquad
-import org.junit.jupiter.api.*
+import net.medrag.theBattle.service.api.AttackServiceApi
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.TestConfiguration
@@ -28,7 +31,7 @@ internal class AttackServiceTest {
     internal class TestConfig
 
     @Autowired
-    lateinit var attackService: AttackService
+    lateinit var attackService: AttackServiceApi
 
     /**
      * Target is already dead

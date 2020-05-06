@@ -1,13 +1,19 @@
 package net.medrag.theBattle.controller
 
 import net.medrag.theBattle.config.PPPair
-import net.medrag.theBattle.model.*
+import net.medrag.theBattle.model.IncompatibleDataException
+import net.medrag.theBattle.model.ProcessingException
+import net.medrag.theBattle.model.ValidationException
 import net.medrag.theBattle.model.dto.ActionType
 import net.medrag.theBattle.model.dto.IndexPageResponse
 import net.medrag.theBattle.model.dto.Position
 import net.medrag.theBattle.model.dto.SimpleAction
 import net.medrag.theBattle.model.entities.PlayerStatus
-import net.medrag.theBattle.service.*
+import net.medrag.theBattle.model.PlayerSession
+import net.medrag.theBattle.service.api.ActionServiceApi
+import net.medrag.theBattle.service.api.AdServiceApi
+import net.medrag.theBattle.service.api.BattleServiceApi
+import net.medrag.theBattle.service.api.PlayerServiceApi
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -23,11 +29,11 @@ import javax.servlet.http.HttpSession
  */
 @RestController
 @RequestMapping("/auth")
-class AuthController(@Autowired private val playerService: PlayerService,
+class AuthController(@Autowired private val playerService: PlayerServiceApi,
                      @Autowired private val session: PlayerSession,
-                     @Autowired private val battleService: BattleService,
-                     @Autowired private val actionService: ActionService,
-                     @Autowired private val adService: AdService) {
+                     @Autowired private val battleService: BattleServiceApi,
+                     @Autowired private val actionService: ActionServiceApi,
+                     @Autowired private val adService: AdServiceApi) {
 
     /**
      * Checks if user authenticated

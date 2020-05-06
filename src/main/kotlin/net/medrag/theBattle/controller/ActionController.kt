@@ -3,8 +3,8 @@ package net.medrag.theBattle.controller
 import net.medrag.theBattle.model.ProcessingException
 import net.medrag.theBattle.model.ValidationException
 import net.medrag.theBattle.model.dto.SimpleAction
-import net.medrag.theBattle.service.ActionService
-import net.medrag.theBattle.service.PlayerSession
+import net.medrag.theBattle.model.PlayerSession
+import net.medrag.theBattle.service.api.ActionServiceApi
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.*
  */
 @RestController
 @RequestMapping("/action")
-class ActionController(@Autowired private val actionService: ActionService,
+class ActionController(@Autowired private val actionService: ActionServiceApi,
                        @Autowired private val session: PlayerSession) {
 
     /**

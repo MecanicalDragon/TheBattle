@@ -1,12 +1,13 @@
 package net.medrag.theBattle.controller
 
-import net.medrag.theBattle.model.*
+import net.medrag.theBattle.model.ProcessingException
+import net.medrag.theBattle.model.ValidationException
 import net.medrag.theBattle.model.dto.BattleBidResponse
 import net.medrag.theBattle.model.dto.BattlePageResponse
 import net.medrag.theBattle.model.dto.SquadDTO
 import net.medrag.theBattle.model.entities.PlayerStatus
-import net.medrag.theBattle.service.BattleService
-import net.medrag.theBattle.service.PlayerSession
+import net.medrag.theBattle.model.PlayerSession
+import net.medrag.theBattle.service.api.BattleServiceApi
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -20,7 +21,7 @@ import java.util.*
  */
 @RestController
 @RequestMapping("/battle")
-class BattleController(@Autowired private val battleService: BattleService,
+class BattleController(@Autowired private val battleService: BattleServiceApi,
                        @Autowired private val session: PlayerSession) {
 
     /**
