@@ -34,7 +34,7 @@ class Index extends Component {
                 background: "#ffffff",
                 borders: "#000000",
                 color: "#000000",
-                name: "dragon1"
+                name: "transparent"
             },
             status: STATUS[0],
             logoutWarning: false,

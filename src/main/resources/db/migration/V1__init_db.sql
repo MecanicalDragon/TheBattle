@@ -6,7 +6,7 @@ create table player
     games                    integer default 0,
     wins                     integer default 0,
     password                 varchar(255)        not null,
-    status                   varchar(255) check (status in ('FREE', 'IN_SEARCH', 'IN BATTLE')),
+    status                   varchar(255) check (status in ('FREE', 'IN_SEARCH', 'IN_BATTLE')),
     profile_image_name       varchar(255),
     profile_image_borders    varchar(255),
     profile_image_background varchar(255),
