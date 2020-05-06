@@ -170,6 +170,24 @@ class ActionService(@Autowired private val battleService: BattleServiceApi,
     }
 
     /**
+     * Send message to the during battle.
+     * @param playerName String - who sends
+     * @param bud UUID
+     * @param msgNumber Int - number of message
+     * @throws ValidationException if battle is over already.
+     */
+    @Throws(ValidationException::class)
+    override fun sendMessageToTheFoe(playerName: String, bud: UUID, msgNumber: Int) {
+        val dislocations = battleService.getDislocations(playerName, bud)
+        val foesName = when (playerName) {
+            dislocations.foe1.playerName -> dislocations.foe2.playerName
+            dislocations.foe2.playerName -> dislocations.foe1.playerName
+            else -> throw ValidationException("Your name is not in battle data, cheater.")
+        }
+        wSocket.convertAndSend("/battle/$foesName", ObjectMapper().writeValueAsString(MessageAction(msgNumber)))
+    }
+
+    /**
      * Includes action BLOCK instructions
      * @param actor UnitDTO
      * @param comments StringBuilder

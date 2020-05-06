@@ -38,4 +38,14 @@ interface ActionServiceApi {
      * @param bud UUID
      */
     fun pingTurn(playerName: String, bud: UUID)
+
+    /**
+     * Send message to the during battle.
+     * @param playerName String - who sends
+     * @param bud UUID
+     * @param msgNumber Int - number of message
+     * @throws ValidationException if battle is over already.
+     */
+    @Throws(ValidationException::class)
+    fun sendMessageToTheFoe(playerName: String, bud: UUID, msgNumber: Int)
 }

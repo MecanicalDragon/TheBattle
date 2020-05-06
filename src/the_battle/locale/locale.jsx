@@ -44,8 +44,8 @@ class Locale extends React.Component {
                 <DropdownMenu style={{minWidth: "unset", width: "100%", fontSize: "inherit"}}>
                     <DropdownItem active={locale === 'en'}
                                   onClick={() => this.setLanguage('en')}>EN</DropdownItem>
-                    <DropdownItem active={locale === 'de'}
-                                  onClick={() => this.setLanguage('de')}>DE</DropdownItem>
+                    {/*<DropdownItem active={locale === 'de'}*/}
+                    {/*              onClick={() => this.setLanguage('de')}>DE</DropdownItem>*/}
                     <DropdownItem active={locale === 'ru'}
                                   onClick={() => this.setLanguage('ru')}>RU</DropdownItem>
                 </DropdownMenu>

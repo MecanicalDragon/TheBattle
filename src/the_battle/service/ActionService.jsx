@@ -1,5 +1,7 @@
 import React from "react";
 import defaultHandling from "@/service/ErrorService";
+import {NotificationManager} from "react-notifications";
+import {FormattedMessage} from "react-intl";
 
 const appApi = DEPLOYED_URL;
 const sendCred = SEND_CREDENTIALS;
@@ -48,4 +50,57 @@ export async function performAction(actor, action, data) {
         defaultHandling(e, true);
         return null;
     });
+}
+
+const msgCoolDown = {
+    player: true,
+    foe: true
+};
+
+/**
+ * Send message to the opponent
+ * @param msgNumber - number of message
+ */
+export async function sendMessage(msgNumber) {
+    if (msgCoolDown.player) {
+        msgCoolDown.player = false
+        let url = new URL(appApi + 'action/sendMessage');
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            credentials: sendCred,
+            body: JSON.stringify(msgNumber)
+        }).then(function (response) {
+            if (response.status === 200) {
+                NotificationManager.success(<FormattedMessage id={"app.battle.message.you.say"}/>,
+                    <FormattedMessage id={"app.battle.message.default." + msgNumber}/>, 3000)
+            } else if (response.status === 400) {
+                NotificationManager.warning(<FormattedMessage id={"app.battle.message.battle.over.msg"}/>,
+                    <FormattedMessage id={"app.battle.message.battle.over.header"}/>, 5000)
+            } else defaultHandling(response, true);
+        })
+        setTimeout(function () {
+            msgCoolDown.player = true;
+        }, 3000)
+    } else {
+        NotificationManager.error("", <FormattedMessage id={"app.battle.message.too.early"}/>, 3000)
+    }
+}
+
+/**
+ * Show opponent's message
+ * @param msg - messageAction
+ */
+export function showNotification(msg) {
+    if (msgCoolDown.foe) {
+        msgCoolDown.foe = false;
+        NotificationManager.warning(<FormattedMessage id={"app.battle.message.foe.says"}/>,
+            <FormattedMessage id={"app.battle.message.default." + msg.messageNumber}/>, 3000)
+        setTimeout(function () {
+            msgCoolDown.foe = true;
+        }, 3000)
+    }
 }

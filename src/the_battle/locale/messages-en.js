@@ -27,7 +27,7 @@ export default {
     'app.index.logout.btn.cancel': 'Cancel',
     'app.index.logout.btn.logout': 'Logout',
 
-    //  Login
+    // Login
     'app.input.regex': 'Player name and password should be 4-16 characters of digits and letters.',
     'app.input.create.trim': 'Remove whitespaces in the beginning and the end of input fields.',
     'app.input.create.bad.request': 'Bad request Don\'t you cheating?',
@@ -66,16 +66,32 @@ export default {
     'app.manage.not.cancelled': 'Battle search is NOT cancelled.',
     'app.manage.need5': '5 heroes required!',
 
-    //Battle page
+    // Battle page
     'app.battle.your.turn.header': 'Your turn',
     'app.battle.foes.turn.header': 'Foe\'s turn',
     'app.battle.over': 'Looks like your battle has finished...',
     'app.battle.over.exit': 'EXIT',
     'app.battle.concede.header': 'WARNING!!!',
     'app.battle.concede.body': 'This action end the battle immediately revoking for you all gained in this battle experience!',
-    'app.battle.btn.attack' : 'Attack!',
-    'app.battle.btn.wait' : 'Wait',
-    'app.battle.btn.block' : 'Block',
-    'app.battle.btn.concede' : 'Concede',
+    'app.battle.btn.attack': 'Attack!',
+    'app.battle.btn.wait': 'Wait',
+    'app.battle.btn.block': 'Block',
+    'app.battle.btn.concede': 'Concede',
+
+    // Battle messages
+    'app.battle.message.you.say': '- you say.',
+    'app.battle.message.foe.says': '- your foe says.',
+    'app.battle.message.too.early': 'Too early!',
+    'app.battle.message.battle.over.header': 'The battle is over.',
+    'app.battle.message.battle.over.msg': 'Unfortunately, now you can\'t send a message to you opponent. But soon we\'ll add an opportunity to like him ;)',
+    'app.battle.message.default.1': 'Hello!',
+    'app.battle.message.default.2': 'Good game.',
+    'app.battle.message.default.3': 'Impressive.',
+    'app.battle.message.default.4': 'Lucky!',
+    'app.battle.message.default.5': 'My bad:(',
+    'app.battle.message.default.6': 'You will die, mortal!',
+    'app.battle.message.default.7': 'Mercy! Please, mercy!',
+    'app.battle.message.default.8': 'I\'ll be back.',
+    'app.battle.message.default.9': 'It\'s a good day to die.',
 
 }

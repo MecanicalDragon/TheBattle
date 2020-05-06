@@ -23,6 +23,30 @@ class ActionController(@Autowired private val actionService: ActionServiceApi,
                        @Autowired private val session: PlayerSession) {
 
     /**
+     * Send message to the opponent.
+     * @param msgNumber Int
+     * @return ResponseEntity<Any>:
+     *      - 200 in success case
+     *      - 401 if unauthorized
+     *      - 400 otherwise
+     */
+    @PostMapping("/sendMessage")
+    fun sendMessage(@RequestBody msgNumber: Int): ResponseEntity<Any> {
+
+        session.playerName?.let { name ->
+            session.bud?.let {
+                return try {
+                    actionService.sendMessageToTheFoe(name, it, msgNumber)
+                    ResponseEntity.ok().build()
+                } catch (e: ValidationException) {
+                    ResponseEntity.badRequest().body(e.message)
+                }
+            }
+        }
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
+    }
+
+    /**
      * SimpleAction handling
      * @param action SimpleAction
      * @return ResponseEntity<Any>:

@@ -17,6 +17,7 @@ import SockJsClient from 'react-stomp';
 import Console from "@/component/battle/Console";
 import * as routes from "@/router/routes";
 import {FormattedMessage} from "react-intl";
+import {showNotification} from "../../service/ActionService";
 
 const appApi = DEPLOYED_URL;
 
@@ -28,7 +29,7 @@ class BattleComp extends Component {
         this.state = {
             playerName: getPlayerName(),
             playersAvatar: null,
-            foesAvatar : null,
+            foesAvatar: null,
             myDescr: "",
             foesDescr: "",
             mySquad: undefined,
@@ -81,8 +82,10 @@ class BattleComp extends Component {
     }
 
     render() {
-        let {mySquad, foesSquad, playerName, foesName, actionMan, battleWon, timeLeft
-            , twoTurnsInARowCounter, playersAvatar, foesAvatar} = this.state;
+        let {
+            mySquad, foesSquad, playerName, foesName, actionMan, battleWon, timeLeft,
+            twoTurnsInARowCounter, playersAvatar, foesAvatar
+        } = this.state;
         return (
             <Container>
                 <Jumbotron style={{paddingLeft: 10, paddingRight: 10}}>
@@ -162,6 +165,10 @@ class BattleComp extends Component {
      * @param msg - ws message
      */
     actionPerformed = (msg) => {
+        if (msg.message) {
+            showNotification(msg)
+            return
+        }
         let actionMan = this.defineActionMan(msg.nextUnit);
         this.setState({
             mySquad: msg.action === ATTACK ? msg.additionalData.DAMAGED_SQUAD : this.state.mySquad,

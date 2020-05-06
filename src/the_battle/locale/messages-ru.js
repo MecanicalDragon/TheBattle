@@ -27,7 +27,7 @@ export default {
     'app.index.logout.btn.cancel': 'Отмена',
     'app.index.logout.btn.logout': 'Выйти',
 
-    //  Login
+    // Login
     'app.input.regex': 'Имя и пароль должны содержать 4-16 символов букв и цифр.',
     'app.input.create.trim': 'Уберите пробелы в начале и конце вводимых полей.',
     'app.input.create.bad.request': 'Невалидный запрос. А не наебать ли ты меня пытаешься?',
@@ -66,16 +66,32 @@ export default {
     'app.manage.not.cancelled': 'Поиск битвы НЕ отменен.',
     'app.manage.need5': 'Нужно 5 героев!',
 
-    //Battle page
+    // Battle page
     'app.battle.your.turn.header': 'Ваш ход',
     'app.battle.foes.turn.header': 'Ход соперника',
     'app.battle.over': 'Похоже, ваш бой уже закончился...',
     'app.battle.over.exit': 'ВЫХОД',
     'app.battle.concede.header': 'ВНИМАНИЕ!!!',
     'app.battle.concede.body': 'Это действие немедленно заканчивает бой, аннулируя весь заработанный вами в этом бою опыт!',
-    'app.battle.btn.attack' : 'Атака!',
-    'app.battle.btn.wait' : 'Выждать',
-    'app.battle.btn.block' : 'Блок',
-    'app.battle.btn.concede' : 'Сдаться',
+    'app.battle.btn.attack': 'Атака!',
+    'app.battle.btn.wait': 'Выждать',
+    'app.battle.btn.block': 'Блок',
+    'app.battle.btn.concede': 'Сдаться',
+
+    // Battle messages
+    'app.battle.message.you.say': '- говорите вы.',
+    'app.battle.message.foe.says': '- говорит ваш противник.',
+    'app.battle.message.too.early': 'Слишком рано!',
+    'app.battle.message.battle.over.header': 'Бой окончен.',
+    'app.battle.message.battle.over.msg': 'К сожалению, вы уже не можете отправить сообщение вашему сопернику, но скоро мы добавим возможность лайкнуть его ;)',
+    'app.battle.message.default.1': 'Привет!',
+    'app.battle.message.default.2': 'Хорошая игра.',
+    'app.battle.message.default.3': 'Впечатляет.',
+    'app.battle.message.default.4': 'Повезло!',
+    'app.battle.message.default.5': 'Сплоховал:(',
+    'app.battle.message.default.6': 'Тобi конец!',
+    'app.battle.message.default.7': 'Пощады!',
+    'app.battle.message.default.8': 'Не прощаюсь.',
+    'app.battle.message.default.9': 'Хороший день для смерти.',
 
 }
