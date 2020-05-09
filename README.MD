@@ -12,7 +12,7 @@ You need java, gradle, node.js and yarn. Input into console following commands:
     - java -jar TheBattle-0.98.6.jar
     
 If you use Linux there might be some problems with path variables definitions or 
-sudo permissions. If so, you can download compiled jar [here](https://yadi.sk/d/rFBVT7Kc8754HA)
+sudo permissions. If so, you can download compiled jar [here](https://yadi.sk/d/jTv1cikc1CclBw)
     
 The game will start on http://localhost:9191 in your browser. 
 Btw, you need another browser and another player if you want to try it, cause there is no AI for a while)
