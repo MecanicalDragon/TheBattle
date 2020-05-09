@@ -22,10 +22,9 @@ import javax.servlet.http.HttpSession
 
 
 /**
+ * Serves for authentication operations.
  * @author Stanislav Tretyakov
  * 23.12.2019
- *
- * Provides authentication operations
  */
 @RestController
 @RequestMapping("/auth")

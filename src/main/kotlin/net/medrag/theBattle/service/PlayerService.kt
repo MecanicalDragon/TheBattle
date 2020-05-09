@@ -18,8 +18,6 @@ import org.springframework.transaction.annotation.Transactional
 /**
  * @author Stanislav Tretyakov
  * 23.12.2019
- *
- * Provides operations with player as user
  */
 @Service
 class PlayerService(

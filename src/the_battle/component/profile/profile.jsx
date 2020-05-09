@@ -1,16 +1,11 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, Fragment} from 'react';
 import {connect} from 'react-redux';
 import Img from 'react-image'
 import * as routes from '@/router/routes'
 import {setNavPosition} from "../../constants/actions";
 import {saveProfileImage, getAvatarsPage} from "../../service/PlayerService";
 import {Profile} from "../../constants/paths";
-import {
-    Container,
-    Jumbotron,
-    Row,
-    Col, Button,
-} from 'reactstrap';
+import {Row, Col, Button} from 'reactstrap';
 import iro from '@jaames/iro';
 import {FormattedMessage} from "react-intl";
 import TheTint from "./tint";
@@ -119,75 +114,75 @@ function ProfilePage(props) {
     }
 
     return (
-        <Container>
-            <Jumbotron style={{textAlign: "center"}}>
-                <Row>
-                    <Col>
-                        <div style={{
-                            width: 162,
-                            height: 162,
-                            backgroundColor: background,
-                            borderWidth: 6,
-                            borderStyle: "solid",
-                            borderRadius: 22,
-                            borderColor: borders,
-                            margin: "auto"
-                        }}>
-                            <TheTint src={APP_ROOT + "res/avatar/" + image + ".png"}
-                                     color={outline} width={"150"} height={"150"}/>
-                        </div>
-                        <br/>
-                        <Button style={{width: 162, backgroundColor: "var(--app-primary-color)"}}
-                                onClick={saveAndReturn}><FormattedMessage id={"app.avatar.save"}/></Button>
-                    </Col>
-                    <Col>
-                        {/*<h6>Borders</h6>*/}
-                        <div id={"bordersColorPicker"}/>
-                    </Col>
-                    <Col>
-                        {/*<h6>Background</h6>*/}
-                        <div id={"backgroundColorPicker"}/>
-                    </Col>
-                    <Col>
-                        {/*<h6>Outline</h6>*/}
-                        <div id={"outlineColorPicker"}/>
-                    </Col>
-                </Row>
-                <br/>
-                <br/>
-                <Row>
-                    <Col style={{textAlign: "right"}}>
-                        <Button color={"info"} onClick={() => prev()} disabled={page === 0}>
-                            <FormattedMessage id={"app.avatar.prev"}/></Button>
-                    </Col>
-                    <Col>
-                        <Row style={{
-                            backgroundColor: "white",
-                            borderRadius: 15,
-                            borerWidth: 5,
-                            borderColor: "darkGrey",
-                            borderStyle: "solid",
-                            width: 660,
-                            height: 266
-                        }}>
-                            {
-                                content.map((image, index) => {
-                                    return <Col key={index} style={{padding: 15}}>
-                                        <Img style={{maxHeight: 100, maxWidth: 100, cursor: "pointer"}}
-                                             onClick={() => setImage(image)}
-                                             src={APP_ROOT + "res/avatar/" + image + ".png"}/>
-                                    </Col>
-                                })
-                            }
-                        </Row>
-                    </Col>
-                    <Col style={{textAlign: "left"}}>
-                        <Button color={"info"} onClick={() => next()} disabled={page + 1 === totalPages}>
-                            <FormattedMessage id={"app.avatar.next"}/></Button>
-                    </Col>
-                </Row>
-            </Jumbotron>
-        </Container>
+        <Fragment>
+            <Row style={{marginTop: 50}}>
+                <Col>
+                    <div style={{
+                        width: 162,
+                        height: 162,
+                        backgroundColor: background,
+                        borderWidth: 6,
+                        borderStyle: "solid",
+                        borderRadius: 22,
+                        borderColor: borders,
+                        margin: "auto"
+                    }}>
+                        <TheTint src={APP_ROOT + "res/avatar/" + image + ".png"}
+                                 color={outline} width={"150"} height={"150"}/>
+                    </div>
+                    <br/>
+                    <Button style={{width: 162, backgroundColor: "var(--app-primary-color)"}}
+                            onClick={saveAndReturn}><FormattedMessage id={"app.avatar.save"}/></Button>
+                </Col>
+                <Col>
+                    {/*<h6>Borders</h6>*/}
+                    <div id={"bordersColorPicker"}/>
+                </Col>
+                <Col>
+                    {/*<h6>Background</h6>*/}
+                    <div id={"backgroundColorPicker"}/>
+                </Col>
+                <Col>
+                    {/*<h6>Outline</h6>*/}
+                    <div id={"outlineColorPicker"}/>
+                </Col>
+            </Row>
+            <br/>
+            <br/>
+            <Row>
+                <Col style={{textAlign: "right"}}>
+                    <Button color={"info"} onClick={() => prev()} disabled={page === 0}
+                            style={page === 0 ? {cursor: "default"} : {cursor: "pointer"}}>
+                        <FormattedMessage id={"app.avatar.prev"}/></Button>
+                </Col>
+                <Col>
+                    <Row style={{
+                        backgroundColor: "white",
+                        borderRadius: 15,
+                        borerWidth: 5,
+                        borderColor: "darkGrey",
+                        borderStyle: "solid",
+                        width: 660,
+                        height: 266
+                    }}>
+                        {
+                            content.map((image, index) => {
+                                return <Col key={index} style={{padding: 15}}>
+                                    <Img style={{maxHeight: 100, maxWidth: 100, cursor: "pointer"}}
+                                         onClick={() => setImage(image)}
+                                         src={APP_ROOT + "res/avatar/" + image + ".png"}/>
+                                </Col>
+                            })
+                        }
+                    </Row>
+                </Col>
+                <Col style={{textAlign: "left"}}>
+                    <Button color={"info"} onClick={() => next()} disabled={page + 1 === totalPages}
+                            style={page + 1 === totalPages ? {cursor: "default"} : {cursor: "pointer"}}>
+                        <FormattedMessage id={"app.avatar.next"}/></Button>
+                </Col>
+            </Row>
+        </Fragment>
     )
 }
 

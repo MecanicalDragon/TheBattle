@@ -1,11 +1,6 @@
-import React, {Component} from 'react';
+import React, {Component, Fragment} from 'react';
 import {connect} from 'react-redux';
-import {
-    Container,
-    Jumbotron,
-    Row,
-    Col
-} from 'reactstrap'
+import {Col, Row} from 'reactstrap'
 import {setNavPosition} from "@/constants/actions";
 import {Battle} from "@/constants/paths";
 import * as BattleService from '@/service/BattleService'
@@ -87,55 +82,53 @@ class BattleComp extends Component {
             twoTurnsInARowCounter, playersAvatar, foesAvatar
         } = this.state;
         return (
-            <Container>
-                <Jumbotron style={{paddingLeft: 10, paddingRight: 10}}>
-                    <Row style={{height: 10, textAlign: "center"}}>
-                        <Col>
-                            <h1 style={timeLeft < 6 ? {color: "red"} : {color: "black"}}>{timeLeft}</h1>
-                        </Col>
+            <Fragment>
+                <Row style={{height: 10, textAlign: "center", marginTop: 30}}>
+                    <Col>
+                        <h1 style={timeLeft < 6 ? {color: "red"} : {color: "black"}}>{timeLeft}</h1>
+                    </Col>
+                </Row>
+                <Row>
+                    <Col style={{padding: 5}}>
+                        {mySquad ?
+                            <BattleSquad foe={false} squad={mySquad} clearTargets={this.clearTargets}
+                                         calculateTargets={this.calculateTargets} actionMan={actionMan}
+                                         simpleAction={this.simpleAction} playerName={playerName}
+                                         won={battleWon} twoTurns={twoTurnsInARowCounter} ava={playersAvatar}/>
+                            : null}
+                    </Col>
+                    <Col style={{padding: 5}}>
+                        {foesSquad ?
+                            <BattleSquad foe={true} squad={foesSquad} clearTargets={this.clearTargets}
+                                         calculateTargets={this.calculateTargets} actionMan={actionMan}
+                                         selectTargets={this.performAttack} playerName={foesName}
+                                         won={battleWon} twoTurns={twoTurnsInARowCounter} ava={foesAvatar}/>
+                            : null}
+                    </Col>
+                </Row>
+                {this.state.badReq ? null :
+                    <Row style={{justifyContent: "center", marginTop: 15}}>
+                        <Console battleLogs={this.state.battleLogs}/>
                     </Row>
+                }
+                {battleWon ?
                     <Row>
-                        <Col>
-                            {mySquad ?
-                                <BattleSquad foe={false} squad={mySquad} clearTargets={this.clearTargets}
-                                             calculateTargets={this.calculateTargets} actionMan={actionMan}
-                                             simpleAction={this.simpleAction} playerName={playerName}
-                                             won={battleWon} twoTurns={twoTurnsInARowCounter} ava={playersAvatar}/>
-                                : null}
-                        </Col>
-                        <Col>
-                            {foesSquad ?
-                                <BattleSquad foe={true} squad={foesSquad} clearTargets={this.clearTargets}
-                                             calculateTargets={this.calculateTargets} actionMan={actionMan}
-                                             selectTargets={this.performAttack} playerName={foesName}
-                                             won={battleWon} twoTurns={twoTurnsInARowCounter} ava={foesAvatar}/>
-                                : null}
+                        <Col style={{textAlign: "center", cursor: "pointer", color: "var(--app-primary-color)"}}
+                             onClick={() => this.props.history.push(routes.manage())}>
+                            {
+                                this.state.badReq ? <FormattedMessage id={'app.battle.over'}/> : null
+                            }
+                            <h1><FormattedMessage id={'app.battle.over.exit'}/></h1>
                         </Col>
                     </Row>
-                    {this.state.badReq ? null :
-                        <Row style={{justifyContent: "center", marginTop: 15}}>
-                            <Console battleLogs={this.state.battleLogs}/>
-                        </Row>
-                    }
-                    {battleWon ?
-                        <Row>
-                            <Col style={{textAlign: "center", cursor: "pointer", color: "var(--app-primary-color)"}}
-                                 onClick={() => this.props.history.push(routes.manage())}>
-                                {
-                                    this.state.badReq ? <FormattedMessage id={'app.battle.over'}/> : null
-                                }
-                                <h1><FormattedMessage id={'app.battle.over.exit'}/></h1>
-                            </Col>
-                        </Row>
-                        : null
-                    }
-                </Jumbotron>
+                    : null
+                }
                 <SockJsClient url={appApi + 'battleStomp'} topics={['/battle/' + this.state.playerName]}
                               onMessage={(msg) => this.actionPerformed(msg)}
                               ref={(client) => {
                                   this.clientRef = client
                               }}/>
-            </Container>
+            </Fragment>
         )
     }
 

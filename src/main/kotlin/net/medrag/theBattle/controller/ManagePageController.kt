@@ -5,7 +5,9 @@ import net.medrag.theBattle.model.PlayerSession
 import net.medrag.theBattle.model.RETIRED
 import net.medrag.theBattle.model.ValidationException
 import net.medrag.theBattle.model.classes.Unitt
-import net.medrag.theBattle.service.api.SquadServiceApi
+import net.medrag.theBattle.model.dto.ManagePageResponse
+import net.medrag.theBattle.service.api.PlayerServiceApi
+import net.medrag.theBattle.service.api.UnitServiceApi
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -13,31 +15,15 @@ import org.springframework.web.bind.annotation.*
 
 
 /**
+ * Handles squad manage page requests.
  * @author Stanislav Tretyakov
  * 19.12.2019
- * Processes squad manage page requests
  */
 @RestController
 @RequestMapping("/squad")
-class SquadController(@Autowired private val squadService: SquadServiceApi,
-                      @Autowired private val session: PlayerSession) {
-
-    /**
-     * Returns free heroes pool
-     * @return ResponseEntity<Any>:
-     *      - 200 List of UnitDTO
-     *      - 401 Error string
-     *      - 555 if db fails
-     */
-    @Deprecated("currently 'getPoolAndData' used")
-    @GetMapping("/getPool")
-    fun getPool(): ResponseEntity<Any> {
-
-        session.playerName?.let {
-            return ResponseEntity.ok(squadService.getPool(it))
-        }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build()
-    }
+class ManagePageController(@Autowired private val unitService: UnitServiceApi,
+                           @Autowired private val playerService: PlayerServiceApi,
+                           @Autowired private val session: PlayerSession) {
 
     /**
      * Returns free heroes pool and player data
@@ -51,10 +37,10 @@ class SquadController(@Autowired private val squadService: SquadServiceApi,
 
         session.playerName?.let {
             try {
-                val pool = squadService.getPool(it)
-                val resp = squadService.compileResponse(it, pool)
-                session.playerStatus = resp.player.status
-                return ResponseEntity.ok(resp)
+                val pool = unitService.getPool(it)
+                val player = playerService.getPlayerData(it)
+                session.playerStatus = player.status
+                return ResponseEntity.ok(ManagePageResponse(player, pool))
             } catch (e: IncompatibleDataException) {
             }
         }
@@ -78,7 +64,7 @@ class SquadController(@Autowired private val squadService: SquadServiceApi,
 
         session.playerName?.let {
             return try {
-                ResponseEntity.ok(squadService.addNewUnit(it, name, type))
+                ResponseEntity.ok(unitService.addNewUnit(it, name, type))
             } catch (e: ValidationException) {
                 ResponseEntity.status(HttpStatus.PRECONDITION_FAILED).build<Any>()
             } catch (e: IncompatibleDataException) {
@@ -102,7 +88,7 @@ class SquadController(@Autowired private val squadService: SquadServiceApi,
 
         session.playerName?.let {
             return try {
-                squadService.deleteUnit(unit, it)
+                unitService.deleteUnit(unit, it)
                 ResponseEntity.ok(RETIRED)
             } catch (e: IncompatibleDataException) {
                 ResponseEntity(e.message, HttpStatus.BAD_REQUEST)

@@ -1,13 +1,6 @@
-import React, {Component} from 'react';
+import React, {Component, Fragment} from 'react';
 import {connect} from 'react-redux';
-import {
-    Container,
-    Jumbotron,
-    Button,
-    ButtonGroup,
-    Row,
-    Col
-} from 'reactstrap'
+import {Button, ButtonGroup, Row, Col} from 'reactstrap'
 import {setNavPosition} from "@/constants/actions";
 import {Manage} from "@/constants/paths";
 import SquadCol from "@/component/manager/SquadCol";
@@ -302,53 +295,50 @@ class ManageComp extends Component {
         let smallRow = this.getSmallRow();
         let longRow = this.getLongRow();
         return (
-            <Container>
-                <Jumbotron style={{paddingTop: 30, height: 700, minWidth: 1100}}>
-                    <DragDropContext onDragEnd={this.onDragEnd} onDragStart={this.onDragStart}
-                                     onDragUpdate={this.onDragUpdate}>
-                        <Row>
-                            <Col xs={"auto"}>
-                                <Pool reserved={this.state.columns.reserve.heroes} pool={this.state.pool}
-                                      descrFunc={this.setDescription} addNewHero={this.addNewHero}/>
+            <Fragment>
+                <DragDropContext onDragEnd={this.onDragEnd} onDragStart={this.onDragStart}
+                                 onDragUpdate={this.onDragUpdate}>
+                    <Row style={{textAlign: "left"}}>
+                        <Col xs={"auto"}>
+                            <Pool reserved={this.state.columns.reserve.heroes} pool={this.state.pool}
+                                  descrFunc={this.setDescription} addNewHero={this.addNewHero}/>
+                        </Col>
+                        <Col xs={"auto"}>
+                            <div style={{marginTop: 60, marginLeft: 38, marginBottom: 15}}>
+                                <h5><FormattedMessage id={"app.manage.squad.type"}/></h5>
+                                <ButtonGroup>
+                                    <Button color={this.state.sqType === 2 ? "success" : "warning"}
+                                            onClick={() => this.setState({sqType: 2})}
+                                            active={this.state.sqType === 2}>FORCED BACK</Button>
+                                    <Button color={this.state.sqType === 1 ? "success" : "warning"}
+                                            onClick={() => this.setState({sqType: 1})}
+                                            active={this.state.sqType === 1}>FORCED FRONT</Button>
+                                </ButtonGroup>
+                            </div>
+                            <Row className={sqType === 1 ? "squadPlace" : "squadPlaceReverse"}>
+                                {smallRow}
+                                {longRow}
+                            </Row>
+                        </Col>
+                        <Col xs={"auto"}>
+                            <Col xs={"auto"} style={{marginTop: 92}}>
+                                <Button onClick={() => this.toBattle()} disabled={this.state.toBattleDisabled}
+                                        color={playerData.status === STATUS[1] ? "danger"
+                                            : playerData.status === STATUS[0] ? "success" : "info"}
+                                        style={{marginBottom: 17, marginRight: 15, width: 100}}>
+                                    <FormattedMessage id={playerData.status === STATUS[1]
+                                        ? "app.manage.battle.cancel" : playerData.status === STATUS[0] ?
+                                            "app.manage.to.battle" : "app.manage.battle.goes"}/></Button>
+                                {playerData.status === STATUS[1] ? <span>Searching...</span> : null}
+                                {/*<Button onClick={() => this.fillWithFighters()} color={"info"}*/}
+                                {/*        style={{marginBottom: 17, marginRight: 15}}>Test</Button>*/}
+                                <br/>
+                                <DescriptionArea description={this.state.descr} height={274}/>
+                                <Remove show={this.state.removeWindow}/>
                             </Col>
-                            <Col xs={"auto"}>
-                                <div style={{marginTop: 60, marginLeft: 38, marginBottom: 15}}>
-                                    <h5><FormattedMessage id={"app.manage.squad.type"}/></h5>
-                                    <ButtonGroup>
-                                        <Button color={this.state.sqType === 2 ? "success" : "warning"}
-                                                onClick={() => this.setState({sqType: 2})}
-                                                active={this.state.sqType === 2}>FORCED BACK</Button>
-                                        <Button color={this.state.sqType === 1 ? "success" : "warning"}
-                                                onClick={() => this.setState({sqType: 1})}
-                                                active={this.state.sqType === 1}>FORCED FRONT</Button>
-                                    </ButtonGroup>
-                                </div>
-                                <Row className={sqType === 1 ? "squadPlace" : "squadPlaceReverse"}>
-                                    {smallRow}
-                                    {longRow}
-                                </Row>
-                            </Col>
-                            <Col xs={"auto"}>
-                                <Col xs={"auto"} style={{marginTop: 92}}>
-                                    <Button onClick={() => this.toBattle()} disabled={this.state.toBattleDisabled}
-                                            color={playerData.status === STATUS[1] ? "danger"
-                                                : playerData.status === STATUS[0] ? "success" : "info"}
-                                            style={{marginBottom: 17, marginRight: 15, width: 100}}>
-                                        <FormattedMessage id={playerData.status === STATUS[1]
-                                            ? "app.manage.battle.cancel" : playerData.status === STATUS[0] ?
-                                                "app.manage.to.battle" : "app.manage.battle.goes"}/></Button>
-                                    {playerData.status === STATUS[1] ? <span>Searching...</span> : null}
-                                    {/*//TODO: comment out*/}
-                                    {/*<Button onClick={() => this.fillWithFighters()} color={"info"}*/}
-                                    {/*        style={{marginBottom: 17, marginRight: 15}}>Test</Button>*/}
-                                    <br/>
-                                    <DescriptionArea description={this.state.descr} height={274}/>
-                                    <Remove show={this.state.removeWindow}/>
-                                </Col>
-                            </Col>
-                        </Row>
-                    </DragDropContext>
-                </Jumbotron>
+                        </Col>
+                    </Row>
+                </DragDropContext>
                 <SockJsClient url={appApi + 'battleStomp'} topics={['/searching/' + this.state.playerName]}
                               onMessage={(msg) => {
                                   if (msg === "GAME_FOUND") this.startBattle()
@@ -356,7 +346,7 @@ class ManageComp extends Component {
                               ref={(client) => {
                                   this.clientRef = client
                               }}/>
-            </Container>
+            </Fragment>
         )
     }
 

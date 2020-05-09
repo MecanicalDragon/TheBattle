@@ -8,6 +8,7 @@ import java.util.*
 
 
 /**
+ * Possible player's actions.
  * @author Stanislav Tretyakov
  * 06.05.2020
  */

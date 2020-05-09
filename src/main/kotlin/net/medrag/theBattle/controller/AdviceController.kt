@@ -6,6 +6,11 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ControllerAdvice
 import org.springframework.web.bind.annotation.ExceptionHandler
 
+/**
+ * Handles DataAccessException.
+ * @author Stanislav Tretyakov
+ * 12.02.2020
+ */
 @ControllerAdvice
 class AdviceController {
     @ExceptionHandler(value = [DataAccessException::class])

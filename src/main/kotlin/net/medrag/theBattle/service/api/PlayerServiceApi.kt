@@ -8,6 +8,7 @@ import org.springframework.data.domain.Page
 
 
 /**
+ * Player-related operations.
  * @author Stanislav Tretyakov
  * 06.05.2020
  */

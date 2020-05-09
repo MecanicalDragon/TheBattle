@@ -16,6 +16,7 @@ import java.util.*
 
 
 /**
+ * Battle-arrangement operations.
  * @author Stanislav Tretyakov
  * 31.12.2019
  */

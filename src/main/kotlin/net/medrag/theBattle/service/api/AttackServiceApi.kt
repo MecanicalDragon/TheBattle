@@ -8,6 +8,7 @@ import net.medrag.theBattle.model.squad.ValidatedSquad
 
 
 /**
+ * Attack performing-related operations.
  * @author Stanislav Tretyakov
  * 06.05.2020
  */

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*
 
 
 /**
+ * Player profile operations.
  * @author Stanislav Tretyakov
  * 30.04.2020
  */

@@ -13,6 +13,10 @@ import net.medrag.theBattle.service.api.AttackServiceApi
 import org.slf4j.LoggerFactory
 import kotlin.math.abs
 
+/**
+ * @author Stanislav Tretyakov
+ * 18.01.2019
+ */
 @Service
 class AttackService : AttackServiceApi {
 

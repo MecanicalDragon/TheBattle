@@ -9,10 +9,10 @@ import ApplicationRouter from '@/router/routerSwitch';
 import {NotificationContainer} from 'react-notifications';
 import {
     Container,
+    Jumbotron,
     Nav,
     Navbar,
     NavbarBrand
-
 } from 'reactstrap';
 
 import "./layout.css";
@@ -43,9 +43,13 @@ class Layout extends React.Component {
                 {/*Content*/}
                 <div className="content" style={{position: "relative"}}>
                     <BreadCrump history={this.props.history}/>
-                    <Suspense fallback={Layout.getLoader()}>
-                        <ApplicationRouter/>
-                    </Suspense>
+                    <Container>
+                        <Jumbotron style={{width: 1110, height: 700, paddingTop: 30, textAlign: "center"}}>
+                            <Suspense fallback={Layout.getLoader()}>
+                                <ApplicationRouter/>
+                            </Suspense>
+                        </Jumbotron>
+                    </Container>
                 </div>
 
                 {/*Footer*/}

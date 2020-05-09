@@ -1,14 +1,7 @@
 import React, {Component, Fragment} from 'react';
 import {connect} from 'react-redux';
 import ProfileImage from "./common/ProfileImage";
-import {
-    Container,
-    Jumbotron,
-    Button,
-    Row,
-    Col,
-    Input, Form, Popover, PopoverHeader, PopoverBody
-} from 'reactstrap'
+import {Button, Row, Col, Input, Form, Popover, PopoverHeader, PopoverBody} from 'reactstrap'
 import * as routes from '@/router/routes'
 import * as player from '@/service/PlayerService'
 import {setNavPosition} from "@/constants/actions";
@@ -66,15 +59,13 @@ class Index extends Component {
 
     render() {
         return (
-            <Container>
-                <Jumbotron style={{textAlign: "center"}}>
-                    <h1 id={"theBattle"} style={{color: "var(--app-primary-color)"}}><FormattedMessage
-                        id={'app.index.header'}/></h1>
-                    <br/>
-                    {this.state.authenticated === true ? this.getPlayerForm() :
-                        this.state.authenticated === false ? this.getLoginForm() : null}
-                </Jumbotron>
-            </Container>
+            <Fragment>
+                <h1 id={"theBattle"} style={{color: "var(--app-primary-color)"}}><FormattedMessage
+                    id={'app.index.header'}/></h1>
+                <br/>
+                {this.state.authenticated === true ? this.getPlayerForm() :
+                    this.state.authenticated === false ? this.getLoginForm() : null}
+            </Fragment>
         )
     }
 
@@ -156,36 +147,38 @@ class Index extends Component {
 
     getLoginForm() {
         return (
-            <Form onSubmit={(e) => this.login(e)}>
-                <Row style={{margin: 7}}>
-                    <Col xs={{size: 4}}/>
-                    <Col xs={{size: 4}}>
-                        <Input type={"text"} value={this.state.enterName} onChange={this.handleChange}
-                               placeholder={"Input your name"}/>
-                    </Col>
-                </Row>
-                <Row style={{margin: 7}}>
-                    <Col xs={{size: 4}}/>
-                    <Col xs={{size: 4}}>
-                        <Input type={"password"} value={this.state.enterPw} onChange={this.handlePwChange}
-                               placeholder={"Input password"}/>
-                    </Col>
-                </Row>
-                <Row style={{margin: 7}}>
-                    <Col xs={{size: 4}}/>
+            <div style={{marginTop: 50}}>
+                <Form onSubmit={(e) => this.login(e)}>
+                    <Row style={{margin: 7}}>
+                        <Col xs={{size: 4}}/>
+                        <Col xs={{size: 4}}>
+                            <Input type={"text"} value={this.state.enterName} onChange={this.handleChange}
+                                   placeholder={"Input your name"}/>
+                        </Col>
+                    </Row>
+                    <Row style={{margin: 7}}>
+                        <Col xs={{size: 4}}/>
+                        <Col xs={{size: 4}}>
+                            <Input type={"password"} value={this.state.enterPw} onChange={this.handlePwChange}
+                                   placeholder={"Input password"}/>
+                        </Col>
+                    </Row>
+                    <Row style={{margin: 7}}>
+                        <Col xs={{size: 4}}/>
 
-                    <Col xs={{size: 2}}>
-                        <Button color={"success"} type={"submit"}
-                                style={{width: 140}}>Login</Button>
-                    </Col>
-                    <Col xs={{size: 2}}>
-                        <Button color={"info"} onClick={() => this.create()}
-                                style={{width: 140}}>Create</Button>
-                    </Col>
-                    <Col xs={{size: 4}}/>
+                        <Col xs={{size: 2}}>
+                            <Button color={"success"} type={"submit"}
+                                    style={{width: 140}}>Login</Button>
+                        </Col>
+                        <Col xs={{size: 2}}>
+                            <Button color={"info"} onClick={() => this.create()}
+                                    style={{width: 140}}>Create</Button>
+                        </Col>
+                        <Col xs={{size: 4}}/>
 
-                </Row>
-            </Form>
+                    </Row>
+                </Form>
+            </div>
         )
     }
 

@@ -8,7 +8,7 @@ import net.medrag.theBattle.model.entities.Player
 import net.medrag.theBattle.model.entities.UnitStatus
 import net.medrag.theBattle.repo.PlayerRepo
 import net.medrag.theBattle.repo.UnitRepo
-import net.medrag.theBattle.service.api.SquadServiceApi
+import net.medrag.theBattle.service.api.UnitServiceApi
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -17,36 +17,17 @@ import org.springframework.transaction.annotation.Transactional
 /**
  * @author Stanislav Tretyakov
  * 19.12.2019
- * Squad manage actions processing
  */
 @Service
-class SquadService(@Autowired val unitRepo: UnitRepo, @Autowired val playerRepo: PlayerRepo): SquadServiceApi {
+class UnitService(@Autowired val unitRepo: UnitRepo, @Autowired val playerRepo: PlayerRepo) : UnitServiceApi {
 
     /**
      * Returns Player's hero pool or empty list
      * @param playerName String
      * @return List<UnitDTO> player's heroes
      */
-    override fun getPool(playerName: String): List<UnitDTO> {
-        val list = unitRepo.findAllByPlayer_NameAndStatus(playerName, UnitStatus.IN_POOL)
-        val result = ArrayList<UnitDTO>(list.size)
-        for (unit in list) result.add(buildUnit(unit))
-        return result;
-    }
-
-    /**
-     * Retrieves player data for manage page start request
-     * @param playerName String
-     * @param pool List<UnitDTO> - list of free heroes
-     * @return ManagePageResponse - data for render manage page
-     * @throws IncompatibleDataException if playerName is incorrect
-     */
-    @Throws(IncompatibleDataException::class)
-    override fun compileResponse(playerName: String, pool: List<UnitDTO>): ManagePageResponse {
-        val player = playerRepo.findByName(playerName)
-                ?: throw IncompatibleDataException("Invalid playername: $playerName")
-        return ManagePageResponse(PlayerDTO(playerName, player.games, player.wins, player.profileImage, player.status), pool)
-    }
+    override fun getPool(playerName: String): List<UnitDTO> =
+            unitRepo.findAllByPlayer_NameAndStatus(playerName, UnitStatus.IN_POOL).map { buildUnit(it) }
 
     /**
      * Adding new hero in pool
@@ -75,8 +56,8 @@ class SquadService(@Autowired val unitRepo: UnitRepo, @Autowired val playerRepo:
      * @param playerName String
      * @throws IncompatibleDataException if somehow player absent in database
      */
-    @Throws(IncompatibleDataException::class)
     @Transactional
+    @Throws(IncompatibleDataException::class)
     override fun deleteUnit(id: Long, playerName: String) {
         val playerId = playerRepo.getIdByName(playerName)
                 ?: throw IncompatibleDataException("Player with this name doesn't exist.")

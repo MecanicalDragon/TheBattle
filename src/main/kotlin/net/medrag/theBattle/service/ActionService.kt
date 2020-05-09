@@ -23,7 +23,6 @@ import kotlin.collections.HashMap
 /**
  * @author Stanislav Tretyakov
  * 21.01.2020
- * SimpleAction handler
  */
 @Service
 class ActionService(@Autowired private val battleService: BattleServiceApi,

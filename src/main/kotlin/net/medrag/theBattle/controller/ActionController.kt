@@ -12,10 +12,9 @@ import org.springframework.web.bind.annotation.*
 
 
 /**
+ * Controller for processing battle actions.
  * @author Stanislav Tretyakov
  * 15.01.2020
- *
- * Controller for handling battle actions
  */
 @RestController
 @RequestMapping("/action")

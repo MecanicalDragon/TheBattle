@@ -3,35 +3,25 @@ package net.medrag.theBattle.service.api
 import net.medrag.theBattle.model.IncompatibleDataException
 import net.medrag.theBattle.model.ValidationException
 import net.medrag.theBattle.model.classes.Unitt
-import net.medrag.theBattle.model.dto.ManagePageResponse
 import net.medrag.theBattle.model.dto.UnitDTO
 
 
 /**
+ * Unit-related operations.
  * @author Stanislav Tretyakov
  * 06.05.2020
  */
-interface SquadServiceApi {
+interface UnitServiceApi {
 
     /**
-     * Returns Player's hero pool or empty list
+     * Returns Player's hero pool or empty list.
      * @param playerName String
      * @return List<UnitDTO> player's heroes
      */
     fun getPool(playerName: String): List<UnitDTO>
 
     /**
-     * Retrieves player data for manage page start request
-     * @param playerName String
-     * @param pool List<UnitDTO> - list of free heroes
-     * @return ManagePageResponse - data for render manage page
-     * @throws IncompatibleDataException if playerName is incorrect
-     */
-    @Throws(IncompatibleDataException::class)
-    fun compileResponse(playerName: String, pool: List<UnitDTO>): ManagePageResponse
-
-    /**
-     * Adding new hero in pool
+     * Adding new hero into the pool.
      * @param pName String - player name
      * @param name String - hero name
      * @param type Type - unit type
@@ -43,7 +33,7 @@ interface SquadServiceApi {
     fun addNewUnit(pName: String, name: String, type: Unitt.Unit.Type): UnitDTO
 
     /**
-     * Removes unit
+     * Removes unit.
      * @param id Long - unit id
      * @param playerName String
      * @throws IncompatibleDataException if somehow player absent in database
