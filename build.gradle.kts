@@ -42,25 +42,19 @@ dependencies {
     testImplementation("org.springframework.security:spring-security-test")
 }
 
-tasks.flywayMigrate{
+tasks.flywayMigrate {
     url = "jdbc:h2:file:$rootDir/database/the_battle"
     user = "the_battle"
     password = "best_pw_ever"
 }
 
-tasks.register("buildResources") {
+tasks.register("buildFront") {
     group = "build"
     dependsOn("yarnInstall", "yarnRunBuild")
 }
 
-tasks.register<Exec>("yarnRunBuild") {
-    group = "yarn"
-    if (System.getProperty("os.name").toLowerCase().contains("windows")) {
-        commandLine("cmd", "/c", "yarn", "run", "build")
-    } else {
-        commandLine("yarn", "run", "build")
-    }
-    doLast {
+tasks.named("processResources") {
+    doFirst {
         copy {
             from("src/res")
             into("src/main/resources/static/res")
@@ -68,12 +62,33 @@ tasks.register<Exec>("yarnRunBuild") {
     }
 }
 
+tasks.named("build") {
+    dependsOn("flywayMigrate")
+}
+
+tasks.register("buildLocally") {
+    group = "build"
+    val buildFront = tasks["buildFront"]
+    val build = tasks["build"]
+    dependsOn(buildFront, build)
+    build.mustRunAfter(buildFront)
+}
+
+tasks.register<Exec>("yarnRunBuild") {
+    group = "yarn"
+    if (System.getProperty("os.name").toLowerCase().contains("windows")) {
+        commandLine("cmd", "/c", "npm", "run", "build-local")
+    } else {
+        commandLine("npm", "run", "build-local")
+    }
+}
+
 tasks.register<Exec>("yarnInstall") {
     group = "yarn"
     if (System.getProperty("os.name").toLowerCase().contains("windows")) {
-        commandLine("cmd", "/c", "yarn", "install")
+        commandLine("cmd", "/c", "npm", "install")
     } else {
-        commandLine("yarn", "install")
+        commandLine("npm", "install")
     }
 }
 
@@ -109,4 +124,3 @@ tasks.withType<KotlinCompile> {
         jvmTarget = "1.8"
     }
 }
-
